@@ -1,6 +1,7 @@
 // src/app/login/page.tsx
 "use client";
 
+import Cookies from 'js-cookie';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
@@ -16,17 +17,25 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+
   // Function Login จำลอง
-  const handleLogin = async (e: React.FormEvent) => {
+const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     // Simulate API Call (หน่วงเวลา 1.5 วิ)
     setTimeout(() => {
-      // Logic ตรวจสอบเบื้องต้น (ของจริงต้องยิง API)
+      // Logic ตรวจสอบเบื้องต้น
       if (username === 'admin' && password === '1234') {
-        router.push('/backoffice'); // ไปหน้า Dashboard (ซึ่งตอนนี้อยู่ใน (backoffice))
+        
+        // ✅ [เติมตรงนี้] สร้าง Cookie ชื่อ 'auth_token' (เปรียบเสมือนบัตรผ่าน)
+        // expires: 1 คืออยู่ได้ 1 วัน, path: '/' คือใช้ได้ทั้งเว็บ
+        Cookies.set('auth_token', 'mock-token-123456', { expires: 1, path: '/' });
+
+        // หลังจากได้บัตรแล้ว ค่อยเชิญไปหน้า Backoffice
+        router.push('/backoffice'); 
+        
       } else {
         setError('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
         setIsLoading(false);
