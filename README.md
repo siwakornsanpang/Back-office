@@ -5,6 +5,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 First, run the development server:
 
 ```bash
+
+ืnpm i lucide-react
+npm i -D @types/js-cookie 
+npm i js-cookie
+
 npm run dev
 # or
 yarn dev
