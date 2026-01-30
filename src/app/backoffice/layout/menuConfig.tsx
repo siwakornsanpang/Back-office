@@ -25,7 +25,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
     title: 'หน้าเว็บ',
     icon: <Globe size={20} />,
     submenu: [
-      { id: 'web-home', title: '1. หน้าแรก', href: '/module/web/home' },
+      { id: 'web-home', title: '1. หน้าแรก', href: '/backoffice/module/web/home' },
       { 
         id: 'web-about', 
         title: '2. เกี่ยวกับองค์กร',
@@ -57,7 +57,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
     id: 'pharmacy-regis',
     title: 'ทะเบียนเภสัช',
     icon: <Pill size={20} />,
-    href: '/module/register' 
+    href: '/backoffice/module/register' 
   },
 
   // --- Module อื่นๆ (Placeholder) ---
@@ -65,17 +65,17 @@ export const SIDEBAR_DATA: MenuItem[] = [
     id: 'module-hr', 
     title: 'E-Service', 
     icon: <Users size={20} />,
-    href:"/module/e-service"
+    href:"/backoffice/module/e-service"
   },
   { id: 'module-doc',
      title: 'การเงิน/ธุรกรรม', 
      icon: <FileText size={20} />, 
-     href: '/module/bill' 
+     href: '/backoffice/module/bill' 
     },
  
   { id: 'module-settings', 
     title: 'ตั้งค่าระบบ', 
     icon: <Settings size={20} />, 
-    href: '/module/setting'
+    href: '/backoffice/module/setting'
  },
 ];
