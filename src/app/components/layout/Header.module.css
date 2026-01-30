@@ -1,0 +1,66 @@
+/* src/components/layout/Header.module.css */
+
+.header {
+  width: 100%;
+  height: 60px; /* ความสูงมาตรฐาน Header */
+  background-color: #537547; /* สีน้ำเงิน Backoffice (เปลี่ยน code สีตามชอบได้) */
+  color: white;
+  display: flex;
+  justify-content: space-between; /* ดันซ้ายสุด กับ ขวาสุด */
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: fixed; /* ยึดติดด้านบนเสมอ */
+  top: 0;
+  left: 0;
+  z-index: 1000; /* ให้ลอยทับทุกอย่าง */
+}
+
+/* --- ฝั่งซ้าย --- */
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* ระยะห่างระหว่าง Logo กับปุ่มเมนู */
+}
+
+.brandBox {
+  display: flex;
+  flex-direction: column; /* เรียงชื่อกับ version เป็นแนวตั้ง */
+  line-height: 1; /* ลดช่องว่างระหว่างบรรทัด */
+}
+
+.brandName {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.version {
+  font-size: 10px;
+  opacity: 0.8; /* ให้สีจางลงนิดนึง */
+}
+
+/* --- ฝั่งขวา --- */
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* ระยะห่างระหว่างไอคอน */
+}
+
+/* --- ปุ่มไอคอนทั่วไป --- */
+.iconButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%; /* เวลา Hover จะเป็นวงกลม */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.iconButton:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* สีขาวจางๆ เวลาเอาเมาส์ชี้ */
+}

@@ -1,0 +1,126 @@
+/* src/components/layout/Sidebar.module.css */
+
+/* กล่อง Sidebar หลัก */
+.sidebar {
+  position: fixed;
+  top: 60px; /* เว้นที่ให้ Header */
+  left: 0;
+  width: 260px;
+  height: calc(100vh - 60px); /* สูงเต็มจอ ลบ Header */
+  background-color: rgb(220, 217, 217);
+  border-right: 1px solid #e5e7eb; /* เส้นขอบสีเทาจางๆ */
+  overflow-y: auto; /* ให้เลื่อนขึ้นลงได้ */
+  z-index: 40; /* ต่ำกว่า Header (50) */
+  padding-bottom: 40px;
+}
+
+/* หัวข้อหมวดหมู่ (Main Modules) */
+.sectionTitle {
+  font-size: 12px;
+  font-weight: bold;
+  color: #9ca3af; /* gray-400 */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* ข้อความเมื่อไม่มีสิทธิ์ */
+.noPermission {
+  text-align: center;
+  font-size: 14px;
+  color: #9ca3af;
+  margin-top: 40px;
+}
+
+/* --- ตัวเมนู (Menu Item) --- */
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* Font เริ่มต้น */
+  font-size: 14px; 
+  color: #374151; /* gray-700 */
+}
+
+/* เมนูหลัก (Level 0) ให้ตัวหนาหน่อย */
+.level0 {
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+/* เมนูย่อย (Level > 0) ให้ตัวบางลง */
+.levelDeep {
+  margin-top: 2px;
+  font-weight: 400;
+  font-size: 13px;
+}
+
+/* --- สถานะ Active / Hover --- */
+
+/* สถานะ Active (กำลังเลือกหน้านี้อยู่) */
+.active {
+  background-color: #eff6ff; /* blue-50 */
+  color: #2563eb; /* blue-600 */
+  border-right: 4px solid #2563eb; /* ขีดขวาสีน้ำเงิน */
+}
+
+/* สถานะปกติ (Inactive) แต่ Hover */
+.inactive:hover {
+  background-color: #f3f4f6; /* gray-100 */
+  color: #2563eb; /* blue-600 */
+}
+
+/* --- Elements ข้างใน --- */
+
+/* กล่องรวม Icon + Text */
+.labelContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+
+/* Icon (Level 0) */
+.icon {
+  color: #6b7280; /* gray-500 */
+}
+.active .icon {
+  color: #2563eb; /* เปลี่ยนสี Icon เมื่อ Active */
+}
+
+/* จุด Bullet (Level > 0) */
+.bullet {
+  min-width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #d1d5db; /* gray-300 */
+}
+.active .bullet {
+  background-color: #2563eb; /* เปลี่ยนสี Bullet เมื่อ Active */
+}
+
+/* Text ชื่อเมนู */
+.labelText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ลูกศรขวา/ลง */
+.chevron {
+  color: #9ca3af; /* gray-400 */
+}
+
+/* --- Submenu Wrapper --- */
+.submenuWrapper {
+  border-left: 1px solid #f3f4f6; /* เส้นโยงลงมา */
+  margin-left: 18px;
+  transition: all 0.3s;
+}
