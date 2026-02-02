@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { X } from 'lucide-react';
-import { Button } from '../../components/common/FormElements';
+import { Button } from './FormElements';
 
 interface ModalProps {
     isOpen: boolean;

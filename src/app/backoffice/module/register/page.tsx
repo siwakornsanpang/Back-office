@@ -2,9 +2,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { Search, Plus, Edit, Trash2, Map as MapIcon, Users, Filter } from 'lucide-react';
-import { Table, TableRow, TableCell } from '../../components/common/Table';
-import { Modal } from '../../components/common/Modal';
-import { Input, Select, Button, Badge } from '../../components/common/FormElements';
+import { Table, TableRow, TableCell } from '../../../components/common/Table';
+import { Modal } from '../../../components/common/Modal';
+import { Input, Select, Button, Badge } from '../../../components/common/FormElements';
 
 // Mock Data for Pharmacists
 const INITIAL_PHARMACISTS = [
