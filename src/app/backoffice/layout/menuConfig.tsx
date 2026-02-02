@@ -30,23 +30,28 @@ export const SIDEBAR_DATA: MenuItem[] = [
         id: 'web-about', 
         title: '2. เกี่ยวกับองค์กร',
         submenu: [
-           { id: 'web-about-history', title: 'ประวัติความเป็นมา', href: '/admin/web/about/history' },
-           { id: 'web-about-board', title: 'คณะกรรมการ', href: '/admin/web/about/board' },
+           { id: 'web-about-history', title: 'ทำเนียบสภา', href: '/backoffice/module/web/about/history' },
+           { id: 'web-about-board', title: 'กรรมการสภา', 
+            submenu :[
+              {id: 'web-about-board1', title:'กรรมการเลือกตั้ง',href:'/backoffice/module/web/about/council/elected'},
+              {id: 'web-about-board2', title:'กรรมการแต่งตั้ง', href:'/backoffice/module/web/about/council/appointed'}
+            ]
+            },
         ]
       },
-      { id: 'web-news', title: '3. ข่าวประชาสัมพันธ์', href: '/admin/web/news' },
-      { id: 'web-service', title: '4. บริการ', href: '/admin/web/service' },
-      { id: 'web-dept', title: '5. หน่วยงาน', href: '/admin/web/dept' },
+      { id: 'web-news', title: '3. ข่าวประชาสัมพันธ์', href :'/backoffice/module/web/news'},
+      { id: 'web-service', title: '4. บริการ', href: '/backoffice/module/web/service' },
+      { id: 'web-dept', title: '5. หน่วยงาน', href: '/backoffice/module/web/agency' },
       { 
         id: 'web-law', 
         title: '6. กฎหมาย',
         submenu: [
-           { id: 'web-law-1', title: 'กฎหมายแพ่ง', href: '/admin/web/law/civil' },
-           { id: 'web-law-2', title: 'กฎหมายอาญา', href: '/admin/web/law/criminal' },
-           { id: 'web-law-3', title: 'พรบ.ยา', href: '/admin/web/law/drug-act' },
-           { id: 'web-law-4', title: 'กฎกระทรวง', href: '/admin/web/law/ministerial' },
-           { id: 'web-law-5', title: 'ประกาศสภา', href: '/admin/web/law/council' },
-           { id: 'web-law-6', title: 'ระเบียบข้อบังคับ', href: '/admin/web/law/regulations' },
+           { id: 'web-law-1', title: 'กฎหมาย1', href: '/backoffice/module/web/law/law1' },
+           { id: 'web-law-2', title: 'กฎหมาย2', href: '/backoffice/module/web/law/law2' },
+           { id: 'web-law-3', title: 'กฎหมาย3', href: '/backoffice/module/web/law/law3' },
+           { id: 'web-law-4', title: 'กฎหมาย4', href: '/backoffice/module/web/law/law4' },
+           { id: 'web-law-5', title: 'กฎหมาย5', href: '/backoffice/module/web/law/law5' },
+           { id: 'web-law-6', title: 'กฎหมาย6', href: '/backoffice/module/web/law/law6' },
         ]
       },
     ]
@@ -78,4 +83,6 @@ export const SIDEBAR_DATA: MenuItem[] = [
     icon: <Settings size={20} />, 
     href: '/backoffice/module/setting'
  },
+ 
+
 ];
