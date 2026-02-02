@@ -85,7 +85,7 @@ function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
 
   const itemContent = (
     <div 
-      className={`${styles.menuItem} ${isActive ? styles.active : ''}`}
+      className={`${styles.menuItem} ${isActive ? styles.active : '' }`}
       style={{ paddingLeft }}
       onClick={handleClick}
     >

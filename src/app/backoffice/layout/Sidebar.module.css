@@ -45,12 +45,23 @@
   color: #6f7e0d;
 }
 
+.menuItem:hover .icon {
+  color: #6f7e0d; /* เปลี่ยนเป็นสีเดียวกับตัวหนังสือ */
+}
+
+.menuItem:hover .bulletIcon {
+  color: #6f7e0d;
+  opacity: 1;
+}
+
 /* --- Active State (ไฮไลท์สี) --- */
 .active {
   background-color: #eff6ff; /* สีฟ้าจางๆ (Blue-50) */
   color: #6f7e0d; /* สีตัวหนังสือฟ้าเข้ม (Blue-600) */
   font-weight: 600;
 }
+
+
 
 /* --- Icons & Text --- */
 .labelContainer {
@@ -68,6 +79,8 @@
   justify-content: center;
   min-width: 20px; /* ล็อคความกว้าง Icon ให้เท่ากัน */
 }
+
+
 
 .active .icon, 
 .iconActive {
