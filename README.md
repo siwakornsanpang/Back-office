@@ -7,8 +7,6 @@ First, run the development server:
 ```bash
 
 ืnpm i lucide-react
-npm i -D @types/js-cookie 
-npm i js-cookie
 
 npm run dev
 # or
