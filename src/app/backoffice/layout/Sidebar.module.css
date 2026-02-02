@@ -1,126 +1,200 @@
-/* src/components/layout/Sidebar.module.css */
-
-/* กล่อง Sidebar หลัก */
+/* Sidebar หลัก */
 .sidebar {
   position: fixed;
-  top: 60px; /* เว้นที่ให้ Header */
+  top: 60px; /* เว้น Header */
   left: 0;
   width: 260px;
-  height: calc(100vh - 60px); /* สูงเต็มจอ ลบ Header */
-  background-color: rgb(220, 217, 217);
-  border-right: 1px solid #e5e7eb; /* เส้นขอบสีเทาจางๆ */
-  overflow-y: auto; /* ให้เลื่อนขึ้นลงได้ */
-  z-index: 40; /* ต่ำกว่า Header (50) */
-  padding-bottom: 40px;
+  height: calc(100vh - 60px);
+  background:  #181824;
+  border-right: 1px solid #f1f5f9;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-/* หัวข้อหมวดหมู่ (Main Modules) */
-.sectionTitle {
-  font-size: 12px;
-  font-weight: bold;
-  color: #9ca3af; /* gray-400 */
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 16px;
-  padding-left: 8px;
-  padding-right: 8px;
+.sidebarContent {
+  padding: 16px 12px; /* ลด padding รอบนอกลงนิดหน่อย */
+  overflow-y: auto;
+  flex: 1;
 }
 
-/* ข้อความเมื่อไม่มีสิทธิ์ */
-.noPermission {
-  text-align: center;
-  font-size: 14px;
-  color: #9ca3af;
-  margin-top: 40px;
-}
-
-/* --- ตัวเมนู (Menu Item) --- */
+/* --- Menu Item (Design แบบ Pill) --- */
 .menuItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 12px;
+  /* padding-left คำนวณใน inline style */
   
-  /* Font เริ่มต้น */
-  font-size: 14px; 
-  color: #374151; /* gray-700 */
-}
-
-/* เมนูหลัก (Level 0) ให้ตัวหนาหน่อย */
-.level0 {
-  margin-bottom: 4px;
+  margin-bottom: 4px; /* ระยะห่างระหว่างบรรทัด */
+  border-radius: 8px; /* มุมมนแบบ Pill */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  color: #ffffff; /* สีเทาเข้ม (Slate-500) */
+  font-size: 14px;
   font-weight: 500;
+  border: 1px solid transparent; /* กันกระตุกตอน hover */
 }
 
-/* เมนูย่อย (Level > 0) ให้ตัวบางลง */
-.levelDeep {
-  margin-top: 2px;
-  font-weight: 400;
-  font-size: 13px;
+/* Hover Effect */
+.menuItem:hover {
+  background-color: #f8fafc; /* สีเทาจางๆ */
+  color: #6f7e0d;
 }
 
-/* --- สถานะ Active / Hover --- */
-
-/* สถานะ Active (กำลังเลือกหน้านี้อยู่) */
+/* --- Active State (ไฮไลท์สี) --- */
 .active {
-  background-color: #eff6ff; /* blue-50 */
-  color: #2563eb; /* blue-600 */
-  border-right: 4px solid #2563eb; /* ขีดขวาสีน้ำเงิน */
+  background-color: #eff6ff; /* สีฟ้าจางๆ (Blue-50) */
+  color: #6f7e0d; /* สีตัวหนังสือฟ้าเข้ม (Blue-600) */
+  font-weight: 600;
 }
 
-/* สถานะปกติ (Inactive) แต่ Hover */
-.inactive:hover {
-  background-color: #f3f4f6; /* gray-100 */
-  color: #2563eb; /* blue-600 */
-}
-
-/* --- Elements ข้างใน --- */
-
-/* กล่องรวม Icon + Text */
+/* --- Icons & Text --- */
 .labelContainer {
   display: flex;
   align-items: center;
+  gap: 10px; /* ระยะห่าง Icon กับ Text */
+  overflow: hidden; /* สำคัญ: กัน Text ทะลุ */
+  flex: 1;
+}
+
+.icon {
+  color: #ffffff; /* Icon ปกติสีเทาอ่อน */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px; /* ล็อคความกว้าง Icon ให้เท่ากัน */
+}
+
+.active .icon, 
+.iconActive {
+  color: #6f7e0d; /* Icon Active สีฟ้า */
+}
+
+/* จุด Bullet เล็กๆ สำหรับเมนูย่อย */
+.bulletIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  color: #cbd5e1; /* สีเทาจาง */
+  opacity: 0.6;
+}
+.active .bulletIcon {
+  color: #6f7e0d;
+  opacity: 1;
+}
+
+/* จัดการ Text ยาวๆ */
+.labelText {
+  white-space: nowrap;      /* ห้ามขึ้นบรรทัดใหม่ */
+  overflow: hidden;         /* ซ่อนส่วนเกิน */
+  text-overflow: ellipsis;  /* ใส่ ... ต่อท้าย */
+  width: 100%;
+}
+
+/* ลูกศรขวาสุด */
+.chevron {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  min-width: 16px;
+}
+
+/* --- Submenu Animation --- */
+.submenuContainer {
+  /* ไม่ต้องมีเส้นขีดด้านซ้ายแล้ว ให้ดู Clean แบบ AnyMate */
+  /* ถ้าอยากได้เส้นบางๆ ให้ uncomment บรรทัดล่าง */
+  /* border-left: 1px solid #f1f5f9; margin-left: 20px; */
+  
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar สวยๆ (Webkit) */
+.sidebarContent::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebarContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebarContent::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+
+.sidebarFooter {
+  padding: 8px;
+  border-top: -1px solid #f1f5f9;
+  background-color: #ffffff;
+}
+
+
+.userProfile {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  padding: 8px;
+  border-radius: 12px;
+  transition: background-color 0.2s;
+}
+
+/* Avatar วงกลม */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* ชื่อและตำแหน่ง */
+.userInfo {
+  flex: 1;
   overflow: hidden;
 }
 
-/* Icon (Level 0) */
-.icon {
-  color: #6b7280; /* gray-500 */
-}
-.active .icon {
-  color: #2563eb; /* เปลี่ยนสี Icon เมื่อ Active */
-}
-
-/* จุด Bullet (Level > 0) */
-.bullet {
-  min-width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #d1d5db; /* gray-300 */
-}
-.active .bullet {
-  background-color: #2563eb; /* เปลี่ยนสี Bullet เมื่อ Active */
-}
-
-/* Text ชื่อเมนู */
-.labelText {
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ลูกศรขวา/ลง */
-.chevron {
-  color: #9ca3af; /* gray-400 */
+.userRole {
+  font-size: 12px;
+  color: #94a3b8;
 }
 
-/* --- Submenu Wrapper --- */
-.submenuWrapper {
-  border-left: 1px solid #f3f4f6; /* เส้นโยงลงมา */
-  margin-left: 18px;
-  transition: all 0.3s;
+/* ปุ่ม Logout */
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Hover แล้วเป็นสีแดง (สื่อความหมายว่าออกจากระบบ) */
+.logoutBtn:hover {
+  background-color: #fee2e2; /* red-100 */
+  color: #ef4444; /* red-500 */
 }

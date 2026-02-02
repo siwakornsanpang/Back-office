@@ -25,10 +25,10 @@ export const SIDEBAR_DATA: MenuItem[] = [
     title: 'หน้าเว็บ',
     icon: <Globe size={20} />,
     submenu: [
-      { id: 'web-home', title: '1. หน้าแรก', href: '/backoffice/module/web/home' },
+      { id: 'web-home', title: 'หน้าแรก', href: '/backoffice/module/web/home' },
       { 
         id: 'web-about', 
-        title: '2. เกี่ยวกับองค์กร',
+        title: 'เกี่ยวกับองค์กร',
         submenu: [
            { id: 'web-about-history', title: 'ทำเนียบสภา', href: '/backoffice/module/web/about/history' },
            { id: 'web-about-board', title: 'กรรมการสภา', 
@@ -39,12 +39,12 @@ export const SIDEBAR_DATA: MenuItem[] = [
             },
         ]
       },
-      { id: 'web-news', title: '3. ข่าวประชาสัมพันธ์', href :'/backoffice/module/web/news'},
-      { id: 'web-service', title: '4. บริการ', href: '/backoffice/module/web/service' },
-      { id: 'web-dept', title: '5. หน่วยงาน', href: '/backoffice/module/web/agency' },
+      { id: 'web-news', title: 'ข่าวประชาสัมพันธ์', href :'/backoffice/module/web/news'},
+      { id: 'web-service', title: 'บริการ', href: '/backoffice/module/web/service' },
+      { id: 'web-dept', title: 'หน่วยงาน', href: '/backoffice/module/web/agency' },
       { 
         id: 'web-law', 
-        title: '6. กฎหมาย',
+        title: 'กฎหมาย',
         submenu: [
            { id: 'web-law-1', title: 'กฎหมาย1', href: '/backoffice/module/web/law/law1' },
            { id: 'web-law-2', title: 'กฎหมาย2', href: '/backoffice/module/web/law/law2' },

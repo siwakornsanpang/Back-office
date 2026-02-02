@@ -1,41 +1,53 @@
-import type { Metadata } from "next";
-// import fonts หรือ css อื่นๆ ตามเดิมของคุณ
+"use client"; // 👈 1. ต้องประกาศว่าเป็น Client Component
 
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
+import Header from './layout/Header';// ตรวจสอบ path ให้ถูก
+import Sidebar from './layout/Sidebar';// ตรวจสอบ path ให้ถูก
 
-// Import Header และ Sidebar ของคุณ
-import Header from "./layout/Header";
-import Sidebar from "./layout/Sidebar";
-
-export const metadata: Metadata = {
-  title: "BackOffice System",
-  description: "Back office management system",
-};
-
-export default function RootLayout({
+export default function BackOfficeLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  // 🛡️ 2. ระบบ "ยามเฝ้าประตู" (Auth Guard)
+  // ใครไม่มี Cookie 'auth_token' จะถูกดีดกลับไปหน้า Login ทันที
+  useEffect(() => {
+    const token = Cookies.get('auth_token');
+    
+    if (!token) {
+      // ถ้าไม่มีตั๋ว ให้ดีดกลับ Login
+      router.replace('/login');
+    } else {
+      // ถ้ามีตั๋ว อนุญาตให้แสดงเนื้อหา
+      setIsAuthorized(true);
+    }
+  }, [router]);
+
+  // ถ้ายังตรวจสอบไม่เสร็จ (หรือไม่มีสิทธิ์) ให้โชว์หน้าจอว่างๆ หรือ Loading ไปก่อน
+  // เพื่อกันไม่ให้เห็นหน้า Backoffice แวบนึง
+  if (!isAuthorized) {
+    return null; // หรือใส่ <div className="p-10 text-center">Checking permission...</div>
+  }
+
   return (
-    <html lang="th">
-      <body className="bg-[#f3f4f6] min-h-screen"> {/* ใส่สีพื้นหลังรวมตรงนี้ */}
-        
-        {/* 1. ส่วนที่ลอยอยู่ (Fixed Elements) */}
-        <Header/>
-        <Sidebar/>
+    <div className="bg-[#f3f4f6] min-h-screen font-sans">
+      
+      {/* ส่วน Fixed */}
+      <Header />
+      <Sidebar />
 
-        {/* 2. ส่วนกล่องรับเนื้อหา (Main Content Wrapper) */}
-        {/* ต้องดันเนื้อหาลง (pt) และดันไปขวา (pl) ให้พ้นแนว Header/Sidebar */}
-        <main 
-          className="pt-[60px] pl-[260px]" // 🔥 หัวใจสำคัญอยู่ตรงนี้ครับ
-        >
-          {/* ใส่ padding เพิ่มอีกนิดหน่อยเพื่อให้เนื้อหาไม่ชิดขอบจนเกินไป */}
-          <div className="p-6">
-            {children}
-          </div>
-        </main>
+      {/* ส่วนเนื้อหาหลัก */}
+      <main className="pt-[60px] pl-[260px] transition-all duration-300">
+        <div className="p-6">
+          {children}
+        </div>
+      </main>
 
-      </body>
-    </html>
+    </div>
   );
 }

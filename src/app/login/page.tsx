@@ -5,7 +5,10 @@ import Cookies from 'js-cookie';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
-import Image from 'next/image'; // เผื่อใส่ Logo
+// import Image from 'next/image'; 
+
+// ✅ Import Styles
+import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,9 +20,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-
   // Function Login จำลอง
-const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -29,11 +31,10 @@ const handleLogin = async (e: React.FormEvent) => {
       // Logic ตรวจสอบเบื้องต้น
       if (username === 'admin' && password === '1234') {
         
-        // ✅ [เติมตรงนี้] สร้าง Cookie ชื่อ 'auth_token' (เปรียบเสมือนบัตรผ่าน)
-        // expires: 1 คืออยู่ได้ 1 วัน, path: '/' คือใช้ได้ทั้งเว็บ
+        // ✅ สร้าง Cookie
         Cookies.set('auth_token', 'mock-token-123456', { expires: 1, path: '/' });
 
-        // หลังจากได้บัตรแล้ว ค่อยเชิญไปหน้า Backoffice
+        // ไปหน้า Backoffice
         router.push('/backoffice'); 
         
       } else {
@@ -44,36 +45,35 @@ const handleLogin = async (e: React.FormEvent) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-900 p-4">
+    <div className={styles.container}>
       
       {/* Login Card */}
-      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+      <div className={styles.card}>
         
-        {/* Header ส่วนหัวการ์ด */}
-        <div className="bg-gray-50 p-8 text-center border-b border-gray-100">
-            {/* ใส่ Logo ตรงนี้ได้ */}
-            <div className="w-16 h-16 bg-blue-600 rounded-xl mx-auto flex items-center justify-center mb-4 text-white font-bold text-2xl shadow-lg">
+        {/* Header */}
+        <div className={styles.header}>
+            <div className={styles.logoBox}>
                 B
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">ยินดีต้อนรับ</h2>
-            <p className="text-gray-500 text-sm mt-1">เข้าสู่ระบบ BackOffice Management</p>
+            <h2 className={styles.title}>ยินดีต้อนรับ</h2>
+            <p className={styles.subtitle}>เข้าสู่ระบบ BackOffice Management</p>
         </div>
 
         {/* Form Input */}
-        <div className="p-8">
-          <form onSubmit={handleLogin} className="space-y-5">
+        <div className={styles.formContainer}>
+          <form onSubmit={handleLogin} className={styles.form}>
             
             {/* Username Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้งาน</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User size={18} className="text-gray-400" />
+            <div className={styles.formGroup}>
+              <label className={styles.label}>ชื่อผู้ใช้งาน</label>
+              <div className={styles.inputWrapper}>
+                <div className={styles.inputIcon}>
+                  <User size={18} />
                 </div>
                 <input
                   type="text"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
+                  className={styles.inputField}
                   placeholder="กรอกชื่อผู้ใช้งาน"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -82,16 +82,16 @@ const handleLogin = async (e: React.FormEvent) => {
             </div>
 
             {/* Password Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock size={18} className="text-gray-400" />
+            <div className={styles.formGroup}>
+              <label className={styles.label}>รหัสผ่าน</label>
+              <div className={styles.inputWrapper}>
+                <div className={styles.inputIcon}>
+                  <Lock size={18} />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   required
-                  className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
+                  className={`${styles.inputField} pr-10`} /* pr-10 เผื่อที่ให้ปุ่มตา */
                   placeholder="กรอกรหัสผ่าน"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -100,7 +100,7 @@ const handleLogin = async (e: React.FormEvent) => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
+                  className={styles.togglePassword}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -108,19 +108,19 @@ const handleLogin = async (e: React.FormEvent) => {
             </div>
 
             {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                <span className="ml-2 text-gray-600">จำรหัสผ่าน</span>
+            <div className={styles.optionsRow}>
+              <label className={styles.checkboxLabel}>
+                <input type="checkbox" className={styles.checkbox} />
+                <span>จำรหัสผ่าน</span>
               </label>
-              <a href="#" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+              <a href="#" className={styles.link}>
                 ลืมรหัสผ่าน?
               </a>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg flex items-center gap-2">
+              <div className={styles.errorMessage}>
                  <span>⚠️ {error}</span>
               </div>
             )}
@@ -129,10 +129,7 @@ const handleLogin = async (e: React.FormEvent) => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`
-                w-full py-2.5 rounded-lg text-white font-medium shadow-md transition-all flex items-center justify-center gap-2
-                ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'}
-              `}
+              className={`${styles.submitButton} ${isLoading ? styles.loadingBtn : styles.activeBtn}`}
             >
               {isLoading ? (
                 <>กำลังเข้าสู่ระบบ...</> 
@@ -145,8 +142,8 @@ const handleLogin = async (e: React.FormEvent) => {
         </div>
         
         {/* Footer */}
-        <div className="bg-gray-50 p-4 text-center text-xs text-gray-400 border-t border-gray-100">
-         
+        <div className={styles.footer}>
+         &copy; 2024 Your Company Name. All rights reserved.
         </div>
 
       </div>
