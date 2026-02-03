@@ -6,9 +6,8 @@ First, run the development server:
 
 ```bash
 
-ืnpm i lucide-react
-npm i -D @types/js-cookie 
-npm i js-cookie
+npm i drizzle-orm js-cookie lucide-react next pg react react-dom
+npm i -D @tailwindcss/postcss @types/js-cookie @types/node @types/pg @types/react @types/react-dom drizzle-kit eslint eslint-config-next tailwindcss typescript
 
 npm run dev
 # or
