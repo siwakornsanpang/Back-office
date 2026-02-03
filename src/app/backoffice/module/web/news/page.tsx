@@ -2,9 +2,16 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { Badge, Button, Select } from "@/app/components/common/FormElements";
+import { Badge, Button, Input, Select } from "@/app/components/common/FormElements";
+import { Modal } from "@/app/components/common/Modal";
 import { Table, TableCell, TableRow } from "@/app/components/common/Table";
-import { loadNews, type NewsItem } from "./newsStorage";
+import { createNews, deleteNews, loadNews, updateNews, type NewsItem, type NewsStatus } from "./newsApi";
+import styles from "./news.module.css";
+
+const STATUS_OPTIONS: { label: string; value: NewsStatus }[] = [
+  { label: "ร่าง", value: "draft" },
+  { label: "เผยแพร่", value: "published" },
+];
 
 function formatDateTime(iso?: string) {
   if (!iso) return "-";
@@ -25,10 +32,102 @@ export default function News() {
   const [items, setItems] = useState<NewsItem[]>([]);
   const [query, setQuery] = useState("");
   const [yearFilter, setYearFilter] = useState<string>("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formTitle, setFormTitle] = useState("");
+  const [formContent, setFormContent] = useState("");
+  const [formYear, setFormYear] = useState(String(new Date().getFullYear()));
+  const [formOrder, setFormOrder] = useState("1");
+  const [formStatus, setFormStatus] = useState<NewsStatus>("draft");
+  const [errors, setErrors] = useState<{ title?: string; content?: string; year?: string; order?: string }>({});
 
   useEffect(() => {
-    setItems(loadNews());
+    setError(null);
+    loadNews()
+      .then(setItems)
+      .catch((e) => setError(e instanceof Error ? e.message : "โหลดข่าวไม่สำเร็จ"))
+      .finally(() => setIsLoading(false));
   }, []);
+
+  const openCreate = () => {
+    setEditingId(null);
+    setFormTitle("");
+    setFormContent("");
+    setFormYear(String(new Date().getFullYear()));
+    setFormOrder("1");
+    setFormStatus("draft");
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const openEdit = (item: NewsItem) => {
+    setEditingId(item.id);
+    setFormTitle(item.title);
+    setFormContent(item.content);
+    setFormYear(String(item.year));
+    setFormOrder(String(item.order));
+    setFormStatus(item.status);
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => setIsModalOpen(false);
+
+  const validate = (): boolean => {
+    const next: typeof errors = {};
+    if (!formTitle.trim()) next.title = "กรุณากรอกหัวข้อ";
+    if (!formContent.trim()) next.content = "กรุณากรอกเนื้อหา";
+    const y = Number(formYear);
+    if (Number.isNaN(y) || y < 2000 || y > 2100) next.year = "กรุณากรอกปีที่ถูกต้อง (2000–2100)";
+    const o = Number(formOrder);
+    if (Number.isNaN(o) || o < 1) next.order = "กรุณากรอกลำดับเป็นตัวเลข (อย่างน้อย 1)";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+    const year = Number(formYear);
+    const order = Number(formOrder);
+    try {
+      if (editingId) {
+        await updateNews(editingId, {
+          title: formTitle.trim(),
+          content: formContent.trim(),
+          year,
+          order,
+          status: formStatus,
+        });
+      } else {
+        await createNews({
+          title: formTitle.trim(),
+          content: formContent.trim(),
+          year,
+          order,
+          status: formStatus,
+        });
+      }
+      const list = await loadNews();
+      setItems(list);
+      closeModal();
+    } catch (e) {
+      setErrors({ title: e instanceof Error ? e.message : "บันทึกไม่สำเร็จ" });
+    }
+  };
+
+  const handleDelete = async (item: NewsItem) => {
+    if (!window.confirm(`ยืนยันลบข่าว "${item.title}" ?`)) return;
+    try {
+      await deleteNews(item.id);
+      const list = await loadNews();
+      setItems(list);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "ลบไม่สำเร็จ");
+    }
+  };
 
   const yearOptions = useMemo(() => {
     const years = Array.from(new Set(items.map((it) => it.year)))
@@ -56,68 +155,72 @@ export default function News() {
   const headers = ["หัวข้อ", "ปี", "ลำดับ", "สถานะ", "อัปเดตล่าสุด", "จัดการ"];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className={styles.root}>
+      <div className={styles.headerRow}>
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">ข่าวประชาสัมพันธ์</h1>
-          <p className="text-sm text-gray-500">จัดการข่าว (MVP: แสดงรายการจาก localStorage)</p>
+          <h1 className={styles.title}>ข่าวประชาสัมพันธ์</h1>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative w-full sm:w-[320px]">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+        <div className={styles.toolbar}>
+          <div className={styles.searchWrap}>
+            <div className={styles.searchIcon}>
               <Search size={18} />
             </div>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="ค้นหาหัวข้อข่าว"
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white text-gray-800 placeholder:text-gray-400"
+              className={styles.searchInput}
             />
           </div>
 
-          <div className="w-[160px]">
+          <div className={styles.yearSelectWrap}>
             <Select
-              label="ปี"
               value={yearFilter}
               onChange={(e) => setYearFilter(e.target.value)}
               options={yearOptions}
             />
           </div>
 
-          <Button variant="secondary" disabled>
-            เพิ่มข่าว (สเต็ปถัดไป)
+          <Button variant="primary" onClick={openCreate}>
+            เพิ่มข่าว
           </Button>
         </div>
       </div>
 
-      <Table headers={headers} isLoading={false}>
-        {filtered.length === 0 ? (
+      {error && (
+        <div className={styles.errorBanner}>
+          {error}
+        </div>
+      )}
+
+      <Table headers={headers} isLoading={isLoading}>
+        {filtered.length === 0 && !isLoading ? (
           <TableRow>
-            <TableCell colSpan={headers.length} className="py-10 text-center text-gray-500">
+            <TableCell colSpan={headers.length} className={styles.emptyCell}>
               ไม่พบรายการข่าว
             </TableCell>
           </TableRow>
         ) : (
           filtered.map((it) => (
             <TableRow key={it.id}>
-              <TableCell className="font-medium text-gray-800">{it.title}</TableCell>
-              <TableCell className="text-gray-700">{it.year}</TableCell>
-              <TableCell className="text-gray-700">{it.order}</TableCell>
+              <TableCell className={styles.cellTitle}>{it.title}</TableCell>
+              <TableCell className={styles.cellMuted}>{it.year}</TableCell>
+              <TableCell className={styles.cellMuted}>{it.order}</TableCell>
               <TableCell>
                 <Badge color={it.status === "published" ? "green" : "gray"}>
                   {it.status === "published" ? "เผยแพร่" : "ร่าง"}
                 </Badge>
               </TableCell>
-              <TableCell className="text-gray-600">
+              <TableCell className={styles.cellSecondary}>
                 {formatDateTime(it.updatedAt ?? it.createdAt)}
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button variant="secondary" disabled>
+                <div className={styles.actions}>
+                  <Button variant="secondary" onClick={() => openEdit(it)}>
                     แก้ไข
                   </Button>
-                  <Button variant="danger" disabled>
+                  <Button variant="danger" onClick={() => handleDelete(it)}>
                     ลบ
                   </Button>
                 </div>
@@ -126,6 +229,78 @@ export default function News() {
           ))
         )}
       </Table>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingId ? "แก้ไขข่าว" : "เพิ่มข่าว"}
+      >
+        <div className={styles.form}>
+          <div className={styles.formRow}>
+            <div className={styles.formFull}>
+              <Input
+                label="หัวข้อ"
+                value={formTitle}
+                onChange={(e) => setFormTitle(e.target.value)}
+                placeholder="เช่น ประกาศเปิดรับสมัคร"
+              />
+              {errors.title && <p className={styles.error}>{errors.title}</p>}
+            </div>
+          </div>
+          <div className={styles.formRow}>
+            <div className={styles.formFull}>
+              <label className={styles.label}>เนื้อหา</label>
+              <textarea
+                value={formContent}
+                onChange={(e) => setFormContent(e.target.value)}
+                placeholder="รายละเอียดข่าว"
+                rows={4}
+                className={styles.textarea}
+              />
+              {errors.content && <p className={styles.error}>{errors.content}</p>}
+            </div>
+          </div>
+          <div className={styles.formRow}>
+            <div className={styles.formHalf}>
+              <Input
+                label="ปีที่ประกาศ"
+                type="number"
+                min={2000}
+                max={2100}
+                value={formYear}
+                onChange={(e) => setFormYear(e.target.value)}
+              />
+              {errors.year && <p className={styles.error}>{errors.year}</p>}
+            </div>
+            <div className={styles.formHalf}>
+              <Input
+                label="ลำดับประกาศ"
+                type="number"
+                min={1}
+                value={formOrder}
+                onChange={(e) => setFormOrder(e.target.value)}
+              />
+              {errors.order && <p className={styles.error}>{errors.order}</p>}
+            </div>
+          </div>
+          <div className={styles.formRow}>
+            <Select
+              label="สถานะ"
+              value={formStatus}
+              onChange={(e) => setFormStatus(e.target.value as NewsStatus)}
+              options={STATUS_OPTIONS}
+            />
+          </div>
+          <div className={styles.formActions}>
+            <Button variant="secondary" onClick={closeModal}>
+              ยกเลิก
+            </Button>
+            <Button onClick={handleSubmit}>
+              {editingId ? "บันทึกการแก้ไข" : "เพิ่มข่าว"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
