@@ -78,6 +78,15 @@
   width: 160px;
 }
 
+.errorBanner {
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
 .emptyCell {
   padding-top: 2.5rem;
   padding-bottom: 2.5rem;

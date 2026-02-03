@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { Badge, Button, Input, Select } from "@/app/components/common/FormElements";
 import { Modal } from "@/app/components/common/Modal";
 import { Table, TableCell, TableRow } from "@/app/components/common/Table";
-import { createNews, deleteNews, loadNews, updateNews, type NewsItem, type NewsStatus } from "./newsStorage";
+import { createNews, deleteNews, loadNews, updateNews, type NewsItem, type NewsStatus } from "./newsApi";
 import styles from "./news.module.css";
 
 const STATUS_OPTIONS: { label: string; value: NewsStatus }[] = [
@@ -32,6 +32,8 @@ export default function News() {
   const [items, setItems] = useState<NewsItem[]>([]);
   const [query, setQuery] = useState("");
   const [yearFilter, setYearFilter] = useState<string>("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -43,7 +45,11 @@ export default function News() {
   const [errors, setErrors] = useState<{ title?: string; content?: string; year?: string; order?: string }>({});
 
   useEffect(() => {
-    setItems(loadNews());
+    setError(null);
+    loadNews()
+      .then(setItems)
+      .catch((e) => setError(e instanceof Error ? e.message : "โหลดข่าวไม่สำเร็จ"))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const openCreate = () => {
@@ -82,23 +88,45 @@ export default function News() {
     return Object.keys(next).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
     const year = Number(formYear);
     const order = Number(formOrder);
-    if (editingId) {
-      updateNews(editingId, { title: formTitle.trim(), content: formContent.trim(), year, order, status: formStatus });
-    } else {
-      createNews({ title: formTitle.trim(), content: formContent.trim(), year, order, status: formStatus });
+    try {
+      if (editingId) {
+        await updateNews(editingId, {
+          title: formTitle.trim(),
+          content: formContent.trim(),
+          year,
+          order,
+          status: formStatus,
+        });
+      } else {
+        await createNews({
+          title: formTitle.trim(),
+          content: formContent.trim(),
+          year,
+          order,
+          status: formStatus,
+        });
+      }
+      const list = await loadNews();
+      setItems(list);
+      closeModal();
+    } catch (e) {
+      setErrors({ title: e instanceof Error ? e.message : "บันทึกไม่สำเร็จ" });
     }
-    setItems(loadNews());
-    closeModal();
   };
 
-  const handleDelete = (item: NewsItem) => {
+  const handleDelete = async (item: NewsItem) => {
     if (!window.confirm(`ยืนยันลบข่าว "${item.title}" ?`)) return;
-    deleteNews(item.id);
-    setItems(loadNews());
+    try {
+      await deleteNews(item.id);
+      const list = await loadNews();
+      setItems(list);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "ลบไม่สำเร็จ");
+    }
   };
 
   const yearOptions = useMemo(() => {
@@ -160,8 +188,14 @@ export default function News() {
         </div>
       </div>
 
-      <Table headers={headers} isLoading={false}>
-        {filtered.length === 0 ? (
+      {error && (
+        <div className={styles.errorBanner}>
+          {error}
+        </div>
+      )}
+
+      <Table headers={headers} isLoading={isLoading}>
+        {filtered.length === 0 && !isLoading ? (
           <TableRow>
             <TableCell colSpan={headers.length} className={styles.emptyCell}>
               ไม่พบรายการข่าว
