@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { Badge, Button, Input, Select } from "@/app/components/common/FormElements";
 import { Modal } from "@/app/components/common/Modal";
 import { Table, TableCell, TableRow } from "@/app/components/common/Table";
-import { createNews, loadNews, updateNews, type NewsItem, type NewsStatus } from "./newsStorage";
+import { createNews, deleteNews, loadNews, updateNews, type NewsItem, type NewsStatus } from "./newsStorage";
 import styles from "./news.module.css";
 
 const STATUS_OPTIONS: { label: string; value: NewsStatus }[] = [
@@ -95,6 +95,12 @@ export default function News() {
     closeModal();
   };
 
+  const handleDelete = (item: NewsItem) => {
+    if (!window.confirm(`ยืนยันลบข่าว "${item.title}" ?`)) return;
+    deleteNews(item.id);
+    setItems(loadNews());
+  };
+
   const yearOptions = useMemo(() => {
     const years = Array.from(new Set(items.map((it) => it.year)))
       .sort((a, b) => b - a)
@@ -180,7 +186,7 @@ export default function News() {
                   <Button variant="secondary" onClick={() => openEdit(it)}>
                     แก้ไข
                   </Button>
-                  <Button variant="danger" disabled>
+                  <Button variant="danger" onClick={() => handleDelete(it)}>
                     ลบ
                   </Button>
                 </div>
