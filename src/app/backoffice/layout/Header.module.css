@@ -3,7 +3,7 @@
 .header {
   width: 100%;
   height: 60px; /* ความสูงมาตรฐาน Header */
-   background: linear-gradient(to bottom right, #2563eb, #312e81); /* สีน้ำเงิน Backoffice (เปลี่ยน code สีตามชอบได้) */
+   background: #2196f3; /* สีน้ำเงิน Backoffice (เปลี่ยน code สีตามชอบได้) */
   color: rgb(0, 0, 0);
   display: flex;
   justify-content: space-between; /* ดันซ้ายสุด กับ ขวาสุด */

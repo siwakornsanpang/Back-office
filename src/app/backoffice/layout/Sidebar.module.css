@@ -5,7 +5,7 @@
   left: 0;
   width: 260px;
   height: calc(100vh - 60px);
-  background:  #181824;
+  background:  #39444d;
   border-right: 1px solid #f1f5f9;
   z-index: 40;
   display: flex;
@@ -119,12 +119,27 @@
 
 /* --- Submenu Animation --- */
 .submenuContainer {
-  /* ไม่ต้องมีเส้นขีดด้านซ้ายแล้ว ให้ดู Clean แบบ AnyMate */
-  /* ถ้าอยากได้เส้นบางๆ ให้ uncomment บรรทัดล่าง */
-  /* border-left: 1px solid #f1f5f9; margin-left: 20px; */
-  
   display: flex;
   flex-direction: column;
+  
+  /* 1. สร้างเส้นแนวตั้งสีเทาจางๆ ทางซ้าย */
+  border-left: 1px solid #475569; 
+  
+  /* 2. ดันทั้งก้อนให้ขยับเข้าไปทางขวา (Indent) */
+  margin-left: 22px; /* ปรับเลขนี้เพื่อให้เส้นตรงกับ Icon ของแม่ */
+  
+  /* 3. เว้นระยะระหว่างเส้นกับตัวหนังสือลูก */
+  padding-left: 4px; 
+}
+
+.submenuContainer .menuItem {
+  color: #e7e9eb; /* สีเทาอ่อน */
+  font-size: 13px; /* ตัวเล็กลงนิดนึง */
+}
+
+.submenuContainer .menuItem:hover,
+.submenuContainer .menuItem.active {
+  color: #252323;
 }
 
 /* Scrollbar สวยๆ (Webkit) */
@@ -210,4 +225,40 @@
 .logoutBtn:hover {
   background-color: #fee2e2; /* red-100 */
   color: #ef4444; /* red-500 */
+}
+
+
+.sectionHeader {
+  padding: 24px 12px 8px 12px; /* เว้นระยะห่างด้านบนเยอะหน่อย */
+  font-size: 12px;
+  font-weight: 700;
+  color: #dfe2e6; /* สีเทาเข้ม Slate-500 */
+  text-transform: uppercase; /* บังคับตัวพิมพ์ใหญ่ */
+  letter-spacing: 0.05em; /* ระยะห่างตัวอักษร */
+  pointer-events: none; /* ห้ามคลิก */
+}
+
+
+/* src/components/Sidebar.module.css */
+
+/* ... (โค้ดเดิมด้านบน) ... */
+
+
+/* 🔥 เพิ่มคลาสนี้: สำหรับก้อนเมนูที่ "เปิดอยู่" (Expanded) */
+.expandedGroup {
+  background-color: #283038; /* สีเข้มกว่าพื้นหลังหลัก (ดูเป็นหลุมลงไป) */
+  margin-bottom: 4px; /* เว้นระยะห่างจากเมนูก้อนอื่น */
+  padding-bottom: 8px; /* เว้นระยะด้านล่างนิดนึงให้สวย */
+  border-radius: 8px;
+}
+
+/* ลบ margin-bottom ของตัวลูกข้างใน เพื่อให้สีพื้นหลังเชื่อมกันสนิท */
+.expandedGroup .menuItem {
+  margin-bottom: 0; 
+  border-radius: 8; /* ทำให้เป็นสี่เหลี่ยมเต็มๆ (หรือจะคงมนไว้ก็ได้แล้วแต่ชอบ) */
+}
+
+/* ถ้าอยากให้หัวข้อแม่ (ตัวบนสุดของกลุ่ม) ยังดูมนๆ อยู่ */
+.expandedGroup .menuItem:first-child {
+ 
 }

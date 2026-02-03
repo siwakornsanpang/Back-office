@@ -67,6 +67,20 @@ export default function Sidebar() {
 // Sub Component
 // =========================================================
 function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
+  
+
+
+if (item.isHeader) {
+    return (
+      <div className={styles.sectionHeader}>
+        {item.title}
+      </div>
+    );
+  }
+
+
+  
+
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname(); 
 
@@ -77,7 +91,7 @@ function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
   // ✅ ปรับสูตรคำนวณระยะห่างใหม่ (ลดจาก 16 เหลือ 10 หรือ 8)
   // Level 0 = 12px
   // Level 1+ = ขยับทีละ 10px พอ (ประหยัดที่)
-  const paddingLeft = level === 0 ? '16px' : `${(level * 10) + 16}px`;
+  const paddingLeft = '12px';
 
   const handleClick = () => {
     if (hasChildren) setIsOpen(!isOpen);
@@ -91,16 +105,14 @@ function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
     >
       <div className={styles.labelContainer}>
         {/* Icon: Level 0 โชว์ Icon ใหญ่, Level ลึกๆ โชว์จุดเล็กๆ หรือไม่โชว์เลย */}
-        {item.icon ? (
+        {/* ถ้ามี Icon ก็โชว์ ถ้าไม่มีก็ไม่ต้องใส่อะไร (ใช้ padding ดันเอา) */}
+        {item.icon && (
            <span className={`${styles.icon} ${isActive ? styles.iconActive : ''}`}>
             {item.icon}
            </span>
-        ) : (
-           // ถ้าไม่มี icon ให้ใส่จุดเล็กๆ แทน เพื่อให้แนวตัวหนังสือตรงกัน
-           <span className={styles.bulletIcon}>
-             <Circle size={6} fill="currentColor" />
-           </span>
         )}
+        
+      
         
         <span className={styles.labelText}>{item.title}</span>
       </div>
@@ -112,10 +124,19 @@ function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
         </span>
       )}
     </div>
+
+
+
   );
 
   return (
-    <div className={styles.itemWrapper}>
+    <div className={`
+      ${styles.itemWrapper} 
+      ${(hasChildren && isOpen) ? styles.expandedGroup : ''}
+    `}>
+
+
+
       {hasChildren ? itemContent : <Link href={item.href || '#'}>{itemContent}</Link>}
 
       {hasChildren && isOpen && (
