@@ -1,35 +1,40 @@
-"use client"; // 👈 สำคัญ: ต้องเป็น Client Component
+"use client"; 
 import React, { useState, useEffect, useRef } from 'react';
 import { Image as ImageIcon, Type, Save, Upload } from 'lucide-react';
 
 export default function WebHomePage() {
   // State สำหรับเก็บข้อมูล
   const [welcomeMessage, setWelcomeMessage] = useState('');
-  const [currentBanner, setCurrentBanner] = useState(''); // รูปจาก Server
-  const [previewImage, setPreviewImage] = useState<string | null>(null); // รูปตัวอย่างที่เลือกใหม่
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); // ไฟล์จริงที่จะส่งไป
+  const [currentBanner, setCurrentBanner] = useState(''); 
+  const [previewImage, setPreviewImage] = useState<string | null>(null); 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null); 
   const [isLoading, setIsLoading] = useState(false);
   
-  // ใช้ Ref เพื่อสั่งกด input file ที่ซ่อนอยู่
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 1. โหลดข้อมูลเก่ามาโชว์ตอนเปิดหน้าเว็บ
+  // 🔥 ดึง URL จาก .env.local (ถ้าไม่มีให้ใช้ localhost เป็นค่าสำรอง)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ;
+
+  // 1. โหลดข้อมูลเก่ามาโชว์
   useEffect(() => {
+<<<<<<< HEAD
     fetch('https://pharmacy-api-6w5d.onrender.com/home-content')
+=======
+    // 🔥 แก้ตรงนี้: ใช้ API_URL แทน localhost
+    fetch(`${API_URL}/home-content`)
+>>>>>>> f4557581109a06f338a46c9dca971bc759691e23
       .then(res => res.json())
       .then(data => {
         if (data.welcomeMessage) setWelcomeMessage(data.welcomeMessage);
         if (data.bannerUrl) setCurrentBanner(data.bannerUrl);
       })
       .catch(err => console.error("Load error:", err));
-  }, []);
+  }, [API_URL]); // เพิ่ม dependency API_URL
 
-  // 2. ฟังก์ชันเมื่อมีการเลือกรูปใหม่
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      // สร้าง URL ปลอมๆ เพื่อโชว์ตัวอย่างรูปทันที (Preview)
       setPreviewImage(URL.createObjectURL(file));
     }
   };
@@ -44,14 +49,15 @@ export default function WebHomePage() {
         formData.append('bannerImage', selectedFile);
       }
 
-      const res = await fetch('http://localhost:8080/home-content', {
+      // 🔥 แก้ตรงนี้: ใช้ API_URL แทน localhost
+      const res = await fetch(`${API_URL}/home-content`, {
         method: 'POST',
-        body: formData, // ส่งไปแบบ Multipart (ไม่ต้องใส่ Content-Type)
+        body: formData, 
       });
 
       if (res.ok) {
+        const result = await res.json(); // อ่านผลลัพธ์จาก Server หน่อย
         alert('บันทึกข้อมูลเรียบร้อย!');
-        // รีเฟรชหน้าเพื่อเคลียร์ค่า Preview
         window.location.reload();
       } else {
         alert('เกิดข้อผิดพลาดในการบันทึก');
@@ -64,8 +70,10 @@ export default function WebHomePage() {
     }
   };
 
+  // ... (ส่วน return JSX ข้างล่างเหมือนเดิมเป๊ะ ไม่ต้องแก้) ...
   return (
     <div className="p-6">
+      {/* ... (เนื้อหา UI เดิม) ... */}
       
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -96,16 +104,14 @@ export default function WebHomePage() {
             
             {/* พื้นที่แสดงรูป / ปุ่มอัปโหลด */}
             <div 
-                onClick={() => fileInputRef.current?.click()} // คลิกกรอบแล้วเด้งหน้าเลือกไฟล์
+                onClick={() => fileInputRef.current?.click()} 
                 className="h-48 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-100 overflow-hidden relative group"
             >
-                {/* Logic การแสดงผล: ถ้ามีรูป Preview ให้โชว์ -> ถ้าไม่มีให้โชว์รูปเดิม -> ถ้าไม่มีให้โชว์ปุ่มบวก */}
                 {previewImage ? (
                     <img src={previewImage} alt="Preview" className="w-full h-full object-cover" />
                 ) : currentBanner ? (
                     <div className="relative w-full h-full">
                         <img src={currentBanner} alt="Current Banner" className="w-full h-full object-cover" />
-                        {/* Overlay บอกว่าคลิกเพื่อเปลี่ยนรูป */}
                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition">
                             <Upload size={24} className="mr-2"/> คลิกเพื่อเปลี่ยนรูป
                         </div>
@@ -118,7 +124,6 @@ export default function WebHomePage() {
                     </>
                 )}
                 
-                {/* Input file ซ่อนไว้ */}
                 <input 
                     type="file" 
                     ref={fileInputRef}
