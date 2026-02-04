@@ -1,0 +1,231 @@
+/* app/news/news.module.css */
+
+.container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Sarabun', sans-serif;
+    color: #333;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Controls: Search + Filter + Add */
+.controls {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.searchBox,
+.filterSelect {
+    padding: 0.5rem 0.8rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    height: 38px;
+    background-color: white;
+}
+
+.searchBox {
+    width: 200px;
+}
+
+.filterSelect {
+    width: 160px;
+    cursor: pointer;
+}
+
+/* ปรับขนาดให้พอดีกับตัวกรอง */
+
+/* Table Styles */
+.tableContainer {
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.table th,
+.table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    white-space: nowrap;
+    user-select: none;
+}
+
+/* [นำกลับมา] Sortable Header Styles */
+.thSortable {
+    cursor: pointer;
+    transition: background 0.2s;
+    padding-right: 1.5rem !important;
+    position: relative;
+}
+
+.thSortable:hover {
+    background-color: #e9ecef;
+}
+
+.sortIcon {
+    font-size: 0.7rem;
+    margin-left: 4px;
+    color: #adb5bd;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.sortIconActive {
+    color: #495057;
+    font-weight: bold;
+}
+
+/* Status Badge Toggle */
+.badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+    min-width: 90px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.badge:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.published {
+    background-color: #d3f9d8;
+    color: #2b8a3e;
+    border-color: #b2f2bb;
+}
+
+.draft {
+    background-color: #f1f3f5;
+    color: #495057;
+    border-color: #dee2e6;
+}
+
+/* Buttons & Modal (คงเดิม) */
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.btnAdd {
+    background-color: #228be6;
+    color: white;
+}
+
+.btnAdd:hover {
+    background-color: #1c7ed6;
+}
+
+.btnDelete {
+    background-color: #fff;
+    color: #fa5252;
+    border: 1px solid #fa5252;
+    height: auto;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.modalHeader {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.formGroup {
+    margin-bottom: 1rem;
+}
+
+.input,
+.textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.btnSave {
+    background-color: #228be6;
+    color: white;
+    justify-content: center;
+}
+
+.btnCancel {
+    background-color: #e9ecef;
+    color: #495057;
+    justify-content: center;
+}

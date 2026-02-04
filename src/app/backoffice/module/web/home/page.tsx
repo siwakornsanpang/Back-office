@@ -16,8 +16,15 @@ export default function WebHomePage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
+
     if (!API_URL) return;
+
+    fetch('https://pharmacy-api-6w5d.onrender.com/home-content')
+
+    // 🔥 แก้ตรงนี้: ใช้ API_URL แทน localhost
+
     fetch(`${API_URL}/home-content`)
+
       .then(res => res.json())
       .then(data => {
         if (data.welcomeMessage) setWelcomeMessage(data.welcomeMessage);
