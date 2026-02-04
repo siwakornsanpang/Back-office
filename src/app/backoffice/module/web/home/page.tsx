@@ -15,7 +15,7 @@ export default function WebHomePage() {
 
   // 1. โหลดข้อมูลเก่ามาโชว์ตอนเปิดหน้าเว็บ
   useEffect(() => {
-    fetch('http://localhost:8080/home-content')
+    fetch('https://pharmacy-api-6w5d.onrender.com/home-content')
       .then(res => res.json())
       .then(data => {
         if (data.welcomeMessage) setWelcomeMessage(data.welcomeMessage);
