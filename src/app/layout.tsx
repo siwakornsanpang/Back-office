@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BackOffice System",
-  description: "Enterprise Management System",
+  title: "ระบบสำนักงานเลขธิการ",
+  description: "ระบบสำนักงานเลขธิการ สภาเภสัชกรรม",
 };
 
 export default function RootLayout({
