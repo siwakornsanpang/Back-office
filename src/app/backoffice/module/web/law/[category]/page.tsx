@@ -8,12 +8,13 @@ import { useState, useEffect } from 'react';
 // 1. ดิกชันนารีแปลชื่อไทย (Config)
 // key ต้องตรงกับที่คุณตั้งใน menuConfig.tsx
 const LAW_TITLES: Record<string, string> = {
-  'law1': '1',
-  'law2': '2',
-  'law3': '3',
-  'law4': '4',
-  'law5': '5',
-  'law6': '6',
+  'law1': 'พระราชบัญญัติวิชาชีพเภสัชกรรม',
+  'law2': 'ข้อบังคับสภาเภสัชกรรม',
+  'law3': 'ประกาศสภาเภสัชกรรม',
+  'law4': 'กฎกระทรวง',
+  'law5': 'กฎหมายอื่นที่เกี่ยวข้อง',
+  'law6': 'คำสั่งสภาเภสัชกรรม',
+  'law7': 'ระเบียบสภาเภสัชกรรม'
 };
 
 export default function LawDynamicPage() {
