@@ -78,7 +78,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
     isHeader: true     // 👈 บอกว่าเป็นหัวข้อ
     },
   {
-    id: 'header-pharmacy',
+    id: 'module-pharmacy',
     title: 'ทะเบียนเภสัช',
     icon: <Pill size={20} />,
     href: '/backoffice/module/register' 

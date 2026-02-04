@@ -1,33 +1,39 @@
+// src/components/layout/Sidebar.tsx
 "use client";
 
 import { useState } from 'react';
 import { usePathname ,useRouter} from 'next/navigation';
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, Circle ,LogOut} from 'lucide-react';
+import { ChevronDown, ChevronRight, LogOut} from 'lucide-react';
 import Cookies from 'js-cookie'; 
-import { SIDEBAR_DATA, MenuItem } from './menuConfig';
+import { SIDEBAR_DATA, MenuItem } from './menuConfig'; // เช็ค path ให้ถูก
 import styles from './Sidebar.module.css';
 
-// ... (เก็บ function filterMenuByPermission ไว้เหมือนเดิม) ...
+// 1. รับ Props isOpen
+interface SidebarProps {
+  isOpen: boolean;
+}
 
-export default function Sidebar() {
-  // 🔥 ใช้ Logic เดิมของคุณ (Permission)
+export default function Sidebar({ isOpen }: SidebarProps) {
   const router = useRouter();
   const visibleMenuItems = SIDEBAR_DATA; 
 
   const handleLogout = () => {
-    // 1. ลบ Cookie บัตรผ่านทิ้ง
     Cookies.remove('auth_token', { path: '/' });
-    router.refresh(); // ระบุ path ให้ชัวร์
-    
-    // 2. ดีดกลับไปหน้า Login
-    
+    router.refresh();
     router.replace('/login');
   };
 
-
   return (
-    <aside className={styles.sidebar}>
+    <aside 
+      className={styles.sidebar}
+      // 2. ใส่ Inline Style เพื่อควบคุมการเลื่อนเข้า-ออก
+      style={{
+        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)', // ถ้าปิด ให้เลื่อนไปทางซ้ายจนพ้นจอ
+        transition: 'transform 0.3s ease-in-out', // ใส่ Animation ให้นุ่มนวล
+        visibility: isOpen ? 'visible' : 'hidden' // กันไม่ให้กดโดนตอนซ่อน
+      }}
+    >
       <div className={styles.sidebarContent}>
         {visibleMenuItems.map((item) => (
            <SidebarItem key={item.id} item={item} level={0} />
@@ -36,17 +42,11 @@ export default function Sidebar() {
 
       <div className={styles.sidebarFooter}>
         <div className={styles.userProfile}>
-          
-          {/* Avatar (ใส่ตัวอักษรย่อ หรือรูปภาพจริง) */}
           <div className={styles.avatar}>A</div> 
-          
-          {/* ข้อมูล User */}
           <div className={styles.userInfo}>
             <div className={styles.userName}>Admin</div>
             <div className={styles.userRole}>Admin Test</div>
           </div>
-
-          {/* ปุ่ม Logout */}
           <button 
             onClick={handleLogout} 
             className={styles.logoutBtn}
@@ -54,98 +54,60 @@ export default function Sidebar() {
           >
             <LogOut size={18} />
           </button>
-          
         </div>
       </div>
-
-
     </aside>
   );
 }
 
-// =========================================================
-// Sub Component
-// =========================================================
+// ... (Sub Component SidebarItem ใช้โค้ดเดิมได้เลย ไม่ต้องแก้) ...
 function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
-  
+    // (ใส่โค้ด SidebarItem เดิมของคุณตรงนี้...)
+    // ...
+    // เพื่อความกระชับ ผมละไว้ในฐานที่เข้าใจนะครับ 
+    // ให้คงโค้ดเดิมส่วนล่างนี้ไว้ทั้งหมดครับ
+    if (item.isHeader) {
+        return <div className={styles.sectionHeader}>{item.title}</div>;
+    }
+    const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname(); 
+    const hasChildren = item.submenu && item.submenu.length > 0;
+    const isActive = item.href ? pathname === item.href : false;
+    const paddingLeft = '12px';
+    const handleClick = () => { if (hasChildren) setIsOpen(!isOpen); };
 
-
-if (item.isHeader) {
-    return (
-      <div className={styles.sectionHeader}>
-        {item.title}
-      </div>
-    );
-  }
-
-
-  
-
-  const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname(); 
-
-  const hasChildren = item.submenu && item.submenu.length > 0;
-  // เช็คว่า URL ปัจจุบัน ตรงกับเมนูนี้ หรือ เป็นลูกหลานของเมนูนี้ไหม
-  const isActive = item.href ? pathname === item.href : false;
-  
-  // ✅ ปรับสูตรคำนวณระยะห่างใหม่ (ลดจาก 16 เหลือ 10 หรือ 8)
-  // Level 0 = 12px
-  // Level 1+ = ขยับทีละ 10px พอ (ประหยัดที่)
-  const paddingLeft = '12px';
-
-  const handleClick = () => {
-    if (hasChildren) setIsOpen(!isOpen);
-  };
-
-  const itemContent = (
-    <div 
-      className={`${styles.menuItem} ${isActive ? styles.active : '' }`}
-      style={{ paddingLeft }}
-      onClick={handleClick}
-    >
-      <div className={styles.labelContainer}>
-        {/* Icon: Level 0 โชว์ Icon ใหญ่, Level ลึกๆ โชว์จุดเล็กๆ หรือไม่โชว์เลย */}
-        {/* ถ้ามี Icon ก็โชว์ ถ้าไม่มีก็ไม่ต้องใส่อะไร (ใช้ padding ดันเอา) */}
-        {item.icon && (
-           <span className={`${styles.icon} ${isActive ? styles.iconActive : ''}`}>
-            {item.icon}
-           </span>
-        )}
-        
-      
-        
-        <span className={styles.labelText}>{item.title}</span>
-      </div>
-
-      {/* ลูกศร (ขยับไปขวาสุด) */}
-      {hasChildren && (
-        <span className={styles.chevron}>
-          {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        </span>
-      )}
-    </div>
-
-
-
-  );
-
-  return (
-    <div className={`
-      ${styles.itemWrapper} 
-      ${(hasChildren && isOpen) ? styles.expandedGroup : ''}
-    `}>
-
-
-
-      {hasChildren ? itemContent : <Link href={item.href || '#'}>{itemContent}</Link>}
-
-      {hasChildren && isOpen && (
-        <div className={styles.submenuContainer}>
-          {item.submenu!.map((subItem) => (
-            <SidebarItem key={subItem.id} item={subItem} level={level + 1} />
-          ))}
+    const itemContent = (
+        <div 
+        className={`${styles.menuItem} ${isActive ? styles.active : '' }`}
+        style={{ paddingLeft }}
+        onClick={handleClick}
+        >
+        <div className={styles.labelContainer}>
+            {item.icon && (
+            <span className={`${styles.icon} ${isActive ? styles.iconActive : ''}`}>
+                {item.icon}
+            </span>
+            )}
+            <span className={styles.labelText}>{item.title}</span>
         </div>
-      )}
-    </div>
-  );
+        {hasChildren && (
+            <span className={styles.chevron}>
+            {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            </span>
+        )}
+        </div>
+    );
+
+    return (
+        <div className={`${styles.itemWrapper} ${(hasChildren && isOpen) ? styles.expandedGroup : ''}`}>
+        {hasChildren ? itemContent : <Link href={item.href || '#'}>{itemContent}</Link>}
+        {hasChildren && isOpen && (
+            <div className={styles.submenuContainer}>
+            {item.submenu!.map((subItem) => (
+                <SidebarItem key={subItem.id} item={subItem} level={level + 1} />
+            ))}
+            </div>
+        )}
+        </div>
+    );
 }

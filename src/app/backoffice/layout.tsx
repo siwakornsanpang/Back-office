@@ -1,10 +1,11 @@
-"use client"; // 👈 1. ต้องประกาศว่าเป็น Client Component
+// src/app/backoffice/layout.tsx (หรือไฟล์ layout ที่คุณใช้)
+"use client"; 
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
-import Header from './layout/Header';// ตรวจสอบ path ให้ถูก
-import Sidebar from './layout/Sidebar';// ตรวจสอบ path ให้ถูก
+import Header from './layout/Header'; // ตรวจสอบ path import ให้ถูก
+import Sidebar from './layout/Sidebar'; // ตรวจสอบ path import ให้ถูก
 
 export default function BackOfficeLayout({
   children,
@@ -13,36 +14,40 @@ export default function BackOfficeLayout({
 }>) {
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
+  
+  // 1. สร้าง State สำหรับเปิด/ปิด Sidebar (ค่าเริ่มต้นคือ true = เปิด)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // 🛡️ 2. ระบบ "ยามเฝ้าประตู" (Auth Guard)
-  // ใครไม่มี Cookie 'auth_token' จะถูกดีดกลับไปหน้า Login ทันที
   useEffect(() => {
     const token = Cookies.get('auth_token');
-    
     if (!token) {
-      // ถ้าไม่มีตั๋ว ให้ดีดกลับ Login
       router.replace('/login');
     } else {
-      // ถ้ามีตั๋ว อนุญาตให้แสดงเนื้อหา
       setIsAuthorized(true);
     }
   }, [router]);
 
-  // ถ้ายังตรวจสอบไม่เสร็จ (หรือไม่มีสิทธิ์) ให้โชว์หน้าจอว่างๆ หรือ Loading ไปก่อน
-  // เพื่อกันไม่ให้เห็นหน้า Backoffice แวบนึง
   if (!isAuthorized) {
-    return null; // หรือใส่ <div className="p-10 text-center">Checking permission...</div>
+    return null; 
   }
 
   return (
     <div className="bg-[#f3f4f6] min-h-screen font-sans">
       
-      {/* ส่วน Fixed */}
-      <Header />
-      <Sidebar />
+      {/* 2. ส่งฟังก์ชันสลับสถานะไปให้ Header */}
+      <Header onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+      
+      {/* 3. ส่งสถานะปัจจุบันไปให้ Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} />
 
-      {/* ส่วนเนื้อหาหลัก */}
-      <main className="pt-[60px] pl-[260px] transition-all duration-300">
+      {/* 4. ปรับ Padding ของ Main Content ตามสถานะ Sidebar */}
+      <main 
+        className={`
+            pt-[60px] 
+            transition-all duration-300 ease-in-out
+            ${isSidebarOpen ? 'pl-[260px]' : 'pl-0'} 
+        `}
+      >
         <div className="p-6">
           {children}
         </div>
