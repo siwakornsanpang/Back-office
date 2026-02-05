@@ -172,10 +172,11 @@
 
 .selectPosition {
   width: 100%;
-  padding: 0.5rem 2rem 0.5rem 0.5rem; /* เว้นขวาไว้ให้ไอคอน */
+  padding: 0.5rem 2rem 0.5rem ; /* เว้นขวาไว้ให้ไอคอน */
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   font-size: 0.875rem;
+  font-weight: bold;
   color: #4b5563; /* สีเทาเข้ม */
   background-color: white;
   cursor: pointer;
@@ -183,6 +184,7 @@
   text-align-last: center; /* จัดกลางข้อความใน Select (เฉพาะบาง Browser) */
   appearance: none; /* ซ่อนลูกศรเดิมของ Browser */
   transition: all 0.2s;
+  justify-items: center;
 }
 
 .selectPosition:hover {
