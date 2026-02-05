@@ -227,7 +227,7 @@ export default function NewsPage() {
               <th className={styles.thSortable} onClick={() => handleSort('createdAt')} style={{ width: '120px' }}>
                 วันที่สร้าง <span className={sortConfig.key === 'createdAt' ? styles.sortIconActive : styles.sortIcon}>{getSortIcon('createdAt')}</span>
               </th>
-              <th className={styles.thSortable} onClick={() => handleSort('updatedAt')} style={{ width: '110px' }}>
+              <th className={styles.thSortable} onClick={() => handleSort('updatedAt')} style={{ width: '120px' }}>
                 แก้ไขล่าสุด <span className={sortConfig.key === 'updatedAt' ? styles.sortIconActive : styles.sortIcon}>{getSortIcon('updatedAt')}</span>
               </th>
               <th className={styles.thSortable} onClick={() => handleSort('status')} style={{ width: '100px', textAlign: 'center' }}>
@@ -291,7 +291,7 @@ export default function NewsPage() {
             <form onSubmit={handleSaveNews}>
 
               <div className={styles.formGroup}>
-                <label style={{ marginBottom: '0.5rem', display: 'block' }}>หัวข้อข่าว</label>
+                <label style={{ marginBottom: '0.5rem', display: 'block' }}>หัวข้อ</label>
                 <input type="text" className={styles.input} value={newTitle} onChange={e => setNewTitle(e.target.value)} required />
               </div>
 
