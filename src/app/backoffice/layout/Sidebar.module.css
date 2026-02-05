@@ -259,6 +259,6 @@
 }
 
 /* ถ้าอยากให้หัวข้อแม่ (ตัวบนสุดของกลุ่ม) ยังดูมนๆ อยู่ */
-.expandedGroup .menuItem:first-child {
+/* .expandedGroup .menuItem:first-child {
  
-}
+} */

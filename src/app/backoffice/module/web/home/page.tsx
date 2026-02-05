@@ -16,7 +16,7 @@ export default function WebHomePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ===============================
-  // API URL จาก .env.local
+  // API URL
   // ===============================
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -96,9 +96,7 @@ export default function WebHomePage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">จัดการหน้าแรก</h2>
-          <p className="text-gray-500 text-sm">
-            Web Management / หน้าแรก
-          </p>
+          <p className="text-gray-500 text-sm">Web Management / หน้าแรก</p>
         </div>
 
         <button
@@ -118,9 +116,7 @@ export default function WebHomePage() {
             <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
               <ImageIcon size={24} />
             </div>
-            <h3 className="font-semibold text-gray-700">
-              Banner สไลด์หลัก
-            </h3>
+            <h3 className="font-semibold text-gray-700">Banner สไลด์หลัก</h3>
           </div>
 
           <div
@@ -177,9 +173,7 @@ export default function WebHomePage() {
             <div className="p-2 bg-green-100 rounded-lg text-green-600">
               <Type size={24} />
             </div>
-            <h3 className="font-semibold text-gray-700">
-              ข้อความต้อนรับ
-            </h3>
+            <h3 className="font-semibold text-gray-700">ข้อความต้อนรับ</h3>
           </div>
 
           <textarea
