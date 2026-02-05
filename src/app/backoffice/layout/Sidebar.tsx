@@ -30,7 +30,7 @@ export default function Sidebar() {
     <aside className={styles.sidebar}>
       <div className={styles.sidebarContent}>
         {visibleMenuItems.map((item) => (
-           <SidebarItem key={item.id} item={item} level={0} />
+         <SidebarItem key={item.id} item={item} level={0} />
         ))}
       </div>
 
