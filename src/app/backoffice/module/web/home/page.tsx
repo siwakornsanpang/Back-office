@@ -1,7 +1,8 @@
-"use client";
-
-import React, { useState, useEffect, useRef } from "react";
-import { Image as ImageIcon, Type, Save, Upload } from "lucide-react";
+"use client"; 
+import React, { useState, useEffect, useRef } from 'react';
+import { Image as ImageIcon, Type, Save, Upload } from 'lucide-react';
+// 🔥 Import CSS Module เข้ามา
+import styles from './home.module.css';
 
 export default function WebHomePage() {
   const [welcomeMessage, setWelcomeMessage] = useState('');

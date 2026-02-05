@@ -160,19 +160,20 @@
 /* Buttons & Modal */
 .btn {
     padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s;
-    height: 38px;
+    /* px-4 py-2 */
+    border-radius: 0.5rem;
+    /* rounded-lg */
     display: flex;
     align-items: center;
-    font-weight: 500;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+    border: none;
+    cursor: pointer;
 }
 
 .btnAdd {
-    background-color: #228be6;
+    background-color: #2563eb;
+    /* bg-blue-600 */
     color: white;
 }
 
@@ -187,6 +188,35 @@
     height: auto;
     padding: 0.3rem 0.8rem;
     font-size: 0.8rem;
+}
+
+.btnDelete:hover {
+    background-color: #fef2f2;
+    border-color: #ef4444;
+}
+
+/* เพิ่มปุ่มแก้ไข */
+.btnEdit {
+    background-color: #fff;
+    color: #3182ce;
+    border: 1px solid #90cdf4;;
+    height: auto;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+    /* เว้นระยะห่างจากปุ่มลบ */
+}
+
+.btnEdit:hover {
+    background-color: #ebf8ff;
+    border-color: #63b3ed;
+}
+
+/* จัดกลุ่มปุ่มในตารางให้อยู่กลางและเรียงกัน */
+.actionButtons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .modalOverlay {
@@ -251,7 +281,28 @@
 }
 
 .breadcrumb {
-  color: #6b7280;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* เพิ่ม Class สำหรับจัด Layout ใน Modal */
+.formRow {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.formCol {
+    flex: 1;
+}
+
+/* ปรับ modalSelect ให้เต็มพื้นที่ */
+.modalSelect {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+    background: white;
 }
