@@ -208,7 +208,6 @@ export default function CouncilCategoryPage() {
                 </label>
             </div>
 
-<<<<<<< HEAD
             <div className={styles.infoArea}>
                 <input 
                     type="text" 
@@ -246,29 +245,6 @@ export default function CouncilCategoryPage() {
                         </button>
                     )}
                 </div>
-=======
-            {/* ส่วนข้อมูล (Info) */}
-            <div className="p-4">
-              <input
-                type="text"
-                defaultValue={member.name}
-              />
-
-              <input 
-                type="text" 
-                value={member.position}
-                className="block w-full text-sm text-gray-500 border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none pb-1 transition-colors"
-              />
-              
-              <div className="mt-4 flex justify-end gap-2">
-                 <button className="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="ลบ">
-                    <Trash2 size={16} />
-                 </button>
-                 <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="บันทึก">
-                    <Save size={16} />
-                 </button>
-              </div>
->>>>>>> ff86e993e6fcf2500f8651209662f2fd150189b0
             </div>
 
           </div>
