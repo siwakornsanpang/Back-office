@@ -429,7 +429,19 @@ export default function LawDynamicPage() {
             </tr>
           </thead>
           <tbody>
-            {laws.length === 0 ? (
+            {/* 🔥 เคสที่ 1: กำลังโหลด (โชว์ Loading ก่อน) */}
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-12 text-gray-400">
+                  <div className="flex flex-col items-center gap-2 animate-pulse">
+                    {/* ใส่ Spinner หรือข้อความโหลดตรงนี้ */}
+                    <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                    <span>กำลังโหลดข้อมูล...</span>
+                  </div>
+                </td>
+              </tr>
+            ) : laws.length === 0 ? (
+              /* 🔥 เคสที่ 2: โหลดเสร็จแล้ว แต่ไม่มีข้อมูลจริงๆ (ค่อยโชว์อันนี้) */
               <tr>
                 <td colSpan={5} className="text-center text-gray-400 py-12">
                   <div className="flex flex-col items-center gap-2">
@@ -439,8 +451,10 @@ export default function LawDynamicPage() {
                 </td>
               </tr>
             ) : (
+              /* 🔥 เคสที่ 3: มีข้อมูล (แสดงรายการปกติ) */
               laws.map((law) => (
                 <tr key={law.id}>
+                  {/* ... (โค้ดแสดงแถวข้อมูลเดิมของคุณ) ... */}
                   <td className="text-center font-medium text-gray-500">
                     {law.order}
                   </td>
@@ -469,7 +483,6 @@ export default function LawDynamicPage() {
                   </td>
                   <td className="text-center">
                     <div className="flex justify-center gap-2">
-                      {/* ปุ่มแก้ไข */}
                       <button
                         onClick={() => handleEdit(law)}
                         className={`${styles.deleteBtn} !border-blue-300 !text-blue-600 hover:!bg-blue-50`}
@@ -477,8 +490,6 @@ export default function LawDynamicPage() {
                       >
                         <Edit size={18} />
                       </button>
-
-                      {/* ปุ่มลบ */}
                       <button
                         onClick={() => handleDelete(law.id)}
                         className={styles.deleteBtn}
