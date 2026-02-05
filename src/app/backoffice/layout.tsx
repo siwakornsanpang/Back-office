@@ -46,8 +46,10 @@ export default function BackOfficeLayout({
             pt-[60px] 
             transition-all duration-300 ease-in-out
             ${isSidebarOpen ? 'pl-[260px]' : 'pl-0'} 
+            
         `}
       >
+       
         <div className="p-6">
           {children}
         </div>

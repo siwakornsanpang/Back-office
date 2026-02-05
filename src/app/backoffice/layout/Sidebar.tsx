@@ -36,7 +36,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
     >
       <div className={styles.sidebarContent}>
         {visibleMenuItems.map((item) => (
-           <SidebarItem key={item.id} item={item} level={0} />
+         <SidebarItem key={item.id} item={item} level={0} />
         ))}
       </div>
 

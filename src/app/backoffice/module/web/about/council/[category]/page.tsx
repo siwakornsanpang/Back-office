@@ -68,11 +68,11 @@ export default function CouncilMemberPage() {
 
             {/* ส่วนข้อมูล (Info) */}
             <div className="p-4">
-              <input 
-                type="text" 
-                value={member.name}
-                className="block w-full font-bold text-gray-800 border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none mb-1 pb-1 transition-colors"
+              <input
+                type="text"
+                defaultValue={member.name}
               />
+
               <input 
                 type="text" 
                 value={member.position}
