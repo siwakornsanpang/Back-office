@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react"; // เพิ่ม Edit icon
 import { useState, useEffect, useRef } from "react";
-import styles from "./page.module.css";
+import styles from "./law.module.css";
 import Swal from "sweetalert2"; // 🔥 เรียกใช้ SweetAlert2
 import withReactContent from "sweetalert2-react-content";
 
@@ -448,10 +448,10 @@ export default function LawDynamicPage() {
                   <td>
                     {law.announcedAt
                       ? new Date(law.announcedAt).toLocaleDateString("th-TH", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })
                       : "-"}
                   </td>
                   <td>
