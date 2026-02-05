@@ -1,161 +1,189 @@
-"use client"; 
-import React, { useState, useEffect, useRef } from 'react';
-import { Image as ImageIcon, Type, Save, Upload } from 'lucide-react';
-// 🔥 Import CSS Module เข้ามา
-import styles from './page.module.css';
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import { Image as ImageIcon, Type, Save, Upload } from "lucide-react";
 
 export default function WebHomePage() {
-  const [welcomeMessage, setWelcomeMessage] = useState('');
-  const [currentBanner, setCurrentBanner] = useState(''); 
-  const [previewImage, setPreviewImage] = useState<string | null>(null); 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); 
+  // ===============================
+  // State
+  // ===============================
+  const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [currentBanner, setCurrentBanner] = useState("");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // ===============================
+  // API URL
+  // ===============================
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+  // ===============================
+  // โหลดข้อมูลหน้าแรก
+  // ===============================
   useEffect(() => {
-
-    if (!API_URL) return;
-
-    fetch('https://pharmacy-api-6w5d.onrender.com/home-content')
-
-    // 🔥 แก้ตรงนี้: ใช้ API_URL แทน localhost
-
-    fetch(`${API_URL}/home-content`)
-
-      .then(res => res.json())
-      .then(data => {
-        if (data.welcomeMessage) setWelcomeMessage(data.welcomeMessage);
-        if (data.bannerUrl) setCurrentBanner(data.bannerUrl);
-      })
-      .catch(err => console.error("Load error:", err));
-  }, [API_URL]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreviewImage(URL.createObjectURL(file));
-    }
-  };
-
-  const handleSave = async () => {
     if (!API_URL) {
-      alert("หา API ไม่เจอ กรุณาเช็ค .env.local");
+      console.error("NEXT_PUBLIC_API_URL is not defined");
       return;
     }
+
+    fetch(`${API_URL}/home-content`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.welcomeMessage) setWelcomeMessage(data.welcomeMessage);
+        if (data?.bannerUrl) setCurrentBanner(data.bannerUrl);
+      })
+      .catch((err) => console.error("Load error:", err));
+  }, [API_URL]);
+
+  // ===============================
+  // เลือกรูป
+  // ===============================
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSelectedFile(file);
+    setPreviewImage(URL.createObjectURL(file));
+  };
+
+  // ===============================
+  // บันทึกข้อมูล
+  // ===============================
+  const handleSave = async () => {
+    if (!API_URL) {
+      alert("ยังไม่ได้ตั้งค่า API_URL");
+      return;
+    }
+
     setIsLoading(true);
+
     try {
       const formData = new FormData();
-      formData.append('welcomeMessage', welcomeMessage);
+      formData.append("welcomeMessage", welcomeMessage);
       if (selectedFile) {
-        formData.append('bannerImage', selectedFile);
+        formData.append("bannerImage", selectedFile);
       }
 
       const res = await fetch(`${API_URL}/home-content`, {
-        method: 'POST',
-        body: formData, 
+        method: "POST",
+        body: formData,
       });
 
-      if (res.ok) {
-        await res.json();
-        alert('บันทึกข้อมูลเรียบร้อย!');
-        window.location.reload();
-      } else {
-        alert('เกิดข้อผิดพลาดในการบันทึก');
+      if (!res.ok) {
+        throw new Error("Save failed");
       }
+
+      await res.json();
+      alert("บันทึกข้อมูลเรียบร้อย!");
+      window.location.reload();
     } catch (error) {
       console.error(error);
-      alert('เชื่อมต่อ Server ไม่ได้');
+      alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // ===============================
+  // UI
+  // ===============================
   return (
-    <div className={styles.container}>
-      
+    <div className="p-6">
       {/* Header */}
-      <div className={styles.header}>
+      <div className="flex justify-between items-center mb-6">
         <div>
-            <h2 className={styles.title}>จัดการหน้าแรก</h2>
-            <p className={styles.breadcrumb}>Web Management / หน้าแรก</p>
+          <h2 className="text-2xl font-bold text-gray-800">จัดการหน้าแรก</h2>
+          <p className="text-gray-500 text-sm">Web Management / หน้าแรก</p>
         </div>
-        <button 
-            onClick={handleSave}
-            disabled={isLoading}
-            className={styles.saveButton}
+
+        <button
+          onClick={handleSave}
+          disabled={isLoading}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition disabled:bg-gray-400"
         >
-            <Save size={18} />
-            <span>{isLoading ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข'}</span>
+          <Save size={18} />
+          <span>{isLoading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}</span>
         </button>
       </div>
 
-      <div className={styles.gridContainer}>
-        
-        {/* Card: จัดการ Banner */}
-        <div className={styles.card}>
-            <div className={styles.cardHeader}>
-                <div className={`${styles.iconBox} ${styles.iconBlue}`}>
-                    <ImageIcon size={24} />
-                </div>
-                <h3 className={styles.cardTitle}>Banner สไลด์หลัก</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Banner */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+              <ImageIcon size={24} />
             </div>
-            
-            <div 
-                onClick={() => fileInputRef.current?.click()} 
-                className={styles.uploadArea}
-            >
-                {previewImage ? (
-                    <img src={previewImage} alt="Preview" className={styles.previewImage} />
-                ) : currentBanner ? (
-                    <div className="relative w-full h-full">
-                        <img src={currentBanner} alt="Current Banner" className={styles.previewImage} />
-                        <div className={styles.imageOverlay}>
-                            <Upload size={24} className="mr-2"/> คลิกเพื่อเปลี่ยนรูป
-                        </div>
-                    </div>
-                ) : (
-                    <>
-                        <Upload size={32} className="mb-2 opacity-50"/>
-                        <span>+ อัปโหลดรูปภาพ</span>
-                        <span className="text-xs mt-1">ขนาดแนะนำ 1920 x 600 px</span>
-                    </>
-                )}
-                
-                <input 
-                    type="file" 
-                    ref={fileInputRef}
-                    hidden
-                    accept="image/*"
-                    onChange={handleFileChange}
+            <h3 className="font-semibold text-gray-700">Banner สไลด์หลัก</h3>
+          </div>
+
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="h-48 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-100 overflow-hidden relative group"
+          >
+            {previewImage ? (
+              <img
+                src={previewImage}
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
+            ) : currentBanner ? (
+              <div className="relative w-full h-full">
+                <img
+                  src={currentBanner}
+                  alt="Current Banner"
+                  className="w-full h-full object-cover"
                 />
-            </div>
-            {currentBanner && !previewImage && (
-                 <p className={styles.uploadText} style={{ textAlign: 'center', color: '#9ca3af', marginTop: '0.5rem' }}>รูปปัจจุบันที่แสดงอยู่</p>
-            )}
-        </div>
-
-        {/* Card: จัดการข้อความต้อนรับ */}
-        <div className={styles.card}>
-            <div className={styles.cardHeader}>
-                <div className={`${styles.iconBox} ${styles.iconGreen}`}>
-                    <Type size={24} />
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition">
+                  <Upload size={24} className="mr-2" />
+                  คลิกเพื่อเปลี่ยนรูป
                 </div>
-                <h3 className={styles.cardTitle}>ข้อความต้อนรับ</h3>
-            </div>
-            <textarea 
-                className={styles.textarea}
-                placeholder="กรอกข้อความต้อนรับที่นี่..."
-                value={welcomeMessage}
-                onChange={(e) => setWelcomeMessage(e.target.value)}
-            ></textarea>
+              </div>
+            ) : (
+              <>
+                <Upload size={32} className="mb-2 opacity-50" />
+                <span>+ อัปโหลดรูปภาพ</span>
+                <span className="text-xs mt-1">
+                  ขนาดแนะนำ 1920 x 600 px
+                </span>
+              </>
+            )}
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              hidden
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </div>
+
+          {currentBanner && !previewImage && (
+            <p className="text-xs text-gray-400 mt-2 text-center">
+              รูปปัจจุบันที่แสดงอยู่
+            </p>
+          )}
         </div>
 
-      </div>
+        {/* Welcome Message */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-green-100 rounded-lg text-green-600">
+              <Type size={24} />
+            </div>
+            <h3 className="font-semibold text-gray-700">ข้อความต้อนรับ</h3>
+          </div>
 
+          <textarea
+            className="w-full h-48 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            placeholder="กรอกข้อความต้อนรับที่นี่..."
+            value={welcomeMessage}
+            onChange={(e) => setWelcomeMessage(e.target.value)}
+          />
+        </div>
+      </div>
     </div>
   );
 }

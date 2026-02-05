@@ -5,6 +5,7 @@ import { Search, Plus, Edit, Trash2, Map as MapIcon, Users, Filter } from 'lucid
 import { Table, TableRow, TableCell } from '../../../components/common/Table';
 import { Modal } from '../../../components/common/Modal';
 import { Input, Select, Button, Badge } from '../../../components/common/FormElements';
+import styles from './Register.module.css';
 
 // Mock Data for Pharmacists
 const INITIAL_PHARMACISTS = [
@@ -54,7 +55,6 @@ const PROVINCES = [
     { label: 'พัทลุง', value: 'พัทลุง' },
     { label: 'พิจิตร', value: 'พิจิตร' },
     { label: 'พิษณุโลก', value: 'พิษณุโลก' },
-    { label: 'เพเชี่ยวบุรี', value: 'เพเชี่ยวบุรี' },
     { label: 'เพชรบุรี', value: 'เพชรบุรี' },
     { label: 'เพชรบูรณ์', value: 'เพชรบูรณ์' },
     { label: 'แพร่', value: 'แพร่' },
@@ -99,19 +99,42 @@ const PROVINCES = [
 export default function Register() {
     const [pharmacists, setPharmacists] = useState(INITIAL_PHARMACISTS);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterProvince, setFilterProvince] = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPharmacist, setEditingPharmacist] = useState<any>(null);
     const [formData, setFormData] = useState({ firstName: '', lastName: '', licenseNumber: '', province: 'กรุงเทพมหานคร', status: 'Active' });
+    const [sortBy, setSortBy] = useState<'name' | 'license' | 'date'>('name');
 
-    // Filtered data based on search and province (if we add province filter from map)
+    // Get unique provinces from current data
+    const uniqueProvinces = useMemo(() => {
+        const provinces = [...new Set(pharmacists.map(p => p.province))];
+        return provinces.sort();
+    }, [pharmacists]);
+
+    // Filtered data based on search and province filter
     const filteredPharmacists = useMemo(() => {
-        return pharmacists.filter(p =>
-            p.firstName.includes(searchTerm) ||
-            p.lastName.includes(searchTerm) ||
-            p.licenseNumber.includes(searchTerm) ||
-            p.province.includes(searchTerm)
-        );
-    }, [pharmacists, searchTerm]);
+        return pharmacists
+            .filter(p => {
+                const matchesSearch = 
+                    p.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    p.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    p.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase());
+                
+                const matchesProvince = filterProvince === '' || p.province === filterProvince;
+                const matchesStatus = filterStatus === '' || p.status === filterStatus;
+                
+                return matchesSearch && matchesProvince && matchesStatus;
+            })
+            .sort((a, b) => {
+                if (sortBy === 'name') {
+                    return (a.firstName + a.lastName).localeCompare(b.firstName + b.lastName);
+                } else if (sortBy === 'license') {
+                    return a.licenseNumber.localeCompare(b.licenseNumber);
+                }
+                return 0;
+            });
+    }, [pharmacists, searchTerm, filterProvince, filterStatus, sortBy]);
 
     const handleOpenModal = (pharmacist: any = null) => {
         if (pharmacist) {
@@ -125,6 +148,12 @@ export default function Register() {
     };
 
     const handleSave = () => {
+        // Validation
+        if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.licenseNumber.trim()) {
+            alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+            return;
+        }
+
         if (editingPharmacist) {
             setPharmacists(pharmacists.map(p => p.id === editingPharmacist.id ? { ...p, ...formData } : p));
         } else {
@@ -133,8 +162,8 @@ export default function Register() {
         setIsModalOpen(false);
     };
 
-    const handleDelete = (id: string) => {
-        if (confirm('คุณต้องการลบข้อมูลเภสัชกรท่านนี้ใช่หรือไม่?')) {
+    const handleDelete = (id: string, name: string) => {
+        if (confirm(`คุณต้องการลบข้อมูลเภสัชกร ${name} ใช่หรือไม่?`)) {
             setPharmacists(pharmacists.filter(p => p.id !== id));
         }
     };
@@ -151,175 +180,237 @@ export default function Register() {
     return (
         <div className="space-y-6">
             {/* Page Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800">ทะเบียนเภสัชกร</h1>
-                    <p className="text-gray-500">จัดการข้อมูลและเรียกดูสถิติจำนวนเภสัชกรทั่วประเทศ</p>
-                </div>
-                <Button onClick={() => handleOpenModal()} icon={Plus}>
-                    เพิ่มทะเบียนเภสัชกร
-                </Button>
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900">ทะเบียนเภสัชกร</h1>
+                <p className="text-gray-600 mt-1">จัดการข้อมูลเภสัชกรและสถานะทะเบียน</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Left Section: Thailand Map */}
-                <div className="lg:col-span-5 bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col min-h-[500px]">
-                    <div className="flex items-center gap-2 mb-4">
-                        <MapIcon className="text-blue-600" size={20} />
-                        <h2 className="font-semibold text-gray-700">แผนที่แสดงจำนวนเภสัชกร</h2>
-                    </div>
-
-                    {/* Placeholder for Interactive Map */}
-                    <div className="flex-1 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center relative overflow-hidden group">
-                        <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md p-3 rounded-lg border border-gray-100 shadow-sm text-xs space-y-2 z-10">
-                            <h3 className="font-bold text-gray-800 mb-1">สรุปตามตัวอย่าง:</h3>
-                            {Object.entries(provinceCounts).map(([prov, count]) => (
-                                <div key={prov} className="flex justify-between gap-4">
-                                    <span>{prov}</span>
-                                    <span className="font-semibold text-blue-600">{count} คน</span>
-                                </div>
-                            ))}
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-gray-600 text-sm font-medium">เภสัชกรทั้งหมด</p>
+                            <p className="text-3xl font-bold text-gray-900 mt-1">{pharmacists.length}</p>
                         </div>
-
-                        {/* Mock Map Illustration */}
-                        <div className="text-center p-8">
-                            <div className="w-48 h-64 bg-blue-100 rounded-full blur-3xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30"></div>
-                            <MapIcon size={120} className="text-blue-300 mx-auto mb-4 animate-pulse" />
-                            <p className="text-gray-400 font-medium">ส่วนแสดงแผนที่ประเทศไทย (Interactive Map)</p>
-                            <p className="text-xs text-gray-400 mt-1 max-w-[200px] mx-auto">คลิกเลือกจังหวัดในแผนที่เพื่อกรองข้อมูลในตาราง</p>
-
-                            <div className="mt-8 flex flex-wrap justify-center gap-2">
-                                {PROVINCES.slice(0, 4).map(p => (
-                                    <button
-                                        key={p.value}
-                                        onClick={() => setSearchTerm(p.value)}
-                                        className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs hover:border-blue-500 hover:text-blue-600 transition"
-                                    >
-                                        {p.label}
-                                    </button>
-                                ))}
-                            </div>
+                        <div className="p-2.5 bg-blue-50 rounded-lg">
+                            <Users size={20} className="text-blue-600" />
                         </div>
                     </div>
                 </div>
 
-                {/* Right Section: Management Table */}
-                <div className="lg:col-span-7 flex flex-col gap-4">
-                    {/* Search and Filters */}
-                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-3">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-gray-600 text-sm font-medium">กำลังใช้งาน</p>
+                            <p className="text-3xl font-bold text-green-600 mt-1">
+                                {pharmacists.filter(p => p.status === 'Active').length}
+                            </p>
+                        </div>
+                        <div className="p-2.5 bg-green-50 rounded-lg">
+                            <Filter size={20} className="text-green-600" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-gray-600 text-sm font-medium">พื้นที่ปฏิบัติงาน</p>
+                            <p className="text-3xl font-bold text-purple-600 mt-1">{uniqueProvinces.length}</p>
+                        </div>
+                        <div className="p-2.5 bg-purple-50 rounded-lg">
+                            <MapIcon size={20} className="text-purple-600" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                {/* Filters Section */}
+                <div className="border-b border-gray-200 p-5 space-y-4">
+                    <h2 className="text-sm font-semibold text-gray-900">ตัวกรองและค้นหา</h2>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {/* Search */}
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                             <input
                                 type="text"
                                 placeholder="ค้นหาชื่อ, นามสกุล, เลขทะเบียน..."
-                                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                                className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <Button variant="secondary" icon={Filter}>
-                            กรองข้อมูล
-                        </Button>
+
+                        {/* Filter by Province */}
+                        <select
+                            value={filterProvince}
+                            onChange={(e) => setFilterProvince(e.target.value)}
+                            className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                        >
+                            <option value="">ทั้งหมด - จังหวัด</option>
+                            {PROVINCES.map(province => (
+                                <option key={province.value} value={province.value}>{province.label}</option>
+                            ))}
+                        </select>
+
+                        {/* Filter by Status */}
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                        >
+                            <option value="">ทั้งหมด - สถานะ</option>
+                            <option value="Active">กำลังใช้งาน</option>
+                            <option value="Inactive">ไม่ใช้งาน</option>
+                        </select>
+
+                        {/* Sort */}
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as 'name' | 'license' | 'date')}
+                            className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                        >
+                            <option value="name">เรียงตามชื่อ</option>
+                            <option value="license">เรียงตามเลขทะเบียน</option>
+                        </select>
                     </div>
 
-                    {/* Table */}
-                    <Table headers={['ชื่อ-นามสกุล', 'เลขทะเบียน', 'จังหวัด', 'สถานะ', 'จัดการ']}>
-                        {filteredPharmacists.length > 0 ? (
-                            filteredPharmacists.map((p) => (
-                                <TableRow key={p.id}>
-                                    <TableCell>
-                                        <div className="font-medium text-gray-900">{p.firstName} {p.lastName}</div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">{p.licenseNumber}</span>
-                                    </TableCell>
-                                    <TableCell>{p.province}</TableCell>
-                                    <TableCell>
-                                        <Badge color={p.status === 'Active' ? 'green' : 'gray'}>
-                                            {p.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => handleOpenModal(p)}
-                                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                                                title="แก้ไข"
-                                            >
-                                                <Edit size={16} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(p.id)}
-                                                className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                title="ลบ"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell className="text-center py-12 text-gray-400" colSpan={5}>
-                                    ไม่พบข้อมูลที่ค้นหา
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </Table>
-
-                    {/* Stats Card */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-                            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                                <Users size={24} />
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-500 font-medium">เภสัชกรทั้งหมด</p>
-                                <p className="text-2xl font-bold text-gray-800">{pharmacists.length}</p>
-                            </div>
+                    {/* Active Filters */}
+                    {(searchTerm || filterProvince || filterStatus) && (
+                        <div className="flex flex-wrap gap-2 pt-2">
+                            {searchTerm && (
+                                <span className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+                                    ค้นหา: {searchTerm}
+                                    <button onClick={() => setSearchTerm('')} className="hover:text-blue-900">✕</button>
+                                </span>
+                            )}
+                            {filterProvince && (
+                                <span className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+                                    {filterProvince}
+                                    <button onClick={() => setFilterProvince('')} className="hover:text-blue-900">✕</button>
+                                </span>
+                            )}
+                            {filterStatus && (
+                                <span className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+                                    {filterStatus === 'Active' ? 'กำลังใช้งาน' : 'ไม่ใช้งาน'}
+                                    <button onClick={() => setFilterStatus('')} className="hover:text-blue-900">✕</button>
+                                </span>
+                            )}
                         </div>
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-                            <div className="p-3 bg-green-50 text-green-600 rounded-lg">
-                                <MapIcon size={24} />
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-500 font-medium">จำนวนจังหวัด</p>
-                                <p className="text-2xl font-bold text-gray-800">{PROVINCES.length}</p>
-                            </div>
-                        </div>
-                    </div>
+                    )}
                 </div>
+
+                {/* Table Section */}
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">ชื่อ-นามสกุล</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">เลขทะเบียน</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">จังหวัด</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">สถานะ</th>
+                                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-700">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {filteredPharmacists.length > 0 ? (
+                                filteredPharmacists.map((p) => (
+                                    <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div>
+                                                <p className="font-medium text-gray-900">{p.firstName} {p.lastName}</p>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <code className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-700 font-mono">
+                                                {p.licenseNumber}
+                                            </code>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-700">{p.province}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                p.status === 'Active'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-gray-100 text-gray-800'
+                                            }`}>
+                                                {p.status === 'Active' ? '✓ กำลังใช้งาน' : '○ ไม่ใช้งาน'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button
+                                                    onClick={() => handleOpenModal(p)}
+                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                                                    title="แก้ไข"
+                                                >
+                                                    <Edit size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(p.id, `${p.firstName} ${p.lastName}`)}
+                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                    title="ลบ"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-12 text-center">
+                                        <MapIcon size={32} className="text-gray-300 mx-auto mb-3" />
+                                        <p className="text-gray-500 font-medium">ไม่พบข้อมูล</p>
+                                        <p className="text-gray-400 text-sm mt-1">ลองปรับตัวกรองหรือค้นหาใหม่อีกครั้ง</p>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Footer Info */}
+                {filteredPharmacists.length > 0 && (
+                    <div className="border-t border-gray-200 px-6 py-3 bg-gray-50 text-sm text-gray-600">
+                        แสดง <span className="font-semibold text-gray-900">{filteredPharmacists.length}</span> จาก <span className="font-semibold text-gray-900">{pharmacists.length}</span> รายการ
+                    </div>
+                )}
             </div>
 
             {/* Add/Edit Modal */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title={editingPharmacist ? 'แก้ไขข้อมูลเภสัชกร' : 'เพิ่มข้อมูลเภสัชกร'}
+                title={editingPharmacist ? 'แก้ไขข้อมูลเภสัชกร' : 'เพิ่มเภสัชกรใหม่'}
             >
-                <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <Input
-                            label="ชื่อ"
-                            placeholder="กรอกชื่อ"
+                            label="ชื่อ *"
+                            placeholder="กรอกชื่อจริง"
                             value={formData.firstName}
                             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                         />
                         <Input
-                            label="นามสกุล"
+                            label="นามสกุล *"
                             placeholder="กรอกนามสกุล"
                             value={formData.lastName}
                             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                         />
                     </div>
+
                     <Input
-                        label="เลขทะเบียนเภสัชกร"
+                        label="เลขทะเบียนเภสัชกร *"
                         placeholder="เช่น ภ.12345"
                         value={formData.licenseNumber}
                         onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
                     />
-                    <div className="grid grid-cols-2 gap-4">
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <Select
                             label="จังหวัด"
                             options={PROVINCES}
@@ -329,16 +420,24 @@ export default function Register() {
                         <Select
                             label="สถานะ"
                             options={[
-                                { label: 'Active', value: 'Active' },
-                                { label: 'Inactive', value: 'Inactive' }
+                                { label: 'กำลังใช้งาน', value: 'Active' },
+                                { label: 'ไม่ใช้งาน', value: 'Inactive' }
                             ]}
                             value={formData.status}
                             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                         />
                     </div>
+
                     <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-100">
-                        <Button variant="secondary" onClick={() => setIsModalOpen(false)}>ยกเลิก</Button>
-                        <Button onClick={handleSave}>บันทึกข้อมูล</Button>
+                        <Button 
+                            variant="secondary" 
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            ยกเลิก
+                        </Button>
+                        <Button onClick={handleSave}>
+                            {editingPharmacist ? 'อัปเดต' : 'เพิ่ม'}เภสัชกร
+                        </Button>
                     </div>
                 </div>
             </Modal>
