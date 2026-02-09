@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Save, User, Camera, Trash2, Users, ChevronDown } from "lucide-react"; // เพิ่ม ChevronDown สำหรับแต่ง Dropdown
-import styles from "./page.module.css";
+import styles from "./council.module.css";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 

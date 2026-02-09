@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import styles from './news.module.css';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Search } from 'lucide-react';
 
 // Types
 type NewsStatus = 'published' | 'draft';
@@ -195,6 +195,7 @@ export default function NewsPage() {
           </p>
         </div>
         <div className={styles.controls}>
+          <Search className={styles.searchIcon} size={20} />
           <input type="text" placeholder="ค้นหา..." className={styles.searchBox} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           <select className={styles.filterSelect} value={filterCategory} onChange={(e) => setFilterCategory(e.target.value as FilterCategory)}>
             <option value="all">ทุกประเภท</option>
