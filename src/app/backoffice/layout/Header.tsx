@@ -1,10 +1,11 @@
 // src/components/layout/Header.tsx
 "use client";
 
-import { Menu, LogOut } from 'lucide-react';
-import styles from './Header.module.css';
-import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
+import { Menu, LogOut } from "lucide-react";
+import styles from "./Header.module.css";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import Link from "next/link";
 
 // 1. กำหนด Type ของ Props ที่จะรับมา
 interface HeaderProps {
@@ -16,41 +17,41 @@ export default function Header({ onToggle }: HeaderProps) {
   const router = useRouter();
 
   const handleLogout = () => {
-    Cookies.remove('auth_token', { path: '/' });
-    router.refresh(); 
-    router.replace('/login');
+    Cookies.remove("auth_token", { path: "/" });
+    router.refresh();
+    router.replace("/login");
   };
 
   return (
     <header className={styles.header}>
-      
       <div className={styles.leftSection}>
         {/* 3. ผูกฟังก์ชัน onToggle กับปุ่ม Menu */}
-        <button 
-          className={styles.toggleBtn} 
+        <button
+          className={styles.toggleBtn}
           title="Toggle Sidebar"
           onClick={onToggle} // 👈 ใส่ตรงนี้
         >
-            <Menu size={20} />
+          <Menu size={20} />
         </button>
-        <h1 className={styles.brandName}>BACKOFFICE</h1>
+        <Link href="/backoffice" style={{ textDecoration: "none" }}>
+          <h1 className={styles.brandName}>BACKOFFICE</h1>
+        </Link>
       </div>
 
       <div className={styles.rightSection}>
-        <div 
-            className={styles.userProfile} 
-            onClick={handleLogout}
-            title="ออกจากระบบ"
+        <div
+          className={styles.userProfile}
+          onClick={handleLogout}
+          title="ออกจากระบบ"
         >
-            <div className={styles.avatar}>A</div>
-            <div className={styles.userInfo}>
-                <span className={styles.userName}>Admin</span>
-                <span className={styles.userRole}>Click to Logout</span>
-            </div>
-            <LogOut size={16} className={styles.logoutIcon} />
+          <div className={styles.avatar}>A</div>
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>Admin</span>
+            <span className={styles.userRole}>Click to Logout</span>
+          </div>
+          <LogOut size={16} className={styles.logoutIcon} />
         </div>
       </div>
-
     </header>
   );
 }
