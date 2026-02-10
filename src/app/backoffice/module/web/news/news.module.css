@@ -199,7 +199,8 @@
 .btnEdit {
     background-color: #fff;
     color: #3182ce;
-    border: 1px solid #90cdf4;;
+    border: 1px solid #90cdf4;
+    ;
     height: auto;
     padding: 0.3rem 0.8rem;
     font-size: 0.8rem;
@@ -238,6 +239,8 @@
     border-radius: 8px;
     width: 90%;
     max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modalHeader {
