@@ -1,7 +1,7 @@
 // src/app/backoffice/module/web/about/council/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Edit,
   Trash2,
@@ -11,6 +11,7 @@ import {
   UploadCloud,
   X,
   ZoomIn,
+  Search,
 } from "lucide-react"; // เพิ่ม UploadCloud icon
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -32,6 +33,55 @@ interface CouncilMember {
 export default function CouncilPage() {
   const [members, setMembers] = useState<CouncilMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState(""); // "" = ทั้งหมด
+  const [filterPosition, setFilterPosition] = useState(""); // "" = ทั้งหมด
+
+  // Sorting
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  const uniquePositions = useMemo(() => {
+    // ดึงเฉพาะชื่อตำแหน่งออกมา แล้วใช้ Set เพื่อตัดคำซ้ำ
+    const positions = Array.from(new Set(members.map((m) => m.position)));
+    return positions.sort(); // เรียงก-ฮ
+  }, [members]);
+
+  const filteredMembers = useMemo(() => {
+    return members
+      .filter((member) => {
+        // 3.1 ค้นหา (จากชื่อ หรือ ตำแหน่ง)
+        const searchLower = searchTerm.toLowerCase();
+        const matchSearch =
+          member.name.toLowerCase().includes(searchLower) ||
+          member.position.toLowerCase().includes(searchLower);
+
+        // 3.2 กรองประเภท
+        const matchType = filterType ? member.type === filterType : true;
+
+        // 3.3 กรองตำแหน่ง
+        const matchPosition = filterPosition
+          ? member.position === filterPosition
+          : true;
+
+        return matchSearch && matchType && matchPosition;
+      })
+      .sort((a, b) => {
+        // 3.4 เรียงลำดับ (ใช้ Logic เดิม + Sort Direction)
+        if (sortDirection === "asc") return a.order - b.order;
+        return b.order - a.order;
+      });
+  }, [members, searchTerm, filterType, filterPosition, sortDirection]);
+
+  const handleSort = () => {
+    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+  };
+
+  const getSortIcon = () => {
+    return sortDirection === "asc" ? "↑" : "↓";
+  };
+
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -156,6 +206,47 @@ export default function CouncilPage() {
             รวมรายชื่อทั้ง เลือกตั้ง และ แต่งตั้ง
           </p>
         </div>
+      </div>
+      <div className={styles.toolbar}>
+        {/* 🔥 2. Toolbar: Search + Filters + Add Button */}
+        {/* ช่องค้นหา */}
+        <div className={styles.searchWrapper}>
+          <Search size={18} className={styles.searchIcon} />
+          <input
+            type="text"
+            className={styles.searchInput}
+            placeholder="ค้นหาชื่อ, ตำแหน่ง..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* Filter: ตำแหน่ง (Dynamic) */}
+        <select
+          className={styles.filterSelect}
+          value={filterPosition}
+          onChange={(e) => setFilterPosition(e.target.value)}
+        >
+          <option value="">ทุกตำแหน่ง</option>
+          {uniquePositions.map((pos, idx) => (
+            <option key={idx} value={pos}>
+              {pos}
+            </option>
+          ))}
+        </select>
+
+        {/* Filter: ประเภท (Static) */}
+        <select
+          className={styles.filterSelect}
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+        >
+          <option value="">ทุกประเภท</option>
+          <option value="elected">🗳️ การเลือกตั้ง</option>
+          <option value="appointed">📜 การแต่งตั้ง</option>
+        </select>
+
+        {/* ปุ่มเพิ่มข้อมูล (ย้ายมาขวาสุด) */}
         <button onClick={() => openModal()} className={styles.btnAdd}>
           <Plus size={20} /> เพิ่มข้อมูลใหม่
         </button>
@@ -167,8 +258,14 @@ export default function CouncilPage() {
           <table className={styles.table}>
             <thead>
               <tr className={styles.tableHead}>
-                <th className={`${styles.tableTh} text-center w-16`}>ลำดับ</th>
-                <th className={`${styles.tableTh} w-24`}>รูปภาพ</th>
+                <th
+                  className={`${styles.tableTh} ${styles.thSortable} text-center w-16`}
+                  onClick={handleSort}
+                >
+                  ลำดับ{" "}
+                  <span className={styles.sortIconActive}>{getSortIcon()}</span>
+                </th>
+                <th className={`${styles.tableTh} text-center w-24`}>รูปภาพ</th>
                 <th className={styles.tableTh}>ชื่อ-นามสกุล</th>
                 <th className={styles.tableTh}>ตำแหน่ง</th>
                 <th className={styles.tableTh}>ประเภท</th>
@@ -183,7 +280,7 @@ export default function CouncilPage() {
                   </td>
                 </tr>
               ) : (
-                members.map((member) => (
+                filteredMembers.map((member) => (
                   <tr key={member.id} className={styles.tableRow}>
                     <td className={`${styles.tableTd} text-center`}>
                       <span className={styles.orderBadge}>{member.order}</span>

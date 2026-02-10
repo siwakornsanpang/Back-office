@@ -61,7 +61,7 @@
   color: #2563eb;
   border-radius: 0.5rem;
   transition: background-color 0.2s;
-  border: none;
+  border: 1px solid #90cdf4;
   background: none;
   cursor: pointer;
 }
@@ -74,7 +74,7 @@
   color: #ef4444;
   border-radius: 0.5rem;
   transition: background-color 0.2s;
-  border: none;
+  border: 1px solid #fa5252;
   background: none;
   cursor: pointer;
 }
@@ -133,16 +133,49 @@
 }
 
 .tableHead {
-  background-color: #f9fafb;
+  background-color: #f8f9fa;
   border-bottom: 1px solid #f3f4f6;
 }
 .tableTh {
   padding: 1rem;
   font-weight: 600;
-  color: #4b5563;
+  color: #495057;
   font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Sortable Header */
+.thSortable {
+  cursor: pointer;
+  transition: background 0.2s;
+  padding-right: 1.5rem !important;
+  position: relative;
+}
+
+.thSortable:hover {
+  background-color: #e9ecef;
+}
+
+.sortIcon {
+  font-size: 0.7rem;
+  margin-left: 4px;
+  color: #adb5bd;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sortIconActive {
+  font-size: 0.7rem;
+  margin-left: 4px;
+  color: #495057;
+  font-weight: bold;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .tableTd {
   padding: 1rem;
@@ -543,4 +576,68 @@
 .imageCell:hover .viewImageLabel {
   color: #2563eb;    /* สีน้ำเงิน */
   text-decoration: underline;
+}
+
+
+.toolbar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap; /* เผื่อจอเล็กจะได้ปัดลงมา */
+}
+
+/* กล่องครอบช่องค้นหา (เพื่อให้มีไอคอนแว่นขยายข้างใน) */
+.searchWrapper {
+  position: relative;
+  flex: 1; /* ยืดเต็มพื้นที่ที่เหลือ */
+  min-width: 200px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af; /* gray-400 */
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem; /* เว้นซ้ายให้ไอคอน */
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  outline: none;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: white;
+}
+.searchInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Dropdown Filter */
+.filterSelect {
+  padding: 0.5rem 2rem 0.5rem 0.75rem; /* เว้นขวาให้ลูกศร */
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  outline: none;
+  font-size: 0.9rem;
+  background-color: white;
+  color: #4b5563;
+  cursor: pointer;
+  min-width: 150px;
+  
+  /* Custom Arrow (Optional: เพื่อความสวยงามเหมือนในรูป) */
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+}
+
+.filterSelect:focus {
+  border-color: #3b82f6;
 }
