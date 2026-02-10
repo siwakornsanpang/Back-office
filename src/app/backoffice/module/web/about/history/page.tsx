@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Edit, Trash2, Plus, User, ImageIcon, UploadCloud, X, ZoomIn } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -25,6 +25,26 @@ export default function HistoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  // Sorting
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = () => {
+    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+  };
+
+  const getSortIcon = () => {
+    return sortDirection === 'asc' ? '↑' : '↓';
+  };
+
+  const sortedItems = useMemo(() => {
+    return [...items].sort((a, b) => {
+      const aVal = parseInt(a.term) || 0;
+      const bVal = parseInt(b.term) || 0;
+      if (sortDirection === 'asc') return aVal - bVal;
+      return bVal - aVal;
+    });
+  }, [items, sortDirection]);
 
   // Form Data (มี 2 รูป)
   const [formData, setFormData] = useState<{
@@ -166,7 +186,9 @@ export default function HistoryPage() {
           <table className={styles.table}>
             <thead>
               <tr className={styles.tableHead}>
-                <th className={`${styles.tableTh} text-center w-20`}>วาระ</th>
+                <th className={`${styles.tableTh} ${styles.thSortable} text-center w-20`} onClick={handleSort}>
+                  วาระ <span className={styles.sortIconActive}>{getSortIcon()}</span>
+                </th>
                 <th className={`${styles.tableTh} w-32`}>ปี (พ.ศ.)</th>
                 <th className={`${styles.tableTh} text-center w-32`}>รูปนายก</th>
                 <th className={styles.tableTh}>ชื่อนายกสภา</th>
@@ -176,7 +198,7 @@ export default function HistoryPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {items.map((item) => (
+              {sortedItems.map((item) => (
                 <tr key={item.id} className={styles.tableRow}>
                   <td className="p-4 text-center font-bold text-blue-600 text-lg">{item.term}</td>
                   <td className="p-4 text-gray-600">{item.years}</td>

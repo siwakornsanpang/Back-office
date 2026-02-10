@@ -61,7 +61,7 @@
   color: #2563eb;
   border-radius: 0.5rem;
   transition: background-color 0.2s;
-  border: none;
+  border: 1px solid #90cdf4;
   background: none;
   cursor: pointer;
 }
@@ -74,7 +74,7 @@
   color: #ef4444;
   border-radius: 0.5rem;
   transition: background-color 0.2s;
-  border: none;
+  border: 1px solid #fa5252;
   background: none;
   cursor: pointer;
 }
@@ -133,16 +133,49 @@
 }
 
 .tableHead {
-  background-color: #f9fafb;
+  background-color: #f8f9fa;
   border-bottom: 1px solid #f3f4f6;
 }
 .tableTh {
   padding: 1rem;
   font-weight: 600;
-  color: #4b5563;
+  color: #495057;
   font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Sortable Header */
+.thSortable {
+  cursor: pointer;
+  transition: background 0.2s;
+  padding-right: 1.5rem !important;
+  position: relative;
+}
+
+.thSortable:hover {
+  background-color: #e9ecef;
+}
+
+.sortIcon {
+  font-size: 0.7rem;
+  margin-left: 4px;
+  color: #adb5bd;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sortIconActive {
+  font-size: 0.7rem;
+  margin-left: 4px;
+  color: #495057;
+  font-weight: bold;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .tableTd {
   padding: 1rem;

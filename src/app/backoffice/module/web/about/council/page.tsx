@@ -1,7 +1,7 @@
 // src/app/backoffice/module/web/about/council/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Edit,
   Trash2,
@@ -32,6 +32,24 @@ interface CouncilMember {
 export default function CouncilPage() {
   const [members, setMembers] = useState<CouncilMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Sorting
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = () => {
+    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+  };
+
+  const getSortIcon = () => {
+    return sortDirection === 'asc' ? '↑' : '↓';
+  };
+
+  const sortedMembers = useMemo(() => {
+    return [...members].sort((a, b) => {
+      if (sortDirection === 'asc') return a.order - b.order;
+      return b.order - a.order;
+    });
+  }, [members, sortDirection]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -167,8 +185,10 @@ export default function CouncilPage() {
           <table className={styles.table}>
             <thead>
               <tr className={styles.tableHead}>
-                <th className={`${styles.tableTh} text-center w-16`}>ลำดับ</th>
-                <th className={`${styles.tableTh} w-24`}>รูปภาพ</th>
+                <th className={`${styles.tableTh} ${styles.thSortable} text-center w-16`} onClick={handleSort}>
+                  ลำดับ <span className={styles.sortIconActive}>{getSortIcon()}</span>
+                </th>
+                <th className={`${styles.tableTh} text-center w-24`}>รูปภาพ</th>
                 <th className={styles.tableTh}>ชื่อ-นามสกุล</th>
                 <th className={styles.tableTh}>ตำแหน่ง</th>
                 <th className={styles.tableTh}>ประเภท</th>
@@ -183,7 +203,7 @@ export default function CouncilPage() {
                   </td>
                 </tr>
               ) : (
-                members.map((member) => (
+                sortedMembers.map((member) => (
                   <tr key={member.id} className={styles.tableRow}>
                     <td className={`${styles.tableTd} text-center`}>
                       <span className={styles.orderBadge}>{member.order}</span>
