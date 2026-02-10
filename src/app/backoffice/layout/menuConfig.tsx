@@ -42,12 +42,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
         icon: <Building2 size={20} />,
         submenu: [
            { id: 'web-about-history', title: 'ทำเนียบสภา', href: '/backoffice/module/web/about/history' },
-           { id: 'web-about-board', title: 'กรรมการสภา', 
-            submenu :[
-              {id: 'web-about-board1', title:'กรรมการเลือกตั้ง',href:'/backoffice/module/web/about/council/elected'},
-              {id: 'web-about-board2', title:'กรรมการแต่งตั้ง', href:'/backoffice/module/web/about/council/appointed'}
-            ]
-            },
+           { id: 'web-about-board', title: 'กรรมการสภา', href: '/backoffice/module/web/about/council' },
         ]
       },
       { id: 'web-news', title: 'ข่าวประชาสัมพันธ์', href :'/backoffice/module/web/news' ,icon: <Megaphone size={20} />,},
