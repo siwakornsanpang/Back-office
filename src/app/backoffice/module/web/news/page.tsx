@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './news.module.css';
 import { Edit, Trash2, Search } from 'lucide-react';
+import Editor from '@/app/components/editor/editor';
 
 // Types
 type NewsStatus = 'published' | 'draft';
@@ -400,8 +401,14 @@ export default function NewsPage() {
 
 
               <div className={styles.formGroup}>
-                <label style={{ marginBottom: '0.5rem', display: 'block' }}>เนื้อหา</label>
-                <textarea rows={4} className={styles.textarea} value={newContent} onChange={e => setNewContent(e.target.value)} required />
+                {/* <label style={{ marginBottom: '0.5rem', display: 'block' }}>เนื้อหา</label>
+                <textarea rows={4} className={styles.textarea} value={newContent} onChange={e => setNewContent(e.target.value)} required /> */}
+                <Editor
+                  label="เนื้อหาข่าว"
+                  value={newContent}
+                  onChange={setNewContent}
+                  placeholder="กรุณาระบุรายละเอียดข่าว..."
+                />
               </div>
 
               <div className={styles.modalActions}>
