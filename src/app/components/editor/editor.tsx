@@ -25,10 +25,13 @@ export default function Editor({ label, value, onChange, placeholder }: EditorPr
 
     const modules = {
         toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
+            ['bold', 'italic', 'underline', 'strike', { 'color': [] }],
+            [{ 'align': [] }],
             [{ list: 'ordered' }, { list: 'bullet' }],
-            ['link', 'clean'],
+            ['link', 'image', 'video'],          
+            [{ header: [1, 2, 3, false] }],
+            ['blockquote', 'code-block'],
+            ['clean'], 
         ],
     };
 

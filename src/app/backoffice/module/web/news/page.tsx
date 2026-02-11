@@ -288,14 +288,14 @@ export default function NewsPage() {
               </th>
               <th>หัวข้อข่าว</th>
               <th style={{ width: '130px', textAlign: 'center' }}>ประเภท</th>
-              <th className={styles.thSortable} onClick={() => handleSort('createdAt')} style={{ width: '120px' }}>
+              <th className={styles.thSortable} onClick={() => handleSort('createdAt')} style={{ width: '140px' }}>
                 วันที่สร้าง <span className={sortConfig.key === 'createdAt' ? styles.sortIconActive : styles.sortIcon}>{getSortIcon('createdAt')}</span>
               </th>
-              <th className={styles.thSortable} onClick={() => handleSort('updatedAt')} style={{ width: '120px' }}>
+              <th className={styles.thSortable} onClick={() => handleSort('updatedAt')} style={{ width: '140px' }}>
                 แก้ไขล่าสุด <span className={sortConfig.key === 'updatedAt' ? styles.sortIconActive : styles.sortIcon}>{getSortIcon('updatedAt')}</span>
               </th>
-              <th style={{ width: '130px', textAlign: 'center' }}>สถานะ</th>
-              <th style={{ width: '140px', textAlign: 'center' }}>จัดการ</th>
+              <th style={{ width: '120px', textAlign: 'center' }}>สถานะ</th>
+              <th style={{ width: '160px', textAlign: 'center' }}>จัดการ</th>
             </tr>
           </thead>
           <tbody>
@@ -309,7 +309,7 @@ export default function NewsPage() {
                   <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#555' }}>{item.order}</td>
                   <td>
                     <div>{item.title}</div>
-                    {/* <div style={{ fontSize: '0.85rem', color: '#666' }}>{item.content}</div> */}
+                    {/* <div style={{ fontSize: '0.85rem', color: '#666' }}><HtmlContent content={item.content} /></div> */}
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <span className={styles.badge}>
