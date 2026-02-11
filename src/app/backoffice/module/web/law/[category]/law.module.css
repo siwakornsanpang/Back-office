@@ -286,3 +286,146 @@
   background-color: #fef2f2;
   border-color: #ef4444;
 }
+
+
+.btnEdit {
+      color: #3182ce;
+  background: white;
+   border: 1px solid #90cdf4;
+  padding: 0.4rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnEdit:hover {
+    background-color: #ebf8ff;
+    border-color: #63b3ed;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+  user-select: none; /* กัน User ลากคลุมดำตอนกดรัวๆ */
+}
+
+.statusBadge:hover {
+  transform: scale(1.05); /* ขยายหน่อยๆ ตอนเอาเมาส์ชี้ */
+}
+
+.statusOnline {
+  background-color: #dcfce7; /* เขียวอ่อน */
+  color: #166534;           /* เขียวเข้ม */
+  border-color: #bbf7d0;
+}
+.statusOnline:hover {
+  background-color: #bbf7d0; /* เขียวเข้มขึ้นตอนชี้ */
+}
+
+.statusOffline {
+  background-color: #f3f4f6; /* เทาอ่อน */
+  color: #4b5563;           /* เทาเข้ม */
+  border-color: #e5e7eb;
+}
+.statusOffline:hover {
+  background-color: #e5e7eb; /* เทาเข้มขึ้นตอนชี้ */
+}
+
+/* เพิ่ม Icon หมุนๆ ตอนกำลังโหลดสถานะ (เผื่อไว้) */
+.loadingSpin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+
+
+
+
+
+
+
+.toolbar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap; /* ให้ปัดบรรทัดใหม่ได้ถ้าจอเล็ก */
+}
+
+/* ช่องค้นหา (Search) */
+.searchWrapper {
+  position: relative;
+  flex: 1; /* ยืดกินพื้นที่ว่างที่เหลือ */
+  min-width: 250px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.6rem 0.75rem 0.6rem 2.5rem; /* เว้นที่ซ้ายให้ไอคอน */
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: white;
+}
+
+.searchInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ตัวกรอง (Filters) */
+.filterGroup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filterInput, .filterSelect {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background-color: white;
+  font-size: 0.9rem;
+  color: #374151;
+  outline: none;
+  cursor: pointer;
+}
+
+.filterInput:focus, .filterSelect:focus {
+  border-color: #3b82f6;
+}
+
+.dateLabel {
+  font-size: 0.85rem;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+/* ปุ่ม Add เดิม (ปรับนิดหน่อยให้เข้าพวก) */
+.mainActionBtn {
+  /* ...ค่าเดิม... */
+  white-space: nowrap; /* ห้ามตัดบรรทัด */
+  height: 42px; /* สูงเท่า input */
+}
