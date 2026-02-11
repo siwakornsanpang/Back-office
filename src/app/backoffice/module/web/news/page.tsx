@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import styles from './news.module.css';
 import { Edit, Trash2, Search } from 'lucide-react';
 import Editor from '@/app/components/editor/editor';
+import HtmlContent from '@/app/components/editor/HtmlContent';
 
 // Types
 type NewsStatus = 'published' | 'draft';
@@ -285,7 +286,7 @@ export default function NewsPage() {
               <th className={styles.thSortable} onClick={() => handleSort('order')} style={{ width: '80px', textAlign: 'center' }}>
                 ลำดับ <span className={sortConfig.key === 'order' ? styles.sortIconActive : styles.sortIcon}>{getSortIcon('order')}</span>
               </th>
-              <th>รายละเอียดข่าว</th>
+              <th>หัวข้อข่าว</th>
               <th style={{ width: '130px', textAlign: 'center' }}>ประเภท</th>
               <th className={styles.thSortable} onClick={() => handleSort('createdAt')} style={{ width: '120px' }}>
                 วันที่สร้าง <span className={sortConfig.key === 'createdAt' ? styles.sortIconActive : styles.sortIcon}>{getSortIcon('createdAt')}</span>
@@ -307,8 +308,8 @@ export default function NewsPage() {
                 <tr key={item.id}>
                   <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#555' }}>{item.order}</td>
                   <td>
-                    <div style={{ fontWeight: 'bold' }}>{item.title}</div>
-                    <div style={{ fontSize: '0.85rem', color: '#666' }}>{item.content}</div>
+                    <div>{item.title}</div>
+                    {/* <div style={{ fontSize: '0.85rem', color: '#666' }}>{item.content}</div> */}
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <span className={styles.badge}>
@@ -367,7 +368,7 @@ export default function NewsPage() {
 
                 <div className={styles.formCol}>
                   <label style={{ marginBottom: '0.5rem', display: 'block' }}>หัวข้อ</label>
-                  <input type="text" className={styles.input} value={newTitle} onChange={e => setNewTitle(e.target.value)} required />
+                  <input type="text" className={styles.input} value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder='กรุณาระบุหัวข้อข่าว...' required />
                 </div>
               </div>
 
@@ -398,11 +399,7 @@ export default function NewsPage() {
                 </div>
               </div>
 
-
-
               <div className={styles.formGroup}>
-                {/* <label style={{ marginBottom: '0.5rem', display: 'block' }}>เนื้อหา</label>
-                <textarea rows={4} className={styles.textarea} value={newContent} onChange={e => setNewContent(e.target.value)} required /> */}
                 <Editor
                   label="เนื้อหาข่าว"
                   value={newContent}
