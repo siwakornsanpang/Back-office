@@ -28,10 +28,10 @@ export default function Editor({ label, value, onChange, placeholder }: EditorPr
             ['bold', 'italic', 'underline', 'strike', { 'color': [] }],
             [{ 'align': [] }],
             [{ list: 'ordered' }, { list: 'bullet' }],
-            ['link', 'image', 'video'],          
+            ['link', 'image'],
+            ['clean'],    
             [{ header: [1, 2, 3, false] }],
             ['blockquote', 'code-block'],
-            ['clean'], 
         ],
     };
 
