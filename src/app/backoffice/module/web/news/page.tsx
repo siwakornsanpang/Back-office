@@ -309,7 +309,7 @@ export default function NewsPage() {
                   <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#555' }}>{item.order}</td>
                   <td>
                     <div>{item.title}</div>
-                    <div style={{ fontSize: '0.85rem', color: '#666' }}><HtmlContent content={item.content} /></div>
+                    {/* <div style={{ fontSize: '0.85rem', color: '#666' }}><HtmlContent content={item.content} /></div> */}
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <span className={styles.badge}>
