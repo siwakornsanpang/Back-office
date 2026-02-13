@@ -1,60 +1,84 @@
-// src/app/backoffice/layout.tsx (หรือไฟล์ layout ที่คุณใช้)
-"use client"; 
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
-import Header from './layout/Header'; // ตรวจสอบ path import ให้ถูก
-import Sidebar from './layout/Sidebar'; // ตรวจสอบ path import ให้ถูก
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+
+import Header from "./layout/Header";
+import Sidebar from "./layout/Sidebar";
 
 export default function BackOfficeLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  
-  // 1. สร้าง State สำหรับเปิด/ปิด Sidebar (ค่าเริ่มต้นคือ true = เปิด)
+
+  // null = ยังไม่เช็ค
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+  // รอให้ component mount ก่อน (กัน hydration issue)
+  const [isMounted, setIsMounted] = useState(false);
+
+  // sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  // เช็คว่า mount แล้ว
   useEffect(() => {
-    const token = Cookies.get('auth_token');
+    setIsMounted(true);
+  }, []);
+
+  // เช็ค auth หลัง mount เท่านั้น
+  useEffect(() => {
+    if (!isMounted) return;
+
+    const token = Cookies.get("auth_token");
+
     if (!token) {
-      router.replace('/login');
+      setIsAuthorized(false);
+      router.replace("/login");
     } else {
       setIsAuthorized(true);
     }
-  }, [router]);
+  }, [isMounted, router]);
 
-  if (!isAuthorized) {
-    return null; 
+  // ระหว่างยังไม่ mount → render เปล่าไว้ก่อน
+  if (!isMounted) {
+    return null;
+  }
+
+  // ระหว่างกำลังเช็ค auth
+  if (isAuthorized === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f3f4f6]">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  // ไม่ผ่าน auth
+  if (isAuthorized === false) {
+    return null;
   }
 
   return (
     <div className="bg-[#f3f4f6] min-h-screen font-sans">
-      
-      {/* 2. ส่งฟังก์ชันสลับสถานะไปให้ Header */}
-      <Header onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
-      
-      {/* 3. ส่งสถานะปัจจุบันไปให้ Sidebar */}
+      {/* Header */}
+      <Header onToggle={() => setIsSidebarOpen((prev) => !prev)} />
+
+      {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} />
 
-      {/* 4. ปรับ Padding ของ Main Content ตามสถานะ Sidebar */}
-      <main 
+      {/* Main Content */}
+      <main
         className={`
-            pt-[60px] 
-            transition-all duration-300 ease-in-out
-            ${isSidebarOpen ? 'pl-[260px]' : 'pl-0'} 
-            
+          pt-[60px]
+          transition-all duration-300 ease-in-out
+          ${isSidebarOpen ? "pl-[260px]" : "pl-0"}
         `}
       >
-       
-        <div className="p-6">
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </main>
-
     </div>
   );
 }

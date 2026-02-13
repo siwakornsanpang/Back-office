@@ -21,6 +21,8 @@ export default function RegisterList() {
     const [filterStatus, setFilterStatus] = useState("");
     const [sortBy, setSortBy] = useState<"name" | "license">("name");
     const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         const fetchPharmacists = async () => {
@@ -95,6 +97,24 @@ export default function RegisterList() {
                 return a.licenseNumber.localeCompare(b.licenseNumber);
             });
     }, [pharmacists, searchTerm, filterProvince, filterStatus, sortBy]);
+
+    // Reset to page 1 when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, filterProvince, filterStatus, sortBy]);
+
+    // Pagination Calculations
+    const totalPages = Math.ceil(filteredPharmacists.length / itemsPerPage);
+    const paginatedPharmacists = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredPharmacists.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredPharmacists, currentPage, itemsPerPage]);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
 
     return (
         <div className={styles.container}>
@@ -177,8 +197,8 @@ export default function RegisterList() {
                                         กำลังโหลดข้อมูล...
                                     </td>
                                 </tr>
-                            ) : filteredPharmacists.length > 0 ? (
-                                filteredPharmacists.map((p) => (
+                            ) : paginatedPharmacists.length > 0 ? (
+                                paginatedPharmacists.map((p) => (
                                     <tr key={p.id} className={styles.tableBodyRow}>
                                         <td className={styles.tableBodyCell}>
                                             {p.firstName} {p.lastName}
@@ -216,7 +236,39 @@ export default function RegisterList() {
 
                 {filteredPharmacists.length > 0 && (
                     <div className={styles.tableFooter}>
-                        แสดง {filteredPharmacists.length} จาก {pharmacists.length} รายการ
+                        <div className={styles.paginationInfo}>
+                            แสดง {Math.min((currentPage - 1) * itemsPerPage + 1, filteredPharmacists.length)} - {Math.min(currentPage * itemsPerPage, filteredPharmacists.length)} จาก {filteredPharmacists.length} รายการ
+                        </div>
+
+                        <div className={styles.paginationControls}>
+                            <button
+                                className={styles.pageBtn}
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                            >
+                                ก่อนหน้า
+                            </button>
+
+                            <div className={styles.pageNumbers}>
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <button
+                                        key={i + 1}
+                                        className={`${styles.pageNum} ${currentPage === i + 1 ? styles.pageNumActive : ''}`}
+                                        onClick={() => handlePageChange(i + 1)}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <button
+                                className={styles.pageBtn}
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                            >
+                                ถัดไป
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
