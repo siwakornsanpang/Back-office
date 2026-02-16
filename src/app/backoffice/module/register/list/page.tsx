@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Search, ChevronLeft } from "lucide-react";
+import { Search, ChevronLeft, Eye, X, Users } from "lucide-react";
 import Link from "next/link";
 import styles from "../register.module.css";
 
@@ -12,6 +12,9 @@ type Pharmacist = {
     licenseNumber: string;
     province: string;
     status: string;
+    address?: string; // New field
+    expiryDate?: string; // New field
+    imageUrl?: string; // New field
 };
 
 export default function RegisterList() {
@@ -22,6 +25,7 @@ export default function RegisterList() {
     const [sortBy, setSortBy] = useState<"name" | "license">("name");
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedPharmacist, setSelectedPharmacist] = useState<Pharmacist | null>(null);
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -49,6 +53,9 @@ export default function RegisterList() {
                         licenseNumber: p.registrationId || "",
                         province: p.province || "",
                         status: p.status || "",
+                        address: p.address || "",
+                        expiryDate: p.expiryDate || "",
+                        imageUrl: p.imageUrl || ""
                     };
                 });
 
@@ -114,6 +121,14 @@ export default function RegisterList() {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page);
         }
+    };
+
+    const openDetails = (pharmacist: Pharmacist) => {
+        setSelectedPharmacist(pharmacist);
+    };
+
+    const closeDetails = () => {
+        setSelectedPharmacist(null);
     };
 
     return (
@@ -188,6 +203,7 @@ export default function RegisterList() {
                                 <th className={styles.tableHeadCell}>เลขทะเบียน</th>
                                 <th className={styles.tableHeadCell}>จังหวัด</th>
                                 <th className={styles.tableHeadCell}>สถานะ</th>
+                                <th className={styles.tableHeadCell}>จัดการ</th>
                             </tr>
                         </thead>
                         <tbody className={styles.tableBody}>
@@ -220,6 +236,15 @@ export default function RegisterList() {
                                             >
                                                 {p.status}
                                             </span>
+                                        </td>
+                                        <td className={styles.tableBodyCell}>
+                                            <button
+                                                className={styles.viewDetailBtn}
+                                                onClick={() => openDetails(p)}
+                                            >
+                                                <Eye size={14} />
+                                                <span>ดูรายละเอียด</span>
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -272,6 +297,82 @@ export default function RegisterList() {
                     </div>
                 )}
             </div>
+
+            {/* Detail Modal */}
+            {selectedPharmacist && (
+                <div className={styles.modalOverlay} onClick={closeDetails}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h3 className={styles.modalTitle}>รายละเอียดเภสัชกร</h3>
+                            <button className={styles.closeButton} onClick={closeDetails}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className={styles.modalBody}>
+                            <div className={styles.modalProfileSection}>
+                                <div className={styles.photoWrapper}>
+                                    {selectedPharmacist.imageUrl ? (
+                                        <img
+                                            src={selectedPharmacist.imageUrl}
+                                            alt="Pharmacist Profile"
+                                            className={styles.pharmacistPhoto}
+                                        />
+                                    ) : (
+                                        <div className={styles.photoPlaceholder}>
+                                            <Users size={40} />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className={styles.profileMainInfo}>
+                                    <h4 className={styles.profileName}>
+                                        {selectedPharmacist.firstName} {selectedPharmacist.lastName}
+                                    </h4>
+                                    <span className={styles.detailLicense}>
+                                        {selectedPharmacist.licenseNumber}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className={styles.detailGrid}>
+                                <div className={styles.detailItem}>
+                                    <span className={styles.detailLabel}>จังหวัด</span>
+                                    <span className={styles.detailValue}>{selectedPharmacist.province}</span>
+                                </div>
+                                <div className={styles.detailItem}>
+                                    <span className={styles.detailLabel}>สถานะ</span>
+                                    <div>
+                                        <span
+                                            className={`${styles.statusBadge} ${selectedPharmacist.status === "ใช้งาน"
+                                                ? styles.statusActive
+                                                : selectedPharmacist.status === "พักใช้ใบอนุญาต"
+                                                    ? styles.statusSuspended
+                                                    : selectedPharmacist.status === "พักใช้ใบอนุญาต"
+                                                        ? styles.statusSuspended
+                                                        : styles.statusInactive
+                                                }`}
+                                        >
+                                            {selectedPharmacist.status}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className={styles.detailItem} style={{ gridColumn: 'span 2' }}>
+                                    <span className={styles.detailLabel}>ใบอนุญาตหมดอายุ</span>
+                                    <span className={styles.detailValue}>{selectedPharmacist.expiryDate || "-"}</span>
+                                </div>
+                                <div className={styles.detailItem} style={{ gridColumn: 'span 2' }}>
+                                    <span className={styles.detailLabel}>ที่อยู่ติดต่อได้</span>
+                                    <span className={styles.detailValue}>{selectedPharmacist.address || "-"}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={styles.modalFooter}>
+                            <button className={styles.confirmButton} onClick={closeDetails}>
+                                ตกลง
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
