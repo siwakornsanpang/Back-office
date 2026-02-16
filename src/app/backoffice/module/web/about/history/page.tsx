@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import styles from "../council/page.module.css"; // ใช้ CSS ตัวเดียวกับหน้า Council ได้เลย หรือก๊อปมาวาง
+import styles from "../council/council.module.css"; // ใช้ CSS ตัวเดียวกับหน้า Council ได้เลย หรือก๊อปมาวาง
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

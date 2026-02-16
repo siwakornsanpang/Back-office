@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import styles from './news.module.css';
 import Editor from '@/app/components/editor/editor';
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 
 // Types
 export type NewsStatus = 'published' | 'draft';
@@ -26,7 +27,7 @@ interface NewsFormProps {
     mode: 'create' | 'edit';
 }
 
-const API_URL = 'https://pharmacy-api-6w5d.onrender.com/news';
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/news`;
 
 export default function NewsForm({ initialData, mode }: NewsFormProps) {
     const router = useRouter();
@@ -41,7 +42,12 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!title.trim() || !content.trim() || order <= 0) {
-            alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+            Swal.fire({
+                icon: 'warning',
+                title: 'ข้อมูลไม่ครบถ้วน',
+                text: 'กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง',
+                confirmButtonColor: '#2563eb',
+            });
             return;
         }
 
@@ -69,6 +75,13 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 });
 
                 if (!res.ok) throw new Error('Failed to update');
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'แก้ไขสำเร็จ',
+                    text: 'บันทึกการแก้ไขข้อมูลข่าวเรียบร้อยแล้ว',
+                    confirmButtonColor: '#2563eb',
+                });
             } else {
                 const currentYear = new Date().getFullYear();
                 const newItem = {
@@ -90,13 +103,25 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 });
 
                 if (!res.ok) throw new Error('Failed to create');
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'เพิ่มสำเร็จ',
+                    text: 'สร้างข่าวประชาสัมพันธ์ใหม่เรียบร้อยแล้ว',
+                    confirmButtonColor: '#2563eb',
+                });
             }
 
             router.push('/backoffice/module/web/news');
             router.refresh();
         } catch (err) {
             console.error(err);
-            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+                confirmButtonColor: '#2563eb',
+            });
         } finally {
             setIsSubmitting(false);
         }

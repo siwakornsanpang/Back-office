@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import NewsForm, { NewsItem } from '../../NewsForm';
 import styles from '../../news.module.css';
 
-const API_URL = 'https://pharmacy-api-6w5d.onrender.com/news';
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/news`;
 
 export default function EditNewsPage() {
     const { id } = useParams();

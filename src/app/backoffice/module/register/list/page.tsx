@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Search, ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import styles from "../Register.module.css";
+import styles from "../register.module.css";
 
 type Pharmacist = {
     id: string;

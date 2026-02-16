@@ -16,7 +16,7 @@ import {
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 // 1. นำเข้า CSS Module
-import styles from "./page.module.css";
+import styles from "./council.module.css";
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
