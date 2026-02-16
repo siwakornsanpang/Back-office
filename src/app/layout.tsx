@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ระบบสำนักงานเลขาธิการ",
-  description: "ระบบสำนักงานเลขาธิการ สภาเภสัชกรรม",
+  title: "PharmacyOne",
 };
 
 export default function RootLayout({
