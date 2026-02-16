@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { User, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 // import Image from 'next/image'; 
 
+
 // ✅ Import Styles
 import styles from './LoginPage.module.css';
 
@@ -53,10 +54,10 @@ export default function LoginPage() {
         {/* Header */}
         <div className={styles.header}>
             <div className={styles.logoBox}>
-                B
+                <img src={"/favicon.ico"}></img>
             </div>
             <h2 className={styles.title}>ยินดีต้อนรับ</h2>
-            <p className={styles.subtitle}>เข้าสู่ระบบ BackOffice Management</p>
+            <p className={styles.subtitle}>เข้าสู่ระบบ PharmacyOne</p>
         </div>
 
         {/* Form Input */}
@@ -143,7 +144,7 @@ export default function LoginPage() {
         
         {/* Footer */}
         <div className={styles.footer}>
-         &copy; 2024 Your Company Name. All rights reserved.
+         &copy; สำนักงานเลขาธิการ สภาเภสัชกรรม อาคารมหิตลาธิเบศร
         </div>
 
       </div>

@@ -23,7 +23,7 @@
 /* --- Header ส่วนหัว --- */
 .header {
   background-color: #f9fafb; /* gray-50 */
-  padding: 32px;
+  padding: 20px;
   text-align: center;
   border-bottom: 1px solid #f3f4f6; /* gray-100 */
 }
@@ -31,16 +31,16 @@
 .logoBox {
   width: 64px;
   height: 64px;
-  background-color: #2563eb; /* blue-600 */
+ 
   border-radius: 12px;
   margin: 0 auto 16px auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: bold;
-  font-size: 24px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+ 
+
+ 
+  
 }
 
 .title {
