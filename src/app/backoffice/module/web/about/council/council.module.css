@@ -241,7 +241,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 1050; /* 🔥 เพิ่มค่านี้ให้สูงๆ (สูงกว่า Header หรือ Table) */
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
@@ -640,4 +640,55 @@
 
 .filterSelect:focus {
   border-color: #3b82f6;
+}
+
+
+.btnReadBio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #2563eb;       /* สีน้ำเงิน */
+  font-size: 0.8rem;
+  font-weight: 500;
+  background-color: #eff6ff; /* พื้นหลังฟ้าอ่อนๆ */
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;     /* ทรงแคปซูล */
+  border: 1px solid #bfdbfe;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+
+.btnReadBio:hover {
+  background-color: #dbeafe;
+  transform: translateY(-1px); /* ลอยขึ้นนิดนึงตอนชี้ */
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+}
+
+.btnReadBioDisabled {
+  color: #9ca3af;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+}
+
+/* 🔥 สไตล์กล่องข้อความใน Modal (ให้อ่านง่าย) */
+.bioContent {
+  color: #374151;
+  font-size: 0.95rem;
+  line-height: 1.7;        /* เพิ่มระยะห่างบรรทัดให้อ่านสบายตา */
+  white-space: pre-wrap;   /* ✅ สำคัญ! เพื่อให้เว้นวรรค/ขึ้นบรรทัดใหม่ตามที่พิมพ์มา */
+  background-color: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  max-height: 60vh;        /* ถ้าประวัติยาวมาก ให้ Scroll ได้ */
+  overflow-y: auto;
 }

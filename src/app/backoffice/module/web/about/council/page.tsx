@@ -12,10 +12,10 @@ import {
   X,
   ZoomIn,
   Search,
-} from "lucide-react"; // เพิ่ม UploadCloud icon
+  FileText,
+} from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-// 1. นำเข้า CSS Module
 import styles from "./council.module.css";
 
 const MySwal = withReactContent(Swal);
@@ -28,6 +28,7 @@ interface CouncilMember {
   type: "elected" | "appointed";
   imageUrl: string | null;
   order: number;
+  background?: string;
 }
 
 export default function CouncilPage() {
@@ -35,39 +36,36 @@ export default function CouncilPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState(""); // "" = ทั้งหมด
-  const [filterPosition, setFilterPosition] = useState(""); // "" = ทั้งหมด
+  const [filterType, setFilterType] = useState("");
+  const [filterPosition, setFilterPosition] = useState("");
+
+  const [viewingBio, setViewingBio] = useState<{
+    name: string;
+    text: string;
+  } | null>(null);
 
   // Sorting
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const uniquePositions = useMemo(() => {
-    // ดึงเฉพาะชื่อตำแหน่งออกมา แล้วใช้ Set เพื่อตัดคำซ้ำ
     const positions = Array.from(new Set(members.map((m) => m.position)));
-    return positions.sort(); // เรียงก-ฮ
+    return positions.sort();
   }, [members]);
 
   const filteredMembers = useMemo(() => {
     return members
       .filter((member) => {
-        // 3.1 ค้นหา (จากชื่อ หรือ ตำแหน่ง)
         const searchLower = searchTerm.toLowerCase();
         const matchSearch =
           member.name.toLowerCase().includes(searchLower) ||
           member.position.toLowerCase().includes(searchLower);
-
-        // 3.2 กรองประเภท
         const matchType = filterType ? member.type === filterType : true;
-
-        // 3.3 กรองตำแหน่ง
         const matchPosition = filterPosition
           ? member.position === filterPosition
           : true;
-
         return matchSearch && matchType && matchPosition;
       })
       .sort((a, b) => {
-        // 3.4 เรียงลำดับ (ใช้ Logic เดิม + Sort Direction)
         if (sortDirection === "asc") return a.order - b.order;
         return b.order - a.order;
       });
@@ -81,11 +79,8 @@ export default function CouncilPage() {
     return sortDirection === "asc" ? "↑" : "↓";
   };
 
-
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<{
@@ -93,6 +88,7 @@ export default function CouncilPage() {
     position: string;
     type: string;
     order: number | string;
+    background: string;
     file: File | null;
     preview: string | null;
   }>({
@@ -100,6 +96,7 @@ export default function CouncilPage() {
     position: "",
     type: "elected",
     order: 1,
+    background: "",
     file: null,
     preview: null,
   });
@@ -122,20 +119,18 @@ export default function CouncilPage() {
 
   const openModal = (member?: CouncilMember) => {
     if (member) {
-      // ✅ โหมดแก้ไข: ต้องดึง URL รูปเดิมมาใส่ใน preview ด้วย
       setEditingId(member.id);
       setFormData({
         name: member.name,
         position: member.position,
         type: member.type,
         order: member.order,
+        background: member.background || "",
         file: null,
-        preview: member.imageUrl || null, // 🔥 แก้ตรงนี้! (ถ้ามีรูปเดิม ให้เอามาใส่ ถ้าไม่มีเป็น null)
+        preview: member.imageUrl || null,
       });
     } else {
-      // ✅ โหมดเพิ่มใหม่: preview เป็น null (ว่างเปล่า)
       setEditingId(null);
-      // Auto increment order
       const maxOrder =
         members.length > 0 ? Math.max(...members.map((m) => m.order)) : 0;
       setFormData({
@@ -143,12 +138,14 @@ export default function CouncilPage() {
         position: "",
         type: "elected",
         order: maxOrder + 1,
+        background: "",
         file: null,
         preview: null,
       });
     }
     setIsModalOpen(true);
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     MySwal.fire({ title: "กำลังบันทึก...", didOpen: () => Swal.showLoading() });
@@ -158,6 +155,7 @@ export default function CouncilPage() {
       form.append("position", formData.position);
       form.append("type", formData.type);
       form.append("order", formData.order.toString());
+      form.append("background", formData.background);
       if (formData.file) form.append("image", formData.file);
 
       const url = editingId
@@ -196,9 +194,7 @@ export default function CouncilPage() {
   };
 
   return (
-    // 2. แทนที่ ClassName ด้วย styles.xxx
     <div className={styles.container}>
-      {/* Header */}
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>จัดการข้อมูลกรรมการสภา</h1>
@@ -207,9 +203,8 @@ export default function CouncilPage() {
           </p>
         </div>
       </div>
+      
       <div className={styles.toolbar}>
-        {/* 🔥 2. Toolbar: Search + Filters + Add Button */}
-        {/* ช่องค้นหา */}
         <div className={styles.searchWrapper}>
           <Search size={18} className={styles.searchIcon} />
           <input
@@ -221,7 +216,6 @@ export default function CouncilPage() {
           />
         </div>
 
-        {/* Filter: ตำแหน่ง (Dynamic) */}
         <select
           className={styles.filterSelect}
           value={filterPosition}
@@ -235,7 +229,6 @@ export default function CouncilPage() {
           ))}
         </select>
 
-        {/* Filter: ประเภท (Static) */}
         <select
           className={styles.filterSelect}
           value={filterType}
@@ -246,18 +239,17 @@ export default function CouncilPage() {
           <option value="appointed">📜 การแต่งตั้ง</option>
         </select>
 
-        {/* ปุ่มเพิ่มข้อมูล (ย้ายมาขวาสุด) */}
         <button onClick={() => openModal()} className={styles.btnAdd}>
           <Plus size={20} /> เพิ่มข้อมูลใหม่
         </button>
       </div>
 
-      {/* Table Card */}
       <div className={styles.tableContainer}>
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr className={styles.tableHead}>
+                {/* 1. ลำดับ */}
                 <th
                   className={`${styles.tableTh} ${styles.thSortable} text-center w-16`}
                   onClick={handleSort}
@@ -265,37 +257,43 @@ export default function CouncilPage() {
                   ลำดับ{" "}
                   <span className={styles.sortIconActive}>{getSortIcon()}</span>
                 </th>
+                {/* 2. รูปภาพ */}
                 <th className={`${styles.tableTh} text-center w-24`}>รูปภาพ</th>
+                {/* 3. ชื่อ */}
                 <th className={styles.tableTh}>ชื่อ-นามสกุล</th>
+                {/* 4. ตำแหน่ง */}
                 <th className={styles.tableTh}>ตำแหน่ง</th>
-                <th className={styles.tableTh}>ประเภท</th>
+                {/* 5. ประเภท */}
+               <th className={`${styles.tableTh} text-center`}>ประเภท</th>
+                {/* 6. ประวัติ */}
+                <th className={`${styles.tableTh} text-center w-32`}>ประวัติ</th>
+                {/* 7. จัดการ */}
                 <th className={`${styles.tableTh} text-center w-32`}>จัดการ</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {members.length === 0 && !isLoading ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-400">
+                  <td colSpan={7} className="p-8 text-center text-gray-400">
                     ยังไม่มีข้อมูล
                   </td>
                 </tr>
               ) : (
                 filteredMembers.map((member) => (
                   <tr key={member.id} className={styles.tableRow}>
+                    {/* 1. ลำดับ */}
                     <td className={`${styles.tableTd} text-center`}>
                       <span className={styles.orderBadge}>{member.order}</span>
                     </td>
+                    
+                    {/* 2. รูปภาพ */}
                     <td className={styles.tableTd}>
                       <div className={styles.imageCell}>
                         <div
                           className={`${styles.avatarContainer} ${member.imageUrl ? styles.clickableAvatar : ""}`}
                           onClick={() => {
-                            if (member.imageUrl)
-                              setPreviewImage(member.imageUrl);
+                            if (member.imageUrl) setPreviewImage(member.imageUrl);
                           }}
-                          title={
-                            member.imageUrl ? "คลิกเพื่อดูรูปขนาดเต็ม" : ""
-                          }
                         >
                           {member.imageUrl ? (
                             <>
@@ -304,16 +302,12 @@ export default function CouncilPage() {
                                 alt={member.name}
                                 className={styles.avatarImg}
                               />
-                              {/* 🔥 เพิ่ม Overlay แว่นขยายตรงนี้ */}
                               <div className={styles.zoomOverlay}>
                                 <ZoomIn size={16} />
                               </div>
                             </>
                           ) : (
-                            <User
-                              size={20}
-                              className={styles.avatarPlaceholder}
-                            />
+                            <User size={20} className={styles.avatarPlaceholder} />
                           )}
                         </div>
                         {member.imageUrl && (
@@ -326,16 +320,19 @@ export default function CouncilPage() {
                         )}
                       </div>
                     </td>
-                    <td
-                      className={`${styles.tableTd} font-medium text-gray-900`}
-                    >
+
+                    {/* 3. ชื่อ */}
+                    <td className={`${styles.tableTd} font-medium text-gray-900`}>
                       {member.name}
                     </td>
+
+                    {/* 4. ตำแหน่ง */}
                     <td className={`${styles.tableTd} text-gray-600`}>
                       {member.position}
                     </td>
-                    <td className={styles.tableTd}>
-                      {/* 3. ใช้ Conditional ClassName สำหรับ Badge */}
+
+                    {/* 5. ประเภท */}
+                    <td className={`${styles.tableTd} text-center`}>
                       <span
                         className={
                           member.type === "elected"
@@ -348,6 +345,30 @@ export default function CouncilPage() {
                           : "📜 การแต่งตั้ง"}
                       </span>
                     </td>
+
+                    {/* 6. ประวัติ (แก้ให้ตรงกลาง) */}
+                    <td className={`${styles.tableTd} text-center`}>
+                      {member.background && member.background.trim() !== "" ? (
+                        <button
+                          type="button"
+                          className={styles.btnReadBio}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setViewingBio({
+                              name: member.name,
+                              text: member.background!,
+                            });
+                          }}
+                        >
+                          <FileText size={14} /> อ่านประวัติ
+                        </button>
+                      ) : (
+                        <span className={styles.btnReadBioDisabled}>-</span>
+                      )}
+                    </td>
+
+                    {/* 7. จัดการ (แก้ให้ตรงกลาง) */}
                     <td className={`${styles.tableTd} text-center`}>
                       <div className="flex justify-center gap-2">
                         <button
@@ -374,7 +395,7 @@ export default function CouncilPage() {
         </div>
       </div>
 
-      {/* --- Modal (Popup) --- */}
+      {/* --- Modals (Popup) --- */}
       {isModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalBox}>
@@ -382,26 +403,17 @@ export default function CouncilPage() {
               <h3 className={styles.modalTitle}>
                 {editingId ? "แก้ไขข้อมูล" : "เพิ่มรายชื่อใหม่"}
               </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className={styles.btnClose}
-              >
-                ✕
-              </button>
+              <button onClick={() => setIsModalOpen(false)} className={styles.btnClose}>✕</button>
             </div>
-
             <form onSubmit={handleSubmit} className={styles.modalBody}>
-              {/* 🔥 4. REDESIGNED IMAGE UPLOAD SECTION 🔥 */}
-              <div className={styles.imageUploadContainer}>
+               {/* (Form fields... copy logic เดิมมาใส่) */}
+               <div className={styles.imageUploadContainer}>
                 <label className={styles.imageUploadLabel}>
-                  {/* Input ซ่อนอยู่เหมือนเดิม */}
                   <input
                     type="file"
                     hidden
                     accept="image/*"
-                    onClick={(e) => {
-                      (e.target as HTMLInputElement).value = "";
-                    }}
+                    onClick={(e) => { (e.target as HTMLInputElement).value = ""; }}
                     onChange={(e) => {
                       if (e.target.files?.[0]) {
                         setFormData({
@@ -412,151 +424,80 @@ export default function CouncilPage() {
                       }
                     }}
                   />
-
-                  {/* กรอบวงกลม */}
                   <div className={styles.circleWrapper}>
                     {formData.preview ? (
-                      // กรณี 1: มีรูปแล้ว
                       <>
-                        <img
-                          src={formData.preview}
-                          className={styles.previewImage}
-                          alt="Preview"
-                        />
-                        {/* Overlay ตอนเอาเมาส์ชี้ */}
-                        <div className={styles.uploadOverlay}>
-                          <ImageIcon size={24} />
-                          <span className="text-xs font-medium mt-1">
-                            เปลี่ยนรูป
-                          </span>
-                        </div>
+                        <img src={formData.preview} className={styles.previewImage} alt="Preview" />
+                        <div className={styles.uploadOverlay}><ImageIcon size={24} /><span className="text-xs font-medium mt-1">เปลี่ยนรูป</span></div>
                       </>
                     ) : (
-                      // กรณี 2: ยังไม่มีรูป
-                      <div className={styles.placeholderContent}>
-                        <UploadCloud size={32} />
-                        <span className="text-xs">เพิ่มรูปภาพ</span>
-                      </div>
+                      <div className={styles.placeholderContent}><UploadCloud size={32} /><span className="text-xs">เพิ่มรูปภาพ</span></div>
                     )}
                   </div>
-
-                  {/* ข้อความใต้รูป (แสดงตลอดเวลา) */}
-                  <span className={styles.helperText}>
-                    {formData.preview ? (
-                      <>
-                        <Edit size={14} /> คลิกที่รูปเพื่อเปลี่ยน
-                      </>
-                    ) : (
-                      "คลิกเพื่ออัปโหลดรูปภาพ"
-                    )}
-                  </span>
+                  <span className={styles.helperText}>{formData.preview ? <><Edit size={14} /> คลิกที่รูปเพื่อเปลี่ยน</> : "คลิกเพื่ออัปโหลดรูปภาพ"}</span>
                 </label>
               </div>
 
               <div className={styles.gridTwo}>
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>ประเภท</label>
-                  <select
-                    className={styles.formSelect}
-                    value={formData.type}
-                    onChange={(e) =>
-                      setFormData({ ...formData, type: e.target.value })
-                    }
-                  >
+                  <select className={styles.formSelect} value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} >
                     <option value="elected">🗳️ การเลือกตั้ง</option>
                     <option value="appointed">📜 การแต่งตั้ง</option>
                   </select>
                 </div>
                 <div>
                   <label className={styles.formLabel}>ลำดับ (Sorting)</label>
-                  <input
-                    type="number"
-                    className={styles.formInput}
-                    value={formData.order}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      // 🔥 แก้ตรงนี้: ถ้าเป็นค่าว่าง ให้ใส่ว่างไปเลย ไม่ต้องใส่ 0
-                      setFormData({
-                        ...formData,
-                        order: val === "" ? "" : parseInt(val),
-                      });
-                    }}
-                  />
+                  <input type="number" className={styles.formInput} value={formData.order} onChange={(e) => { const val = e.target.value; setFormData({ ...formData, order: val === "" ? "" : parseInt(val), }); }} />
                 </div>
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  ชื่อ-นามสกุล <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  className={styles.formInput}
-                  placeholder="เช่น ภก.สมชาย ใจดี"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                />
+                <label className={styles.formLabel}>ชื่อ-นามสกุล <span className="text-red-500">*</span></label>
+                <input type="text" required className={styles.formInput} placeholder="เช่น ภก.สมชาย ใจดี" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
               </div>
-
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  ตำแหน่ง <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  className={styles.formInput}
-                  placeholder="เช่น นายกสภา..."
-                  value={formData.position}
-                  onChange={(e) =>
-                    setFormData({ ...formData, position: e.target.value })
-                  }
-                />
+                <label className={styles.formLabel}>ตำแหน่ง <span className="text-red-500">*</span></label>
+                <input type="text" required className={styles.formInput} placeholder="เช่น นายกสภา..." value={formData.position} onChange={(e) => setFormData({ ...formData, position: e.target.value })} />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>ประวัติ / ภูมิหลัง</label>
+                <textarea className={styles.formInput} placeholder="ระบุรายละเอียดประวัติ..." rows={4} style={{ resize: "vertical", minHeight: "80px" }} value={formData.background} onChange={(e) => setFormData({ ...formData, background: e.target.value })} />
               </div>
 
               <div className="pt-2 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className={styles.btnCancel}
-                >
-                  ยกเลิก
-                </button>
-                <button type="submit" className={styles.btnSubmit}>
-                  บันทึกข้อมูล
-                </button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className={styles.btnCancel}>ยกเลิก</button>
+                <button type="submit" className={styles.btnSubmit}>บันทึกข้อมูล</button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Image Preview Modal */}
       {previewImage && (
-        <div
-          className={styles.imagePreviewOverlay}
-          onClick={() => setPreviewImage(null)}
-        >
-          <div
-            className={styles.imagePreviewContent}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className={styles.closePreviewBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                setPreviewImage(null);
-              }}
-              title="ปิด"
-            >
-              <X size={32} />
-            </button>
-            <img
-              src={previewImage}
-              alt="Full Size"
-              className={styles.fullSizeImage}
-            />
+        <div className={styles.imagePreviewOverlay} onClick={() => setPreviewImage(null)}>
+          <div className={styles.imagePreviewContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.closePreviewBtn} onClick={(e) => { e.stopPropagation(); setPreviewImage(null); }} title="ปิด"><X size={32} /></button>
+            <img src={previewImage} alt="Full Size" className={styles.fullSizeImage} />
+          </div>
+        </div>
+      )}
+
+      {/* Bio Modal */}
+      {viewingBio && (
+        <div className={styles.modalOverlay} onClick={() => setViewingBio(null)}>
+          <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>ประวัติ: {viewingBio.name}</h3>
+              <button onClick={() => setViewingBio(null)} className={styles.btnClose}>✕</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.bioContent}>{viewingBio.text}</div>
+              <div className="flex justify-end pt-2">
+                <button onClick={() => setViewingBio(null)} className={styles.btnCancel} style={{ flex: "none" }}>ปิดหน้าต่าง</button>
+              </div>
+            </div>
           </div>
         </div>
       )}
