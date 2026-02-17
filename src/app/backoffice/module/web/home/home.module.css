@@ -1,167 +1,180 @@
-/* page.module.css */
+/* src/app/manage/home/home.module.css */
 
 .container {
-  padding: 1.5rem; /* p-6 */;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Sarabun', sans-serif; /* ถ้ามีฟอนต์ไทย */
+  color: #333;
 }
 
-/* --- Header Section --- */
+/* Header */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem; /* mb-6 */
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.title {
-  font-size: 1.5rem; /* text-2xl */
-  font-weight: 700; /* font-bold */
-  color: #1f2937; /* text-gray-800 */
-  margin: 0;
-}
-
-.breadcrumb {
-  color: #6b7280; /* text-gray-500 */
-  font-size: 0.875rem; /* text-sm */
-  margin: 0;
-}
+.title { font-size: 1.8rem; font-weight: 700; color: #111827; margin: 0; }
+.breadcrumb { color: #6b7280; font-size: 0.9rem; margin-top: 0.25rem; }
 
 .saveButton {
-  background-color: #2563eb; /* bg-blue-600 */
-  color: white;
-  padding: 0.5rem 1rem; /* px-4 py-2 */
-  border-radius: 0.5rem; /* rounded-lg */
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: background-color 0.2s;
-  border: none;
-  cursor: pointer;
+  background-color: #2563eb; color: white;
+  padding: 0.75rem 1.5rem; border-radius: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border: none; cursor: pointer; font-weight: 600;
+  transition: all 0.2s;
 }
+.saveButton:hover { background-color: #1d4ed8; transform: translateY(-1px); }
+.saveButton:disabled { background-color: #9ca3af; cursor: not-allowed; transform: none; }
 
-.saveButton:hover {
-  background-color: #1d4ed8; /* hover:bg-blue-700 */
-}
-
-.saveButton:disabled {
-  background-color: #9ca3af; /* disabled:bg-gray-400 */
-  cursor: not-allowed;
-}
-
-/* --- Grid Layout --- */
+/* Grid Main Layout */
 .gridContainer {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem; /* gap-6 */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-@media (min-width: 1024px) { /* lg:grid-cols-2 */
-  .gridContainer {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* --- Card Styles --- */
+/* Card Common */
 .card {
-  background-color: white;
+  background: white;
   padding: 1.5rem;
-  border-radius: 0.75rem; /* rounded-xl */
-  border: 1px solid #e5e7eb; /* border-gray-200 */
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .cardHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1.5rem; padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
 }
-
-.cardTitle {
-  font-weight: 600; /* font-semibold */
-  color: #374151; /* text-gray-700 */
-  margin: 0;
-}
-
-/* --- Icons --- */
 .iconBox {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.cardTitle { font-size: 1.1rem; font-weight: 600; margin: 0; }
+
+/* --- Banner Section --- */
+.bannerList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.iconBlue {
-  background-color: #dbeafe; /* bg-blue-100 */
-  color: #2563eb; /* text-blue-600 */
+.bannerCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  position: relative;
+  background: #f9fafb;
+  transition: box-shadow 0.2s;
+}
+.bannerCard:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+
+/* Badge บอกลำดับ */
+.orderBadge {
+  position: absolute; top: 0.5rem; left: 0.5rem;
+  background: rgba(0,0,0,0.7); color: white;
+  padding: 0.25rem 0.75rem; border-radius: 20px;
+  font-size: 0.75rem; font-weight: bold;
+  z-index: 10;
 }
 
-.iconGreen {
-  background-color: #dcfce7; /* bg-green-100 */
-  color: #16a34a; /* text-green-600 */
+.bannerImage {
+  width: 100%; aspect-ratio: 16/9; object-fit: cover;
+  display: block;
 }
 
-/* --- Upload Area --- */
+.bannerControls {
+  padding: 0.75rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background: white; border-top: 1px solid #e5e7eb;
+}
+
+.statusToggle {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.85rem; cursor: pointer;
+}
+
+.deleteBtn {
+  color: #ef4444; background: none; border: none; cursor: pointer;
+  padding: 0.25rem; border-radius: 4px;
+}
+.deleteBtn:hover { background: #fee2e2; }
+
+/* Upload Area */
 .uploadArea {
-  height: 12rem; /* h-48 */
-  background-color: #f9fafb; /* bg-gray-50 */
-  border-radius: 0.5rem;
-  border: 2px dashed #d1d5db; /* border-gray-300 */
+  border: 2px dashed #cbd5e1;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f8fafc;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #9ca3af; /* text-gray-400 */
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
-  transition: background-color 0.2s;
+  gap: 0.5rem;
+}
+.uploadArea:hover { border-color: #3b82f6; background: #eff6ff; color: #2563eb; }
+
+/* Input Fields */
+.inputGroup { margin-bottom: 1.25rem; }
+.label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
+.input, .textarea {
+  width: 100%; padding: 0.75rem;
+  border: 1px solid #d1d5db; border-radius: 0.5rem;
+  font-size: 0.95rem; transition: border-color 0.2s;
+}
+.input:focus, .textarea:focus { outline: none; border-color: #2563eb; ring: 2px solid #bfdbfe; }
+
+/* Switch Toggle (CSS Pure) */
+.switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc; transition: .4s; border-radius: 34px;
+}
+.slider:before {
+  position: absolute; content: "";
+  height: 16px; width: 16px; left: 3px; bottom: 3px;
+  background-color: white; transition: .4s; border-radius: 50%;
+}
+input:checked + .slider { background-color: #10b981; }
+input:checked + .slider:before { transform: translateX(18px); }
+
+
+
+.bannerCard {
+  /* ... ของเดิม ... */
+  cursor: grab; /* เปลี่ยนเมาส์เป็นรูปมือจับ */
+  background: white;
 }
 
-.uploadArea:hover {
-  background-color: #f3f4f6; /* hover:bg-gray-100 */
+.bannerCard:active {
+  cursor: grabbing; /* ตอนกำมือ */
 }
 
-.previewImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* คลาสตอนกำลังโดนลาก */
+.dragging {
+  opacity: 0.4;
+  border: 2px dashed #3b82f6;
 }
 
-.imageOverlay {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  opacity: 0;
-  transition: opacity 0.2s;
+/* ปุ่มเปลี่ยนรูป (Edit Button) */
+.editBtn {
+  color: #3b82f6; 
+  background: none; border: none; cursor: pointer;
+  padding: 0.25rem; border-radius: 4px;
+  margin-right: 0.25rem;
 }
-
-.uploadArea:hover .imageOverlay {
-  opacity: 1;
-}
-
-.uploadText {
-  font-size: 0.75rem; /* text-xs */
-  margin-top: 0.25rem;
-}
-
-/* --- Textarea --- */
-.textarea {
-  width: 100%;
-  height: 12rem; /* h-48 */
-  padding: 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  resize: none;
-  font-family: inherit;
-}
-
-.textarea:focus {
-  outline: none;
-  border-color: #3b82f6; /* ring-blue-500 */
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
+.editBtn:hover { background: #eff6ff; }

@@ -10,6 +10,7 @@ import {
   LayoutGrid,
   Landmark,
   Scale,
+  Book,
 
 } from 'lucide-react';
 
@@ -35,7 +36,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
 
 
 
-  { id: 'web-home', title: 'หน้าแรก', href: '/backoffice/module/web/home', icon: <LayoutDashboard size={20} />, },
+  { id: 'web-home', title: 'จัดการหน้าแรก', href: '/backoffice/module/web/home', icon: <LayoutDashboard size={20} />, },
   {
     id: 'web-about',
     title: 'เกี่ยวกับองค์กร',
@@ -80,6 +81,19 @@ export const SIDEBAR_DATA: MenuItem[] = [
     href: '/backoffice/module/register'
   },
 
+
+  {
+    id: 'header-royalcollege',
+    title: 'ราชวิทยาลัย', // หรือจะใช้คำว่า "WEB MANAGEMENT" ให้เหมือนต้นแบบ
+    isHeader: true     // 👈 บอกว่าเป็นหัวข้อ
+  },
+  {
+    id: 'module-royalcollege',
+    title: 'จัดการราชวิทยาลัย',
+    icon: <Book size={20} />,
+    href: '/backoffice/module/royalcollege'
+  },
+
   // --- Module อื่นๆ (Placeholder) ---
   {
     id: 'header-eservice',
@@ -92,6 +106,9 @@ export const SIDEBAR_DATA: MenuItem[] = [
     icon: <Users size={20} />,
     href: "/backoffice/module/e-service"
   },
+
+
+
 
 
 
