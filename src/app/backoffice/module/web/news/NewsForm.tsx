@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './news.module.css';
-import Editor from '@/app/components/editor/editor';
+import Editor from '@/app/components/editor/editor'; // หรือ path ที่ถูกต้อง
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 
@@ -15,11 +15,9 @@ export interface NewsItem {
     order: number;
     title: string;
     content: string;
-    year: number;
     category: NewsCategory;
     status: NewsStatus;
-    createdAt: string;
-    updatedAt: string;
+    // images field ไม่ต้องใช้ใน Form แล้ว เพราะอยู่ใน content
 }
 
 interface NewsFormProps {
@@ -33,95 +31,68 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // State เหลือแค่นี้
     const [title, setTitle] = useState(initialData?.title || '');
     const [content, setContent] = useState(initialData?.content || '');
     const [category, setCategory] = useState<NewsCategory>(initialData?.category || 'news');
     const [status, setStatus] = useState<NewsStatus>(initialData?.status || 'draft');
-    const [order, setOrder] = useState<number>(initialData?.order || 0);
+    const [order, setOrder] = useState<number | string>(initialData?.order || 0);
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title.trim() || !content.trim() || order <= 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'ข้อมูลไม่ครบถ้วน',
-                text: 'กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง',
-                confirmButtonColor: '#2563eb',
-            });
+
+        // Validate
+        if (!title.trim() || !content.trim()) {
+            Swal.fire('แจ้งเตือน', 'กรุณาระบุหัวข้อและเนื้อหาข่าว', 'warning');
             return;
         }
 
         setIsSubmitting(true);
-        const today = new Date().toISOString().split('T')[0];
-        const currentTime = new Date().toTimeString().slice(0, 8);
-        const todayDateTime = `${today} ${currentTime}`;
 
         try {
+            // ✅ เปลี่ยนกลับมาส่ง JSON ปกติ (เพราะรูปเป็น URL ใน content แล้ว)
+            const payload = {
+                title,
+                content,
+                category,
+                status,
+                order: Number(order)
+            };
+
+            let url = API_URL;
+            let method = 'POST';
+
             if (mode === 'edit' && initialData) {
-                const updatedItem = {
-                    ...initialData,
-                    title,
-                    content,
-                    category,
-                    status,
-                    order,
-                    updatedAt: todayDateTime
-                };
-
-                const res = await fetch(`${API_URL}/${initialData.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedItem),
-                });
-
-                if (!res.ok) throw new Error('Failed to update');
-
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'แก้ไขสำเร็จ',
-                    text: 'บันทึกการแก้ไขข้อมูลข่าวเรียบร้อยแล้ว',
-                    confirmButtonColor: '#2563eb',
-                });
-            } else {
-                const currentYear = new Date().getFullYear();
-                const newItem = {
-                    id: Date.now(),
-                    order,
-                    title,
-                    content,
-                    year: currentYear,
-                    category,
-                    status,
-                    createdAt: todayDateTime,
-                    updatedAt: todayDateTime,
-                };
-
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newItem),
-                });
-
-                if (!res.ok) throw new Error('Failed to create');
-
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'เพิ่มสำเร็จ',
-                    text: 'สร้างข่าวประชาสัมพันธ์ใหม่เรียบร้อยแล้ว',
-                    confirmButtonColor: '#2563eb',
-                });
+                url = `${API_URL}/${initialData.id}`;
+                method = 'PUT';
             }
+
+            const res = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json', // ✅ สำคัญ: ต้องระบุว่าเป็น JSON
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Failed to save');
+            }
+
+            await Swal.fire({
+                icon: 'success',
+                title: 'บันทึกสำเร็จ',
+                showConfirmButton: false,
+                timer: 1500
+            });
 
             router.push('/backoffice/module/web/news');
             router.refresh();
-        } catch (err) {
+
+        } catch (err: any) {
             console.error(err);
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
-                confirmButtonColor: '#2563eb',
-            });
+            Swal.fire('Error', err.message, 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -133,88 +104,63 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 <div>
                     <h1 className={styles.title}>{mode === 'create' ? 'เพิ่มข่าวใหม่' : 'แก้ไขข่าว'}</h1>
                     <p className={styles.breadcrumb}>
-                        ข่าวประชาสัมพันธ์ / <span className="text-blue-600 font-medium">{mode === 'create' ? 'เพิ่มข่าว' : 'แก้ไขข่าว'}</span>
+                        ข่าวประชาสัมพันธ์ / <span className="text-blue-600 font-medium">{mode === 'create' ? 'เพิ่มข่าวใหม่' : 'แก้ไขข่าว'}</span>
                     </p>
                 </div>
             </header>
 
-            <div className={styles.tableContainer} style={{ padding: '2rem', marginTop: '0' }}>
+            <div className={styles.tableContainer} style={{ padding: '2rem' }}>
                 <form onSubmit={handleSave}>
+                    {/* --- ส่วน Input ทั่วไป --- */}
                     <div className={styles.formRow}>
                         <div className={styles.formCol} style={{ flex: '0 0 auto', width: '100px' }}>
-                            <label style={{ marginBottom: '0.5rem', display: 'block', fontWeight: 500 }}>ลำดับที่</label>
+                            <label>ลำดับที่</label>
                             <input
                                 type="number"
                                 className={styles.input}
-                                min="1"
-                                value={order || ''}
-                                onChange={e => setOrder(parseInt(e.target.value) || 0)}
-                                required
+                                value={order}
+                                onChange={e => setOrder(e.target.value)}
                             />
                         </div>
-
                         <div className={styles.formCol}>
-                            <label style={{ marginBottom: '0.5rem', display: 'block', fontWeight: 500 }}>หัวข้อ</label>
-                            <input
-                                type="text"
-                                className={styles.input}
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                                placeholder='กรุณาระบุหัวข้อข่าว...'
-                                required
-                            />
+                            <label>หัวข้อ</label>
+                            <input type="text" className={styles.input} value={title} onChange={e => setTitle(e.target.value)} required />
                         </div>
                     </div>
 
                     <div className={styles.formRow}>
                         <div className={styles.formCol}>
-                            <label style={{ marginBottom: '0.5rem', display: 'block', fontWeight: 500 }}>ประเภท</label>
-                            <select
-                                className={styles.modalSelect}
-                                value={category}
-                                onChange={e => setCategory(e.target.value as NewsCategory)}
-                            >
+                            <label>ประเภท</label>
+                            <select className={styles.modalSelect} value={category} onChange={e => setCategory(e.target.value as any)}>
                                 <option value="news">ข่าว</option>
                                 <option value="announcement">ประกาศ</option>
                                 <option value="activity">กิจกรรม</option>
                             </select>
                         </div>
-
                         <div className={styles.formCol}>
-                            <label style={{ marginBottom: '0.5rem', display: 'block', fontWeight: 500 }}>สถานะ</label>
-                            <select
-                                className={styles.modalSelect}
-                                value={status}
-                                onChange={e => setStatus(e.target.value as NewsStatus)}
-                            >
+                            <label>สถานะ</label>
+                            <select className={styles.modalSelect} value={status} onChange={e => setStatus(e.target.value as any)}>
                                 <option value="draft">ฉบับร่าง</option>
                                 <option value="published">เผยแพร่</option>
                             </select>
                         </div>
                     </div>
 
-                    <div className={styles.formGroup}>
+                    {/* --- Editor --- */}
+                    <div className={styles.formGroup} style={{ marginTop: '20px' }}>
                         <Editor
                             label="เนื้อหาข่าว"
                             value={content}
                             onChange={setContent}
-                            placeholder="กรุณาระบุรายละเอียดข่าว..."
+                            placeholder="พิมพ์เนื้อหาข่าว หรือกดปุ่มรูปภาพเพื่ออัปโหลด..."
                         />
                     </div>
 
-                    <div className={styles.modalActions}>
-                        <button
-                            type="button"
-                            className={`${styles.btn} ${styles.btnCancel}`}
-                            onClick={() => router.back()}
-                        >
-                            ยกเลิก
-                        </button>
-                        <button
-                            type="submit"
-                            className={`${styles.btn} ${styles.btnSave}`}
-                            disabled={isSubmitting}
-                        >
+                    {/* ❌ ลบส่วน Upload Gallery เดิมออกทั้งหมดตรงนี้ ❌ */}
+
+                    <div className={styles.modalActions} style={{ marginTop: '20px' }}>
+                        <button type="button" className={`${styles.btn} ${styles.btnCancel}`} onClick={() => router.back()}>ยกเลิก</button>
+                        <button type="submit" className={`${styles.btn} ${styles.btnSave}`} disabled={isSubmitting}>
                             {isSubmitting ? 'กำลังบันทึก...' : 'บันทึก'}
                         </button>
                     </div>
