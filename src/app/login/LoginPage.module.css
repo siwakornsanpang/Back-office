@@ -6,7 +6,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to bottom right, #2563eb, #312e81); /* blue-600 to indigo-900 */
+  
+  background-color: #5c681e;
+  background: linear-gradient(to bottom, #5c681e 20%, #ffffff 73%);
   padding: 16px;
 }
 
@@ -155,7 +157,7 @@
 }
 
 .link {
-  color: #2563eb;
+  color:  #565151;
   font-weight: 500;
   text-decoration: none;
 }
@@ -195,10 +197,10 @@
 
 /* สถานะปกติ */
 .activeBtn {
-  background-color: #2563eb; /* blue-600 */
+  background-color: #1d1616; /* blue-600 */
 }
 .activeBtn:hover {
-  background-color: #1d4ed8; /* blue-700 */
+  background-color: #1d1616; /* blue-700 */
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
