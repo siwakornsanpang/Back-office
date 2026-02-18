@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import styles from './news.module.css';
-import { Edit, Trash2, Search, Plus, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'; // เพิ่ม Icon
+import { Edit, Trash2, Search, Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-react'; // เพิ่ม Icon
 import Swal from 'sweetalert2';
 
 // --- Types & Interfaces ---
@@ -18,6 +18,7 @@ interface NewsItem {
   // year: number; // เอาออกถ้าไม่ได้ใช้ หรือใส่กลับถ้ามีใน DB
   category: NewsCategory;
   status: NewsStatus;
+  publishedAt?: string; // Updated to publishedAt
   createdAt: string;
   updatedAt: string;
 }
@@ -36,6 +37,26 @@ export default function NewsPage() {
   // --- States ---
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date()); // State for real-time updates
+
+  // Timer for real-time status updates
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Check every minute
+    return () => clearInterval(timer);
+  }, []);
+
+  // Helper function to check effective status
+  const getEffectiveStatus = useCallback((item: NewsItem): NewsStatus => {
+    if (item.publishedAt) {
+      const publishDate = new Date(item.publishedAt);
+      if (publishDate <= currentTime) {
+        return 'published';
+      }
+    }
+    return item.status;
+  }, [currentTime]);
 
   // UI States
   const [searchQuery, setSearchQuery] = useState('');
@@ -129,7 +150,9 @@ export default function NewsPage() {
     }
 
     // Filter
-    if (filterStatus !== 'all') result = result.filter(item => item.status === filterStatus);
+    if (filterStatus !== 'all') {
+      result = result.filter(item => getEffectiveStatus(item) === filterStatus);
+    }
     if (filterCategory !== 'all') result = result.filter(item => item.category === filterCategory);
 
     // Sort
@@ -144,7 +167,7 @@ export default function NewsPage() {
     });
 
     return result;
-  }, [newsList, searchQuery, filterStatus, filterCategory, sortConfig]);
+  }, [newsList, searchQuery, filterStatus, filterCategory, sortConfig, getEffectiveStatus]); // Added getEffectiveStatus dependency
 
   // --- Render ---
   return (
@@ -217,7 +240,7 @@ export default function NewsPage() {
               processedNews.map((item) => (
                 <tr key={item.id}>
                   <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#555' }}>{item.order}</td>
-                  <td><div style={{ fontWeight: 500 }}>{item.title}</div></td>
+                  <td><div style={{ fontWeight: 550 }}>{item.title}</div></td>
                   <td style={{ textAlign: 'center' }}>
                     <span className={styles.badge} data-category={item.category}>
                       {item.category === 'news' && 'ข่าว'}
@@ -234,12 +257,15 @@ export default function NewsPage() {
                     <div style={{ fontSize: '0.8rem', color: '#999' }}>{formatDateTime(item.updatedAt).time}</div>
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                    <span className={`${styles.badge} ${item.status === 'published' ? styles.published : styles.draft}`}>
-                      {item.status === 'published' ? 'เผยแพร่' : 'ฉบับร่าง'}
+                    <span className={`${styles.badge} ${getEffectiveStatus(item) === 'published' ? styles.published : styles.draft}`}>
+                      {getEffectiveStatus(item) === 'published' ? 'เผยแพร่' : 'ฉบับร่าง'}
                     </span>
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <div className={styles.actionButtons}>
+                      <Link href={`/backoffice/module/web/news/preview/${item.id}`} className={`${styles.btn} ${styles.btnEdit}`} title="ดูตัวอย่าง">
+                        <Eye size={16} />
+                      </Link>
                       <Link href={`/backoffice/module/web/news/edit/${item.id}`} className={`${styles.btn} ${styles.btnEdit}`}>
                         <Edit size={16} />
                       </Link>
