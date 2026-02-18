@@ -48,7 +48,15 @@ export const SIDEBAR_DATA: MenuItem[] = [
   },
   { id: 'web-news', title: 'ข่าวประชาสัมพันธ์', href: '/backoffice/module/web/news', icon: <Megaphone size={20} />, },
   { id: 'web-service', title: 'บริการ', href: '/backoffice/module/web/service', icon: <LayoutGrid size={20} /> },
-  { id: 'web-dept', title: 'หน่วยงาน', href: '/backoffice/module/web/agency', icon: <Landmark size={20} /> },
+
+  { id: 'web-agency', title: 'หน่วยงาน', icon: <Landmark size={20} />, 
+    submenu: [
+      { id: 'web-pharmacy', title: 'สำนักงานเลขาธิการ', href: 'backoffice/module/web/agency/pharmacy' },
+      { id: 'web-royal-college', title: 'ราชวิทยาลัย', href: 'backoffice/module/web/agency/royal-college' },
+      { id: 'web-supervised-organization', title: 'องค์กรในกำกับ', href: 'backoffice/module/web/agency/supervised-organization' },
+    ]
+  },
+
   {
     id: 'web-law',
     title: 'กฎหมาย',
@@ -64,6 +72,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
 
     ]
   },
+
   { id: 'web-setting', title: 'ตั้งค่าเว็บไซต์', href: '/backoffice/module/web/setting', icon: <Settings size={20} /> },
 
 
