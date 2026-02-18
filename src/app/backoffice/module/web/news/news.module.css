@@ -2,7 +2,7 @@
 
 .container {
     padding: 2rem;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     font-family: 'Sarabun', sans-serif;
     color: #333;
@@ -22,174 +22,116 @@
     font-weight: bold;
 }
 
-/* Controls: Search + Filters + Add */
+.headerActions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* Controls: Search + Filters + Add (For List Page) */
 .controls {
     display: flex;
     gap: 0.5rem;
     align-items: center;
     flex-wrap: wrap;
-    /* เผื่อจอเล็ก */
 }
 
-.searchBox,
-.filterSelect {
-    padding: 0.5rem 0.8rem;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    height: 38px;
-    background-color: white;
+/* Two Column Layout for Form */
+.layoutGrid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 1.5rem;
+    align-items: start;
 }
 
-.searchBox {
-    width: 200px;
+@media (max-width: 1024px) {
+    .layoutGrid {
+        grid-template-columns: 1fr;
+    }
 }
 
-.filterSelect {
-    width: 150px;
-    cursor: pointer;
+.mainColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-/* Table Styles */
-.tableContainer {
-    overflow-x: auto;
+.sidebarColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Cards */
+.card {
     background: white;
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid #eee;
+    padding: 1.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1000px;
-    /* ขยายความกว้างขั้นต่ำเพราะมี col เพิ่ม */
-}
-
-.table th,
-.table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #f0f0f0;
-    vertical-align: middle;
-}
-
-.table th {
-    background-color: #f8f9fa;
+.cardTitle {
+    font-size: 1rem;
     font-weight: 600;
-    color: #495057;
-    white-space: nowrap;
-    user-select: none;
+    margin-bottom: 1rem;
+    color: #111827;
 }
 
-/* Sortable Header */
-.thSortable {
-    cursor: pointer;
-    transition: background 0.2s;
-    padding-right: 1.5rem !important;
-    position: relative;
+/* Form Elements */
+.formGroup {
+    margin-bottom: 1rem;
 }
 
-.thSortable:hover {
-    background-color: #e9ecef;
+.label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
 }
 
-.sortIcon {
-    font-size: 0.7rem;
-    margin-left: 4px;
-    color: #adb5bd;
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.sortIconActive {
-    color: #495057;
-    font-weight: bold;
-}
-
-/* In-Table Dropdown for Category */
-.tableSelect {
-    padding: 0.35rem 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #dee2e6;
-    background-color: white;
-    font-size: 0.85rem;
-    cursor: pointer;
+.input,
+.textarea,
+.modalSelect {
     width: 100%;
-    min-width: 100px;
-}
-
-.tableSelect:hover {
-    border-color: #adb5bd;
-}
-
-/* Status Badge */
-.badge {
-    display: inline-block;
-    padding: 0.35rem 0.75rem;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    user-select: none;
-    text-align: center;
-    min-width: 90px;
-    border: 1px solid transparent;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: white;
     transition: all 0.2s;
 }
 
-.badge:hover {
-    opacity: 0.8;
-    transform: scale(1.05);
+.input:focus,
+.textarea:focus,
+.modalSelect:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* --- Category Colors (เพิ่มใหม่ตรงนี้) --- */
-
-/* 1. ข่าว (News) -> สีฟ้า */
-.badge[data-category="news"] {
-    background-color: #dbeafe;
-    /* bg-blue-100 */
-    color: #1e40af;
-    /* text-blue-800 */
-    border-color: #bfdbfe;
-    /* border-blue-200 */
+/* Radio Group in Sidebar */
+.radioGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-/* 2. ประกาศ (Announcement) -> สีส้มเหลือง */
-.badge[data-category="announcement"] {
-    background-color: #fef3c7;
-    /* bg-amber-100 */
-    color: #92400e;
-    /* text-amber-800 */
-    border-color: #fde68a;
-    /* border-amber-200 */
+.radioItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
 }
 
-/* 3. กิจกรรม (Activity) -> สีม่วง */
-.badge[data-category="activity"] {
-    background-color: #f3e8ff;
-    /* bg-purple-100 */
-    color: #6b21a8;
-    /* text-purple-800 */
-    border-color: #e9d5ff;
-    /* border-purple-200 */
+.radioItem input[type="radio"] {
+    accent-color: #2563eb;
+    transform: scale(1.1);
 }
 
-.published {
-    background-color: #d3f9d8;
-    color: #2b8a3e;
-    border-color: #b2f2bb;
-}
-
-.draft {
-    background-color: #f1f3f5;
-    color: #495057;
-    border-color: #dee2e6;
-}
-
-/* Buttons & Modal */
+/* Buttons */
 .btn {
     padding: 0.5rem 1rem;
     /* px-4 py-2 */
@@ -203,116 +145,129 @@
     cursor: pointer;
 }
 
-.btnAdd {
+.btnSave {
     background-color: #2563eb;
-    /* bg-blue-600 */
     color: white;
 }
 
-.btnAdd:hover {
-    background-color: #1c7ed6;
+.btnSave:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
 }
 
-.btnDelete {
-    background-color: #fff;
-    color: #fa5252;
-    border: 1px solid #fa5252;
-    height: auto;
-    padding: 0.3rem 0.8rem;
-    font-size: 0.8rem;
+.btnCancel {
+    background-color: #fde7e7;
+    color: #dc2626;
 }
 
-.btnDelete:hover {
-    background-color: #fef2f2;
-    border-color: #ef4444;
+.btnCancel:hover {
+    background-color: #fec9c9;
+    color: #da1818;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
 }
 
-/* เพิ่มปุ่มแก้ไข */
-.btnEdit {
-    background-color: #fff;
-    color: #3182ce;
-    border: 1px solid #90cdf4;
-    ;
-    height: auto;
-    padding: 0.3rem 0.8rem;
-    font-size: 0.8rem;
-    margin-right: 0.5rem;
-    /* เว้นระยะห่างจากปุ่มลบ */
+.btnPreview {
+    background-color: #ffffff;
+    color: #4b5563;
+    border-color: #d1d5db;
 }
 
-.btnEdit:hover {
-    background-color: #ebf8ff;
-    border-color: #63b3ed;
+.btnPreview:hover {
+    color: #0284c7;
+    border-color: #0284c7;
+    background-color: #f0f9ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(2, 132, 199, 0.3);
 }
 
-/* จัดกลุ่มปุ่มในตารางให้อยู่กลางและเรียงกัน */
+/* Badge Styles (Keep existing) */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.published {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.draft {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.tableSelect {
+    padding: 0.35rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    background-color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* Table Styles (Keep existing) */
+.tableContainer {
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #eee;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.table th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    color: #4b5563;
+}
+
 .actionButtons {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 0.5rem;
 }
 
-.modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modalContent {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modalHeader {
-    margin-bottom: 1.5rem;
-    font-size: 1.25rem;
-    font-weight: bold;
-}
-
-.modalActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-.formGroup {
-    margin-bottom: 1rem;
-}
-
-.input,
-.textarea,
-.modalSelect {
-    width: 100%;
-    padding: 0.6rem;
-    border: 1px solid #ced4da;
+.btnEdit {
+    background-color: #fff;
+    color: #3b82f6;
+    border: 1px solid #93c5fd;
+    padding: 0.3rem 0.5rem;
     border-radius: 4px;
-    font-size: 1rem;
-    background: white;
 }
 
-.btnSave {
-    background-color: #228be6;
-    color: white;
-    justify-content: center;
+.btnEdit:hover {
+    background-color: #eff6ff;
 }
 
-.btnCancel {
-    background-color: #e9ecef;
-    color: #495057;
-    justify-content: center;
+.btnDelete {
+    background-color: #fff;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+}
+
+.btnDelete:hover {
+    background-color: #fef2f2;
 }
 
 .breadcrumb {
@@ -321,23 +276,49 @@
     margin-top: 0.25rem;
 }
 
-/* เพิ่ม Class สำหรับจัด Layout ใน Modal */
-.formRow {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.formCol {
-    flex: 1;
-}
-
-/* ปรับ modalSelect ให้เต็มพื้นที่ */
-.modalSelect {
-    width: 100%;
-    padding: 0.6rem;
+.searchBox,
+.filterSelect {
+    padding: 0.5rem 0.8rem;
     border: 1px solid #ced4da;
     border-radius: 4px;
-    font-size: 1rem;
-    background: white;
+    font-size: 0.9rem;
+    height: 38px;
+    background-color: white;
+}
+
+.badge[data-category="news"] {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.badge[data-category="announcement"] {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+.badge[data-category="activity"] {
+    background-color: #f3e8ff;
+    color: #6b21a8;
+    border-color: #e9d5ff;
+}
+
+/* Sortable Table Columns */
+.thSortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.thSortable:hover {
+    background-color: #f3f4f6;
+}
+
+.btnAdd {
+    background-color: #2563eb;
+    color: white;
+}
+
+.btnAdd:hover {
+    background-color: #1d4ed8;
 }
