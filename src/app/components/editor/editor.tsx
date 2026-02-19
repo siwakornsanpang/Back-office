@@ -74,6 +74,7 @@ export default function Editor({ label, value, onChange, placeholder }: EditorPr
                 [{ 'header': [1, 2, 3, false] }],
                 ['bold', 'italic', 'underline', 'strike'],
                 [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'align': [] }],
                 [{ 'color': [] }, { 'background': [] }],
                 ['link', 'image', 'video'], // ✅ มีปุ่ม Image
                 ['clean']

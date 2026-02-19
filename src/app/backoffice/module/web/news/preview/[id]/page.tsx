@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, User, Tag } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Tag, Smartphone, Tablet, Laptop, Monitor } from 'lucide-react';
 import styles from '../preview.module.css';
+import 'react-quill-new/dist/quill.snow.css';
 
 interface NewsItem {
     id: number;
@@ -12,6 +13,7 @@ interface NewsItem {
     content: string;
     category: 'news' | 'announcement' | 'activity';
     status: 'published' | 'draft';
+    publishedAt?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -26,6 +28,7 @@ export default function NewsPreviewPage() {
     const [news, setNews] = useState<NewsItem | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<'mobile' | 'tablet' | 'laptop' | 'desktop'>('laptop');
 
     useEffect(() => {
         const fetchNews = async () => {
@@ -64,13 +67,38 @@ export default function NewsPreviewPage() {
         }
     };
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    const renderSkeleton = () => (
+        <div className={styles.previewContainer}>
+            <div className={styles.deviceToolbar}>
+                <div className={styles.backButton} style={{ opacity: 0.5 }}>
+                    <ArrowLeft size={20} /> ย้อนกลับ
+                </div>
+                <div className={styles.deviceSelector} style={{ opacity: 0.5 }}>
+                    <div className={styles.deviceBtn}><Smartphone size={18} /></div>
+                    <div className={styles.deviceBtn}><Tablet size={18} /></div>
+                    <div className={styles.deviceBtn}><Laptop size={18} /></div>
+                    <div className={styles.deviceBtn}><Monitor size={18} /></div>
+                </div>
+                <div style={{ width: '80px' }}></div>
             </div>
-        );
-    }
+            <div className={styles.viewportContainer}>
+                <div className={`${styles.deviceFrame} ${styles[viewMode]}`}>
+                    <div className={styles.articleWrapper}>
+                        <div className={`${styles.skeleton} ${styles.skMeta}`} />
+                        <div className={`${styles.skeleton} ${styles.skTitle}`} />
+                        <div className={`${styles.skeleton} ${styles.skText}`} style={{ width: '100%' }} />
+                        <div className={`${styles.skeleton} ${styles.skText}`} style={{ width: '90%' }} />
+                        <div className={`${styles.skeleton} ${styles.skText}`} style={{ width: '95%' }} />
+                        <div className={`${styles.skeleton} ${styles.skImage}`} />
+                        <div className={`${styles.skeleton} ${styles.skText}`} style={{ width: '100%' }} />
+                        <div className={`${styles.skeleton} ${styles.skText}`} style={{ width: '85%' }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    if (isLoading) return renderSkeleton();
 
     if (error || !news) {
         return (
@@ -88,39 +116,87 @@ export default function NewsPreviewPage() {
 
     return (
         <div className={styles.previewContainer}>
-            <div className={styles.articleWrapper}>
+            {/* Device Toolbar */}
+            <div className={styles.deviceToolbar}>
                 <button onClick={() => router.back()} className={styles.backButton}>
                     <ArrowLeft size={20} /> ย้อนกลับ
                 </button>
 
-                <header className={styles.header}>
-                    <div className={styles.meta}>
-                        <span className={styles.categoryTag}>
-                            {getCategoryLabel(news.category)}
-                        </span>
-                        <span className={styles.publishDate}>
-                            <Calendar size={16} />
-                            {formatDate(news.createdAt)}
-                        </span>
-                        {/* ถ้ามีผู้เขียนก็ใส่ได้ แต่ตอนนี้ API อาจยังไม่ส่งมา */}
-                        <span className="flex items-center gap-1">
-                            <User size={16} /> Admin
-                        </span>
-                    </div>
-                    <h1 className={styles.title}>{news.title}</h1>
-                </header>
+                <div className={styles.deviceSelector}>
+                    <button
+                        className={`${styles.deviceBtn} ${viewMode === 'mobile' ? styles.deviceBtnActive : ''}`}
+                        onClick={() => setViewMode('mobile')}
+                        title="มือถือ"
+                    >
+                        <Smartphone size={18} />
+                        <span className="hidden md:inline">มือถือ</span>
+                    </button>
+                    <button
+                        className={`${styles.deviceBtn} ${viewMode === 'tablet' ? styles.deviceBtnActive : ''}`}
+                        onClick={() => setViewMode('tablet')}
+                        title="ไอแพด"
+                    >
+                        <Tablet size={18} />
+                        <span className="hidden md:inline">ไอแพด</span>
+                    </button>
+                    <button
+                        className={`${styles.deviceBtn} ${viewMode === 'laptop' ? styles.deviceBtnActive : ''}`}
+                        onClick={() => setViewMode('laptop')}
+                        title="โน้ตบุ๊ค"
+                    >
+                        <Laptop size={18} />
+                        <span className="hidden md:inline">โน้ตบุ๊ค</span>
+                    </button>
+                    <button
+                        className={`${styles.deviceBtn} ${viewMode === 'desktop' ? styles.deviceBtnActive : ''}`}
+                        onClick={() => setViewMode('desktop')}
+                        title="เดสก์ท็อป"
+                    >
+                        <Monitor size={18} />
+                        <span className="hidden md:inline">เดสก์ท็อป</span>
+                    </button>
+                </div>
 
-                {/* Render HTML content safely */}
-                <article
-                    className={styles.content}
-                    dangerouslySetInnerHTML={{ __html: news.content }}
-                />
+                <div style={{ width: '80px' }}></div> {/* Spacer for symmetry */}
+            </div>
 
-                {news.status === 'draft' && (
-                    <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-center">
-                        นี่คือ "ฉบับร่าง" ยังไม่ได้เผยแพร่สู่สาธารณะ
+            <div className={styles.viewportContainer}>
+                <div className={`${styles.deviceFrame} ${styles[viewMode]}`}>
+                    <div className={styles.articleWrapper}>
+                        <header className={styles.header}>
+                            <div className={styles.meta}>
+                                <span className={styles.categoryTag}>
+                                    {getCategoryLabel(news.category)}
+                                </span>
+                                {news.status === 'published' && (
+                                    <span className={styles.publishDate}>
+                                        <Calendar size={16} />
+                                        เผยแพร่เมื่อวันที่ {formatDate(news.publishedAt || news.createdAt)}
+                                    </span>
+                                )}
+                                <span className="flex items-center gap-1">
+                                    <User size={16} /> Admin
+                                </span>
+                            </div>
+                            <h1 className={styles.title}>{news.title}</h1>
+                        </header>
+
+                        {/* Render HTML content safely with Quill styles */}
+                        <article className={`${styles.content} ql-snow`}>
+                            <div
+                                className="ql-editor"
+                                style={{ padding: 0 }} // Remove default quill padding to match preview layout
+                                dangerouslySetInnerHTML={{ __html: news.content }}
+                            />
+                        </article>
+
+                        {news.status === 'draft' && (
+                            <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-center">
+                                นี่คือ "ฉบับร่าง" ยังไม่ได้เผยแพร่สู่สาธารณะ
+                            </div>
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

@@ -3,10 +3,10 @@
 
 import { useParams } from "next/navigation";
 import {
-  Save, Plus, Trash2, FileText, Download, UploadCloud, Edit, 
-  Globe, Power, Loader2 ,Search// 🔥 เพิ่ม Icon ใหม่
+  Save, Plus, Trash2, FileText, Download, UploadCloud, Edit,
+  Globe, Power, Loader2, Search// 🔥 เพิ่ม Icon ใหม่
 } from "lucide-react";
-import { useState, useEffect, useRef , useMemo} from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import styles from "./law.module.css";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -80,7 +80,7 @@ export default function LawDynamicPage() {
     return laws.filter((law) => {
       // 2.1 ค้นหา (Search)
       const searchLower = searchTerm.toLowerCase();
-      const matchesSearch = 
+      const matchesSearch =
         law.title.toLowerCase().includes(searchLower) ||
         law.order.toString().includes(searchLower) ||
         (law.announcedAt && law.announcedAt.includes(searchLower));
@@ -123,14 +123,14 @@ export default function LawDynamicPage() {
       if (res.ok) {
         // อัปเดต state ในหน้าเว็บทันที (ไม่ต้องโหลดใหม่ให้เสียเวลา)
         setLaws(prev => prev.map(l => l.id === item.id ? { ...l, status: newStatus } : l));
-        
+
         // แจ้งเตือนเล็กๆ ที่มุมจอ (Toast)
         const Toast = MySwal.mixin({
-            toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true
+          toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true
         });
         Toast.fire({
-            icon: 'success',
-            title: `เปลี่ยนสถานะเป็น ${newStatus === 'online' ? 'ออนไลน์' : 'ออฟไลน์'} แล้ว`
+          icon: 'success',
+          title: `เปลี่ยนสถานะเป็น ${newStatus === 'online' ? 'ออนไลน์' : 'ออฟไลน์'} แล้ว`
         });
       }
     } catch (err) {
@@ -208,19 +208,19 @@ export default function LawDynamicPage() {
       <div className={styles.header}>
         <div className={styles.titleGroup}>
           <h2><FileText className="text-blue-600" size={32} /> {titleTH}</h2>
-          <p className={styles.breadcrumb}>หน้าเว็บ / กฎหมาย / <span className="text-blue-600 font-medium">{titleTH}</span></p>
+          <p className={styles.breadcrumb}>จัดการเว็บไซต์ / กฎหมาย / <span className="text-blue-600 font-medium">{titleTH}</span></p>
         </div>
       </div>
 
       <div className={styles.toolbar}>
-        
+
         {/* ช่องค้นหา */}
         <div className={styles.searchWrapper}>
           <Search size={18} className={styles.searchIcon} />
-          <input 
-            type="text" 
-            className={styles.searchInput} 
-            placeholder="ค้นหาชื่อกฎหมาย, ลำดับ, หรือวันที่..." 
+          <input
+            type="text"
+            className={styles.searchInput}
+            placeholder="ค้นหาชื่อกฎหมาย, ลำดับ, หรือวันที่..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -229,25 +229,25 @@ export default function LawDynamicPage() {
         {/* Filter: ช่วงวันที่ */}
         <div className={styles.filterGroup}>
           <span className={styles.dateLabel}>ประกาศ:</span>
-          <input 
-            type="date" 
-            className={styles.filterInput} 
-            value={startDate} 
+          <input
+            type="date"
+            className={styles.filterInput}
+            value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             title="วันที่เริ่มต้น"
           />
           <span className="text-gray-400">-</span>
-          <input 
-            type="date" 
-            className={styles.filterInput} 
-            value={endDate} 
+          <input
+            type="date"
+            className={styles.filterInput}
+            value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
             title="วันที่สิ้นสุด"
           />
         </div>
 
         {/* Filter: สถานะ */}
-        <select 
+        <select
           className={styles.filterSelect}
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
@@ -273,18 +273,18 @@ export default function LawDynamicPage() {
           <div className={styles.formBody}>
             <div className={styles.formGrid}>
               <div className="space-y-6">
-                
+
                 {/* ช่องเลือกสถานะในฟอร์ม (Dropdown) */}
                 <div className={styles.inputGroup}>
-                   <label className={styles.label}>สถานะการแสดงผล</label>
-                   <select 
-                      className={styles.select}
-                      value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
-                    >
-                      <option value="online">🟢 แสดงผล (Online)</option>
-                      <option value="offline">⚪️ ซ่อน (Offline)</option>
-                    </select>
+                  <label className={styles.label}>สถานะการแสดงผล</label>
+                  <select
+                    className={styles.select}
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  >
+                    <option value="online">🟢 แสดงผล (Online)</option>
+                    <option value="offline">⚪️ ซ่อน (Offline)</option>
+                  </select>
                 </div>
 
                 <div className={styles.inputGroup}>
@@ -302,7 +302,7 @@ export default function LawDynamicPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className={styles.inputGroup}>
                 <label className={styles.label}>{editId ? "เปลี่ยนไฟล์ PDF" : "แนบไฟล์ PDF *"}</label>
                 <div className={styles.fileUploadBox} onClick={() => fileInputRef.current?.click()}>
@@ -338,50 +338,50 @@ export default function LawDynamicPage() {
           <thead>
             <tr>
               <th style={{ width: "80px", textAlign: "center" }}>ลำดับ</th>
-              
-              <th style={{ textAlign: "left" }}>ชื่อกฎหมาย</th> 
 
-             
+              <th style={{ textAlign: "left" }}>ชื่อกฎหมาย</th>
+
+
               <th style={{ width: "150px", textAlign: "center" }}>วันที่ประกาศ</th>
               <th style={{ width: "110px", textAlign: "center" }}>เอกสาร</th>
-              
+
               <th style={{ width: "120px", textAlign: "center" }}>สถานะ</th>
               <th style={{ width: "120px", textAlign: "center" }}>จัดการ</th>
             </tr>
           </thead>
           <tbody>
-            {!isLoading && filteredLaws.map((law) =>(
+            {!isLoading && filteredLaws.map((law) => (
               <tr key={law.id} className={law.status === 'offline' ? 'bg-gray-50 opacity-75' : ''}>
                 <td className="text-center font-medium text-gray-500">{law.order}</td>
-                
+
                 <td className="font-medium text-gray-700 text-left">{law.title}</td>
 
                 {/* 🔥 แก้ไข 2: เพิ่ม className="text-center" ให้เนื้อหาอยู่ตรงกลาง */}
                 <td className="text-center">
-                    {law.announcedAt ? new Date(law.announcedAt).toLocaleDateString("th-TH", { year: "numeric", month: "short", day: "numeric" }) : "-"}
-                </td>
-                
-                <td className="text-center">
-                    {law.pdfUrl ? (
-                        <a href={law.pdfUrl} target="_blank" rel="noreferrer" className={styles.pdfLink}>
-                            <Download size={16} /> <span>PDF</span>
-                        </a>
-                    ) : (
-                        <span className="text-gray-300">-</span>
-                    )}
+                  {law.announcedAt ? new Date(law.announcedAt).toLocaleDateString("th-TH", { year: "numeric", month: "short", day: "numeric" }) : "-"}
                 </td>
 
                 <td className="text-center">
-                  <div 
+                  {law.pdfUrl ? (
+                    <a href={law.pdfUrl} target="_blank" rel="noreferrer" className={styles.pdfLink}>
+                      <Download size={16} /> <span>PDF</span>
+                    </a>
+                  ) : (
+                    <span className="text-gray-300">-</span>
+                  )}
+                </td>
+
+                <td className="text-center">
+                  <div
                     className={`${styles.statusBadge} ${law.status === 'online' ? styles.statusOnline : styles.statusOffline}`}
                     onClick={() => handleToggleStatus(law)}
                     title="คลิกเพื่อเปลี่ยนสถานะ"
                     style={{ justifyContent: 'center' }} // จัด icon กับ text ให้กลางปุ่ม
                   >
                     {togglingId === law.id ? (
-                        <Loader2 size={14} className={styles.loadingSpin} />
+                      <Loader2 size={14} className={styles.loadingSpin} />
                     ) : (
-                        law.status === 'online' ? <Globe size={14} /> : <Power size={14} />
+                      law.status === 'online' ? <Globe size={14} /> : <Power size={14} />
                     )}
                     <span>{law.status === 'online' ? 'Online' : 'Offline'}</span>
                   </div>

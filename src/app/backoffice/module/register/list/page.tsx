@@ -143,7 +143,7 @@ export default function RegisterList() {
                 </div>
                 <h1 className={styles.title}>รวมข้อมูลสมาชิก</h1>
                 <p className={styles.breadcrumb}>
-                    Web Management / ทะเบียนเภสัชกร / รวมข้อมูลสมาชิก
+                    ทะเบียนเภสัชกร / <span className="text-blue-600 font-medium">รวมข้อมูลสมาชิก</span>
                 </p>
             </div>
 

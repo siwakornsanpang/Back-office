@@ -6,7 +6,6 @@ import {
     Settings,
     MapPin,
     Share2,
-    Search,
     Save,
     RotateCcw,
     Globe,
@@ -16,7 +15,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
-type TabType = 'general' | 'contact' | 'social' | 'seo';
+type TabType = 'general' | 'contact' | 'social';
 
 export default function SettingPage() {
     const [activeTab, setActiveTab] = useState<TabType>('general');
@@ -38,11 +37,7 @@ export default function SettingPage() {
         // Social
         facebook: 'https://facebook.com/PharmacyCouncil',
         line: '@PharmacyCouncil',
-        youtube: 'https://youtube.com/PharmacyCouncil',
-        // SEO
-        metaTitle: 'สภาเภสัชกรรม (The Pharmacy Council)',
-        metaDescription: 'เว็บไซต์อย่างเป็นทางการของสภาเภสัชกรรม ประเทศไทย ข้อมูลข่าวสาร กฎหมาย และทะเบียนเภสัชกร',
-        keywords: 'สภาเภสัชกรรม, เภสัชกร, สอบใบประกอบวิชาชีพ, ทะเบียนเภสัชกร'
+        youtube: 'https://youtube.com/PharmacyCouncil'
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -234,44 +229,6 @@ export default function SettingPage() {
                     </div>
                 );
 
-            case 'seo':
-                return (
-                    <div className={styles.formGrid}>
-                        <h2 className={styles.tabTitle}>SEO & Metadata</h2>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Meta Title</label>
-                            <input
-                                type="text"
-                                name="metaTitle"
-                                className={styles.input}
-                                value={settings.metaTitle}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Meta Description</label>
-                            <textarea
-                                name="metaDescription"
-                                className={styles.textarea}
-                                value={settings.metaDescription}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Keywords (แยกด้วยเครื่องหมายจุลภาค ,)</label>
-                            <input
-                                type="text"
-                                name="keywords"
-                                className={styles.input}
-                                value={settings.keywords}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                    </div>
-                );
 
             default:
                 return null;
@@ -311,13 +268,7 @@ export default function SettingPage() {
                         <Share2 size={20} />
                         โซเชียลมีเดีย
                     </button>
-                    <button
-                        className={`${styles.tabButton} ${activeTab === 'seo' ? styles.tabButtonActive : ''}`}
-                        onClick={() => setActiveTab('seo')}
-                    >
-                        <Search size={20} />
-                        SEO & Metadata
-                    </button>
+
                 </aside>
 
                 {/* Content Area */}

@@ -50,7 +50,7 @@ export default function RegisterDashboard() {
       <div style={{ marginBottom: "2rem" }}>
         <h1 className={styles.title}>ทะเบียนเภสัชกร</h1>
         <p className={styles.breadcrumb}>
-          Web Management / ทะเบียนเภสัชกร / Dashboard
+          ทะเบียนเภสัชกร / <span className="text-blue-600 font-medium">Dashboard</span>
         </p>
       </div>
 

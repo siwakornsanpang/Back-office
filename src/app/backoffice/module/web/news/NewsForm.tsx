@@ -5,7 +5,7 @@ import styles from './news.module.css';
 import Editor from '@/app/components/editor/editor'; // หรือ path ที่ถูกต้อง
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, Save, X } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 // Types
@@ -122,16 +122,6 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 </div>
 
                 <div className={styles.headerActions}>
-                    {mode === 'edit' && initialData && (
-                        <Link
-                            href={`/backoffice/module/web/news/preview/${initialData.id}`}
-                            className={styles.btnPreview}
-                            style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', border: '1px solid #d1d5db' }}
-                            target="_blank"
-                        >
-                            <Eye size={18} /> ดูตัวอย่าง
-                        </Link>
-                    )}
                     <button
                         type="button"
                         className={`${styles.btn} ${styles.btnCancel}`}
