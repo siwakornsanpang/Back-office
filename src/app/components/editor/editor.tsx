@@ -3,28 +3,71 @@
 import React, { useRef, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.snow.css';
+import './quill-size.css'; // ✅ Global CSS สำหรับ Font Size Picker
 import styles from './editor.module.css';
 import Swal from 'sweetalert2';
 
+// ✅ ขนาดที่อนุญาตให้เลือก
+const Font_Size = ['16px', '18px', '20px', '24px', '28px', '32px', '48px', '64px'];
+
 const ReactQuill = dynamic(async () => {
     const { default: RQ } = await import('react-quill-new');
+    const Quill = RQ.Quill;
+
+    // ✅ สร้าง Font Size Attributor จาก Parchment โดยตรง (รองรับ Quill 2)
+    const Parchment = Quill.import('parchment') as any;
+    const SizeStyle = new Parchment.StyleAttributor('size', 'font-size', {
+        scope: Parchment.Scope.INLINE,
+        whitelist: Font_Size
+    });
+    Quill.register(SizeStyle, true);
+
     // ✅ นำเข้าและลงทะเบียน Module สำหรับ Resize รูปภาพ (เฉพาะฝั่ง Client)
     const { default: ImageResize } = await import('@mgreminger/quill-image-resize-module');
-    RQ.Quill.register('modules/imageResize', ImageResize);
+    Quill.register('modules/imageResize', ImageResize);
+
     return RQ;
 }, {
     ssr: false,
     loading: () => <p className="p-4 text-gray-500">กำลังโหลดเครื่องมือแก้ไข...</p>,
 }) as any;
 
+// ✅ กำหนด Toolbar แบบต่างๆ (เพิ่ม size เข้าไป)
+const TOOLBAR_OPTIONS = {
+    full: [
+        [{ 'header': [1, 2, 3, 4, false] }, { 'size': Font_Size }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        [{ 'color': [] }, { 'background': [] }],
+        ['link', 'image', 'video'],
+        ['clean']
+    ],
+    simple: [
+        [{ 'header': [1, 2, 3, 4, false] }, { 'size': Font_Size }],
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        ['link', 'image'],
+        ['clean']
+    ],
+    essential: [
+        [{ 'header': [1, 2, 3, 4, false] }, { 'size': Font_Size }],
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        ['clean']
+    ]
+};
+
 interface EditorProps {
     label?: string;
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
+    variant?: 'full' | 'simple' | 'essential';
 }
 
-export default function Editor({ label, value, onChange, placeholder }: EditorProps) {
+export default function Editor({ label, value, onChange, placeholder, variant = 'full' }: EditorProps) {
     const quillRef = useRef<any>(null);
 
     // ✅ ฟังก์ชันอัปโหลดรูป (ยิงไป Backend ทันทีที่เลือกไฟล์)
@@ -38,9 +81,8 @@ export default function Editor({ label, value, onChange, placeholder }: EditorPr
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const formData = new FormData();
-                formData.append('file', file); // key ต้องตรงกับที่ backend รับ (req.file())
+                formData.append('file', file);
 
-                // Show loading
                 Swal.fire({
                     title: 'กำลังอัปโหลดรูป...',
                     allowOutsideClick: false,
@@ -48,10 +90,9 @@ export default function Editor({ label, value, onChange, placeholder }: EditorPr
                 });
 
                 try {
-                    // ยิงไปที่ Route ใหม่ที่เราเพิ่งสร้าง
                     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/upload-image`, {
                         method: 'POST',
-                        body: formData, // Browser จัดการ Content-Type ให้เอง
+                        body: formData,
                     });
 
                     if (!res.ok) throw new Error('Upload failed');
@@ -61,7 +102,6 @@ export default function Editor({ label, value, onChange, placeholder }: EditorPr
 
                     Swal.close();
 
-                    // แทรกรูปลงใน Editor
                     const quill = quillRef.current.getEditor();
                     const range = quill.getSelection();
                     quill.insertEmbed(range ? range.index : 0, 'image', url);
@@ -76,23 +116,15 @@ export default function Editor({ label, value, onChange, placeholder }: EditorPr
 
     const modules = useMemo(() => ({
         toolbar: {
-            container: [
-                [{ 'header': [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                [{ 'align': [] }],
-                [{ 'color': [] }, { 'background': [] }],
-                ['link', 'image', 'video'], // ✅ มีปุ่ม Image
-                ['clean']
-            ],
+            container: TOOLBAR_OPTIONS[variant],
             handlers: {
-                image: imageHandler // ✅ ผูก Handler
+                image: imageHandler
             },
         },
         imageResize: {
-            displaySize: true // แสดงขนาดตอน Resize
+            displaySize: true
         }
-    }), [imageHandler]);
+    }), [variant, imageHandler]);
 
     return (
         <div className={styles.container}>

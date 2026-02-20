@@ -1,11 +1,12 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { Image as ImageIcon, Type, Save, Upload, Trash2, MessageSquare, Edit, GripVertical, MonitorPlay, ZoomIn, ZoomOut } from 'lucide-react';
-import Swal from 'sweetalert2'; 
-import withReactContent from 'sweetalert2-react-content'; 
-import Cropper from 'react-easy-crop'; 
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+import Cropper from 'react-easy-crop';
 import getCroppedImg from './cropImage';
 import styles from './home.module.css';
+import Editor from '@/app/components/editor/editor';
 
 const MySwal = withReactContent(Swal);
 
@@ -44,7 +45,7 @@ export default function WebHomePage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
-  
+
   // Load Data
   useEffect(() => {
     if (!API_URL) return;
@@ -74,16 +75,16 @@ export default function WebHomePage() {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       const imageUrl = URL.createObjectURL(file);
-      
+
       setImageToCrop(imageUrl);
       setCropType(type);
       setEditTargetIndex(index);
       setIsCropping(true);
-      
+
       // Reset ค่าเริ่มต้นตอนเปิดหน้าต่าง crop
       setCrop({ x: 0, y: 0 });
       setZoom(1);
-      e.target.value = ''; 
+      e.target.value = '';
     }
   };
 
@@ -134,7 +135,7 @@ export default function WebHomePage() {
       text: "ข้อมูลจะถูกลบออกจากระบบทันทีและไม่สามารถกู้คืนได้",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#ef4444', 
+      confirmButtonColor: '#ef4444',
       cancelButtonColor: '#d1d5db',
       confirmButtonText: 'ลบข้อมูล',
       cancelButtonText: 'ยกเลิก',
@@ -331,19 +332,13 @@ export default function WebHomePage() {
             </div>
             <h3 className={styles.cardTitle}>ข้อความต้อนรับบนภาพ</h3>
           </div>
-          <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>บรรทัดที่ 1</label>
-              <input type="text" className={styles.input} value={headerText} onChange={e => setHeaderText(e.target.value)} placeholder="เช่น สภาเภสัชกรรม" />
-            </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>บรรทัดที่ 2</label>
-              <input type="text" className={styles.input} value={subHeaderText} onChange={e => setSubHeaderText(e.target.value)} placeholder="เช่น The Pharmacy Council of Thailand" />
-            </div>
-          </div>
           <div className={styles.inputGroup}>
-            <label className={styles.label}>บรรทัดที่ 3</label>
-            <textarea className={styles.textarea} rows={3} value={bodyText} onChange={e => setBodyText(e.target.value)} placeholder="เช่น สภาเคียงข้าง สร้างวิชาชีพ..." />
+            <Editor
+              variant="essential"
+              value={headerText}
+              onChange={setHeaderText}
+              placeholder="พิมพ์ข้อความที่ต้องการให้แสดงบนภาพแบนเนอร์ (สามารถจัดรูปแบบหลายบรรทัดได้ที่นี่)..."
+            />
           </div>
         </div>
 
@@ -386,7 +381,7 @@ export default function WebHomePage() {
       {isCropping && imageToCrop && (
         <div className={styles.cropModalOverlay}>
           <div className={styles.cropModalContent}>
-            
+
             {/* พื้นที่ครอปรูป */}
             <div className={styles.cropperContainer}>
               <Cropper

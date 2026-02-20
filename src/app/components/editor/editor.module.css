@@ -14,7 +14,6 @@
 /* ปรับพื้นที่เขียนข้อความ */
 .container :global(.ql-container) {
     min-height: 200px;
-    /* ปรับความสูงตามต้องการ */
     font-size: 1rem;
     font-family: 'Sarabun', sans-serif;
     border-bottom-left-radius: 4px;
