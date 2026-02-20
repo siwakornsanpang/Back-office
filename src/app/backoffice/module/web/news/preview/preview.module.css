@@ -118,8 +118,8 @@
 }
 
 .title {
-    font-size: 2.25rem;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 500;
     line-height: 1.3;
     color: #111;
     margin: 0;
@@ -142,6 +142,24 @@
     height: auto;
     border-radius: 8px;
     margin: 1.5rem 0;
+}
+
+/* Quill Alignment Classes */
+.content :global(.ql-align-center) {
+    text-align: center;
+}
+
+.content :global(.ql-align-right) {
+    text-align: right;
+}
+
+.content :global(.ql-align-justify) {
+    text-align: justify;
+}
+
+/* Ensure images in centered blocks behavior correctly */
+.content :global(.ql-align-center) img {
+    display: inline-block;
 }
 
 .content h2,
