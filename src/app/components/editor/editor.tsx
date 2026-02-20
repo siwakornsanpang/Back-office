@@ -6,9 +6,15 @@ import 'react-quill-new/dist/quill.snow.css';
 import styles from './editor.module.css';
 import Swal from 'sweetalert2';
 
-const ReactQuill = dynamic(() => import('react-quill-new'), {
+const ReactQuill = dynamic(async () => {
+    const { default: RQ } = await import('react-quill-new');
+    // ✅ นำเข้าและลงทะเบียน Module สำหรับ Resize รูปภาพ (เฉพาะฝั่ง Client)
+    const { default: ImageResize } = await import('@mgreminger/quill-image-resize-module');
+    RQ.Quill.register('modules/imageResize', ImageResize);
+    return RQ;
+}, {
     ssr: false,
-    loading: () => <p className="p-4 text-gray-500">Loading Editor...</p>,
+    loading: () => <p className="p-4 text-gray-500">กำลังโหลดเครื่องมือแก้ไข...</p>,
 }) as any;
 
 interface EditorProps {
@@ -81,7 +87,10 @@ export default function Editor({ label, value, onChange, placeholder }: EditorPr
             ],
             handlers: {
                 image: imageHandler // ✅ ผูก Handler
-            }
+            },
+        },
+        imageResize: {
+            displaySize: true // แสดงขนาดตอน Resize
         }
     }), [imageHandler]);
 
