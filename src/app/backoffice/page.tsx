@@ -5,18 +5,12 @@ import Link from "next/link";
 import {
   Users,
   Megaphone,
-  DollarSign,
-  Clock,
   PlusCircle,
   Search,
   FileCheck,
   TrendingUp,
-  TrendingDown,
-  UserPlus,
-  Edit,
-  Trash2,
-  LogIn,
   Loader2,
+  Building2,
 } from "lucide-react";
 import styles from "./Dashboard.module.css";
 
@@ -32,22 +26,20 @@ type Pharmacist = {
   status: string;
 };
 
-// Mock Data สำหรับข้อมูลที่ยังไม่มี API
-const MOCK_NEWS = [
-  { id: 1, title: "ประกาศรายชื่อผู้สอบผ่านใบอนุญาต ครั้งที่ 1/2569", date: "9 ก.พ. 69" },
-  { id: 2, title: "แจ้งเวียนประกาศสภาเภสัชกรรม เรื่อง หลักเกณฑ์การประกอบวิชาชีพ", date: "8 ก.พ. 69" },
-  { id: 3, title: "กำหนดการประชุมใหญ่สามัญประจำปี 2569", date: "7 ก.พ. 69" },
-  { id: 4, title: "รับสมัครเภสัชกรเข้าร่วมโครงการพัฒนาความรู้", date: "5 ก.พ. 69" },
-  { id: 5, title: "ประชาสัมพันธ์หลักสูตรอบรมระยะสั้น", date: "3 ก.พ. 69" },
-];
+type NewsItem = {
+  id: number;
+  title: string;
+  category: string;
+  status: string;
+  createdAt: string;
+};
 
-const RECENT_ACTIVITIES = [
-  { id: 1, type: "add", text: "เพิ่มข่าวใหม่ โดย Admin", time: "5 นาทีที่แล้ว" },
-  { id: 2, type: "edit", text: "แก้ไขข้อมูลเภสัชกร ภ.12458", time: "15 นาทีที่แล้ว" },
-  { id: 3, type: "login", text: "เจ้าหน้าที่ทะเบียน เข้าสู่ระบบ", time: "30 นาทีที่แล้ว" },
-  { id: 4, type: "add", text: "ลงทะเบียนเภสัชกรใหม่ 3 ราย", time: "1 ชั่วโมงที่แล้ว" },
-  { id: 5, type: "delete", text: "ลบข่าวเก่า 2 รายการ", time: "2 ชั่วโมงที่แล้ว" },
-];
+type CouncilMember = {
+  id: number;
+  name: string;
+  position: string;
+  type: string;
+};
 
 const QUICK_ACTIONS = [
   {
@@ -76,18 +68,40 @@ const QUICK_ACTIONS = [
 export default function Dashboard() {
   // State for real data from API
   const [pharmacists, setPharmacists] = useState<Pharmacist[]>([]);
+  const [newsList, setNewsList] = useState<NewsItem[]>([]);
+  const [councilMembers, setCouncilMembers] = useState<CouncilMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch pharmacists data from API
+  // Fetch all data from API
   useEffect(() => {
-    const fetchPharmacists = async () => {
+    const fetchAllData = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(`${API_URL}/pharmacists`);
-        if (!res.ok) throw new Error("Failed to fetch pharmacists");
-        const data = await res.json();
-        setPharmacists(data);
+
+        const [pharmacistRes, newsRes, councilRes] = await Promise.allSettled([
+          fetch(`${API_URL}/pharmacists`),
+          fetch(`${API_URL}/news`),
+          fetch(`${API_URL}/council`),
+        ]);
+
+        // Pharmacists
+        if (pharmacistRes.status === "fulfilled" && pharmacistRes.value.ok) {
+          const data = await pharmacistRes.value.json();
+          setPharmacists(data);
+        }
+
+        // News
+        if (newsRes.status === "fulfilled" && newsRes.value.ok) {
+          const data = await newsRes.value.json();
+          setNewsList(data);
+        }
+
+        // Council
+        if (councilRes.status === "fulfilled" && councilRes.value.ok) {
+          const data = await councilRes.value.json();
+          setCouncilMembers(data);
+        }
       } catch (err) {
         console.error("Fetch error:", err);
         setError("ไม่สามารถโหลดข้อมูลได้");
@@ -97,7 +111,7 @@ export default function Dashboard() {
     };
 
     if (API_URL) {
-      fetchPharmacists();
+      fetchAllData();
     } else {
       setIsLoading(false);
       setError("ยังไม่ได้ตั้งค่า API_URL");
@@ -107,7 +121,9 @@ export default function Dashboard() {
   // Calculate stats from real data
   const totalPharmacists = pharmacists.length;
   const activePharmacists = pharmacists.filter((p) => p.status === "ใช้งาน").length;
-  const uniqueProvinces = [...new Set(pharmacists.map((p) => p.province).filter(Boolean))].length;
+  const totalNews = newsList.length;
+  const publishedNews = newsList.filter((n) => n.status === "published").length;
+  const totalCouncil = councilMembers.length;
 
   // Get latest 5 pharmacists for the table
   const latestPharmacists = pharmacists.slice(0, 5).map((p) => {
@@ -120,55 +136,43 @@ export default function Dashboard() {
     };
   });
 
-  // Calculate chart data (mock monthly registration data based on total)
-  const baseValue = Math.floor(totalPharmacists / 100) || 100;
-  const CHART_DATA = [
-    { label: "ก.ย.", value: baseValue + Math.floor(Math.random() * 50) },
-    { label: "ต.ค.", value: baseValue + Math.floor(Math.random() * 50) },
-    { label: "พ.ย.", value: baseValue + Math.floor(Math.random() * 50) },
-    { label: "ธ.ค.", value: baseValue + Math.floor(Math.random() * 50) },
-    { label: "ม.ค.", value: baseValue + Math.floor(Math.random() * 50) },
-    { label: "ก.พ.", value: baseValue + Math.floor(Math.random() * 50) },
-  ];
+  // Get latest 5 news for the table
+  const latestNews = newsList.slice(0, 5).map((n) => {
+    const date = n.createdAt ? new Date(n.createdAt) : null;
+    const formattedDate = date
+      ? date.toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" })
+      : "-";
+    return {
+      id: n.id,
+      title: n.title,
+      date: formattedDate,
+    };
+  });
 
-  const maxChartValue = Math.max(...CHART_DATA.map((d) => d.value));
-
-  // Stats Cards data
+  // Stats Cards data (only real data)
   const STATS_DATA = [
     {
       id: 1,
       title: "เภสัชกรทั้งหมด",
       value: isLoading ? "..." : totalPharmacists.toLocaleString(),
       change: `${activePharmacists} ใช้งาน`,
-      changeType: "up" as const,
       icon: Users,
       iconClass: "iconBlue",
     },
     {
       id: 2,
       title: "ข่าวประชาสัมพันธ์",
-      value: "156",
-      change: "+3 วันนี้",
-      changeType: "up" as const,
+      value: isLoading ? "..." : totalNews.toLocaleString(),
+      change: `${publishedNews} เผยแพร่แล้ว`,
       icon: Megaphone,
       iconClass: "iconGreen",
     },
     {
       id: 3,
-      title: "รายได้เดือนนี้",
-      value: "฿850,000",
-      change: "+12%",
-      changeType: "up" as const,
-      icon: DollarSign,
-      iconClass: "iconOrange",
-    },
-    {
-      id: 4,
-      title: "จังหวัดที่มีเภสัชกร",
-      value: isLoading ? "..." : uniqueProvinces.toString(),
-      change: "จังหวัด",
-      changeType: "up" as const,
-      icon: Clock,
+      title: "กรรมการสภา",
+      value: isLoading ? "..." : totalCouncil.toLocaleString(),
+      change: "คน",
+      icon: Building2,
       iconClass: "iconPurple",
     },
   ];
@@ -203,22 +207,14 @@ export default function Dashboard() {
               <div className={styles.statContent}>
                 <h3>{stat.title}</h3>
                 <p className={styles.statValue}>
-                  {isLoading && (stat.id === 1 || stat.id === 4) ? (
+                  {isLoading ? (
                     <Loader2 size={24} className={styles.spinner} />
                   ) : (
                     stat.value
                   )}
                 </p>
-                <span
-                  className={`${styles.statChange} ${
-                    stat.changeType === "up" ? styles.statChangeUp : styles.statChangeDown
-                  }`}
-                >
-                  {stat.changeType === "up" ? (
-                    <TrendingUp size={12} />
-                  ) : (
-                    <TrendingDown size={12} />
-                  )}
+                <span className={`${styles.statChange} ${styles.statChangeUp}`}>
+                  <TrendingUp size={12} />
                   {stat.change}
                 </span>
               </div>
@@ -250,81 +246,53 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className={styles.chartsGrid}>
-        {/* Bar Chart - สถิติเภสัชกรลงทะเบียน */}
-        <div className={styles.chartCard}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>📈 สถิติเภสัชกรลงทะเบียนใหม่</h2>
-          </div>
-          <div className={styles.simpleBarChart}>
-            {CHART_DATA.map((item, index) => (
-              <div key={index} className={styles.barItem}>
-                <span className={styles.barValue}>{item.value}</span>
-                <div
-                  className={styles.bar}
-                  style={{ height: `${(item.value / maxChartValue) * 150}px` }}
-                />
-                <span className={styles.barLabel}>{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Placeholder for more charts */}
-        <div className={styles.chartCard}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>🍩 สัดส่วนสถานะใบอนุญาต</h2>
-          </div>
-          <div className={styles.chartPlaceholder}>
-            <span>📊</span>
-            <p>สามารถเพิ่ม Chart Library ภายหลัง</p>
-            <p style={{ fontSize: "0.75rem", marginTop: "0.5rem" }}>
-              (เช่น Chart.js, Recharts)
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Data Tables */}
       <div className={styles.tablesGrid}>
-        {/* Recent News (Mock) */}
+        {/* Recent News (Real Data) */}
         <div className={styles.tableCard}>
           <div className={styles.tableCardHeader}>
             <h3 className={styles.tableCardTitle}>📰 ข่าวล่าสุด</h3>
           </div>
           <div className={styles.tableCardBody}>
-            <table className={styles.dataTable}>
-              <thead>
-                <tr>
-                  <th>หัวข้อ</th>
-                  <th>วันที่</th>
-                </tr>
-              </thead>
-              <tbody>
-                {MOCK_NEWS.map((news) => (
-                  <tr key={news.id}>
-                    <td className={styles.newsTitle}>{news.title}</td>
-                    <td className={styles.newsDate}>{news.date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <Link href="/backoffice/module/web/news" className={styles.viewAllLink}>
-              ดูทั้งหมด →
-            </Link>
+            {isLoading ? (
+              <div style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>
+                <Loader2 size={24} style={{ animation: "spin 1s linear infinite" }} />
+                <p style={{ marginTop: "0.5rem" }}>กำลังโหลดข้อมูล...</p>
+              </div>
+            ) : latestNews.length > 0 ? (
+              <>
+                <table className={styles.dataTable}>
+                  <thead>
+                    <tr>
+                      <th>หัวข้อ</th>
+                      <th>วันที่</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {latestNews.map((news) => (
+                      <tr key={news.id}>
+                        <td className={styles.newsTitle}>{news.title}</td>
+                        <td className={styles.newsDate}>{news.date}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <Link href="/backoffice/module/web/news" className={styles.viewAllLink}>
+                  ดูทั้งหมด →
+                </Link>
+              </>
+            ) : (
+              <div style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>
+                ไม่พบข้อมูลข่าว
+              </div>
+            )}
           </div>
         </div>
 
         {/* New Pharmacists (Real Data) */}
         <div className={styles.tableCard}>
           <div className={styles.tableCardHeader}>
-            <h3 className={styles.tableCardTitle}>
-              👤 เภสัชกรลงทะเบียนใหม่ 
-              <span style={{ fontSize: "0.75rem", color: "#16a34a", marginLeft: "0.5rem" }}>
-                (ข้อมูลจริง)
-              </span>
-            </h3>
+            <h3 className={styles.tableCardTitle}>👤 เภสัชกรลงทะเบียนใหม่</h3>
           </div>
           <div className={styles.tableCardBody}>
             {isLoading ? (
@@ -365,36 +333,6 @@ export default function Dashboard() {
             )}
           </div>
         </div>
-      </div>
-
-      {/* Recent Activities */}
-      <div className={styles.activitiesCard}>
-        <div className={styles.tableCardHeader}>
-          <h3 className={styles.tableCardTitle}>🕐 กิจกรรมล่าสุด</h3>
-        </div>
-        <ul className={styles.activityList}>
-          {RECENT_ACTIVITIES.map((activity) => {
-            const iconMap: Record<string, { icon: React.ElementType; class: string }> = {
-              add: { icon: UserPlus, class: styles.activityIconAdd },
-              edit: { icon: Edit, class: styles.activityIconEdit },
-              delete: { icon: Trash2, class: styles.activityIconDelete },
-              login: { icon: LogIn, class: styles.activityIconLogin },
-            };
-            const { icon: ActivityIcon, class: iconClass } = iconMap[activity.type];
-
-            return (
-              <li key={activity.id} className={styles.activityItem}>
-                <div className={`${styles.activityIcon} ${iconClass}`}>
-                  <ActivityIcon size={14} />
-                </div>
-                <div className={styles.activityContent}>
-                  <p className={styles.activityText}>{activity.text}</p>
-                  <p className={styles.activityTime}>{activity.time}</p>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
       </div>
     </div>
   );
