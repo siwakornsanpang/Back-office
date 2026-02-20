@@ -22,6 +22,24 @@
     background-color: white;
 }
 
+/* บังคับการจัดตำแหน่งใน Editor */
+.container :global(.ql-snow .ql-editor .ql-align-center) {
+    text-align: center;
+}
+
+.container :global(.ql-snow .ql-editor .ql-align-right) {
+    text-align: right;
+}
+
+.container :global(.ql-snow .ql-editor .ql-align-justify) {
+    text-align: justify;
+}
+
+/* ทำให้รูปภาพพ่วงตามการจัดตำแหน่งใน Editor */
+.container :global(.ql-snow .ql-editor .ql-align-center) img {
+    display: inline-block;
+}
+
 /* ปรับ Toolbar */
 .container :global(.ql-toolbar) {
     border-top-left-radius: 4px;
