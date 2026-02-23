@@ -322,3 +322,52 @@
 .btnAdd:hover {
     background-color: #1d4ed8;
 }
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.pageBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    background: white;
+    color: #4b5563;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pageBtn:hover:not(:disabled) {
+    background-color: #f3f4f6;
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.pageBtn.active {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.pageBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f9fafb;
+}
+
+.pageInfo {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-right: 1rem;
+}

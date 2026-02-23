@@ -62,6 +62,22 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
         setIsSubmitting(true);
 
         try {
+            // ✅ ตรวจสอบลำดับซ้ำ (Proactive check)
+            const checkRes = await fetch(API_URL);
+            if (checkRes.ok) {
+                const existingNews: NewsItem[] = await checkRes.json();
+                const duplicate = existingNews.find(item =>
+                    Number(item.order) === Number(order) &&
+                    (mode === 'create' || item.id !== initialData?.id)
+                );
+
+                if (duplicate) {
+                    Swal.fire('แจ้งเตือน', 'มีลำดับนี้อยู่แล้วในระบบ กรุณาแก้ลำดับ', 'warning');
+                    setIsSubmitting(false);
+                    return;
+                }
+            }
+
             // ✅ เปลี่ยนกลับมาส่ง JSON ปกติ (เพราะรูปเป็น URL ใน content แล้ว)
             const payload = {
                 title,
