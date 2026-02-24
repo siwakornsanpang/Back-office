@@ -49,7 +49,8 @@ export const SIDEBAR_DATA: MenuItem[] = [
   { id: 'web-news', title: 'ข่าวประชาสัมพันธ์', href: '/backoffice/module/web/news', icon: <Megaphone size={20} />, },
   { id: 'web-service', title: 'บริการ', href: '/backoffice/module/web/service', icon: <LayoutGrid size={20} /> },
 
-  { id: 'web-agency', title: 'หน่วยงาน', icon: <Landmark size={20} />, 
+  {
+    id: 'web-agency', title: 'หน่วยงาน', icon: <Landmark size={20} />,
     submenu: [
       { id: 'web-pharmacy', title: 'สำนักงานเลขาธิการ', href: '/backoffice/module/web/agency/pharmacy' },
       { id: 'web-royal-college', title: 'ราชวิทยาลัย', href: '/backoffice/module/web/agency/royal-college' },
@@ -106,12 +107,12 @@ export const SIDEBAR_DATA: MenuItem[] = [
   // --- Module อื่นๆ (Placeholder) ---
   {
     id: 'header-eservice',
-    title: 'E-Service', // หรือจะใช้คำว่า "WEB MANAGEMENT" ให้เหมือนต้นแบบ
+    title: 'บริการอิเล็กทรอนิกส์', // หรือจะใช้คำว่า "WEB MANAGEMENT" ให้เหมือนต้นแบบ
     isHeader: true     // 👈 บอกว่าเป็นหัวข้อ
   },
   {
     id: 'module-eservice',
-    title: 'E-Service',
+    title: 'บริการอิเล็กทรอนิกส์',
     icon: <Users size={20} />,
     href: "/backoffice/module/e-service"
   },

@@ -13,7 +13,7 @@ import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
-  
+
   // States
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -31,13 +31,13 @@ export default function LoginPage() {
     setTimeout(() => {
       // Logic ตรวจสอบเบื้องต้น
       if (username === 'admin' && password === '1234') {
-        
+
         // ✅ สร้าง Cookie
         Cookies.set('auth_token', 'mock-token-123456', { expires: 1, path: '/' });
 
         // ไปหน้า Backoffice
-        router.push('/backoffice'); 
-        
+        router.push('/backoffice');
+
       } else {
         setError('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
         setIsLoading(false);
@@ -47,23 +47,23 @@ export default function LoginPage() {
 
   return (
     <div className={styles.container}>
-      
+
       {/* Login Card */}
       <div className={styles.card}>
-        
+
         {/* Header */}
         <div className={styles.header}>
-            <div className={styles.logoBox}>
-                <img src={"/favicon.ico"}></img>
-            </div>
-            <h2 className={styles.title}>ยินดีต้อนรับ</h2>
-            <p className={styles.subtitle}>เข้าสู่ระบบ PharmacyOne</p>
+          <div className={styles.logoBox}>
+            <img src={"/favicon.ico"}></img>
+          </div>
+          <h2 className={styles.title}>ยินดีต้อนรับ</h2>
+          <p className={styles.subtitle}>เข้าสู่ระบบ PharmacyOne</p>
         </div>
 
         {/* Form Input */}
         <div className={styles.formContainer}>
           <form onSubmit={handleLogin} className={styles.form}>
-            
+
             {/* Username Input */}
             <div className={styles.formGroup}>
               <label className={styles.label}>ชื่อผู้ใช้งาน</label>
@@ -122,7 +122,7 @@ export default function LoginPage() {
             {/* Error Message */}
             {error && (
               <div className={styles.errorMessage}>
-                 <span>⚠️ {error}</span>
+                <span>⚠️ {error}</span>
               </div>
             )}
 
@@ -133,7 +133,7 @@ export default function LoginPage() {
               className={`${styles.submitButton} ${isLoading ? styles.loadingBtn : styles.activeBtn}`}
             >
               {isLoading ? (
-                <>กำลังเข้าสู่ระบบ...</> 
+                <>กำลังเข้าสู่ระบบ...</>
               ) : (
                 <> <LogIn size={18} /> เข้าสู่ระบบ </>
               )}
@@ -141,10 +141,10 @@ export default function LoginPage() {
 
           </form>
         </div>
-        
+
         {/* Footer */}
         <div className={styles.footer}>
-         &copy; สำนักงานเลขาธิการ สภาเภสัชกรรม อาคารมหิตลาธิเบศร
+          &copy; สำนักงานเลขาธิการ สภาเภสัชกรรม อาคารมหิตลาธิเบศร
         </div>
 
       </div>
