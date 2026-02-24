@@ -7,6 +7,7 @@ import Cropper from 'react-easy-crop';
 import getCroppedImg from './cropImage';
 import styles from './home.module.css';
 import Editor from '@/app/components/editor/editor';
+import { authFetch } from '@/app/utils/authFetch';
 
 const MySwal = withReactContent(Swal);
 
@@ -49,7 +50,7 @@ export default function WebHomePage() {
   // Load Data
   useEffect(() => {
     if (!API_URL) return;
-    fetch(`${API_URL}/home-content`)
+    authFetch(`${API_URL}/home-content`)
       .then((res) => res.json())
       .then((data) => {
         if (data) {
@@ -169,7 +170,7 @@ export default function WebHomePage() {
 
         if (newPopupFile) formData.append("popupImage", newPopupFile);
 
-        const res = await fetch(`${API_URL}/home-content`, { method: 'POST', body: formData });
+        const res = await authFetch(`${API_URL}/home-content`, { method: 'POST', body: formData });
         if (!res.ok) throw new Error("Failed");
 
         setBanners(updatedBanners);
@@ -226,7 +227,7 @@ export default function WebHomePage() {
 
       if (newPopupFile) formData.append("popupImage", newPopupFile);
 
-      const res = await fetch(`${API_URL}/home-content`, { method: 'POST', body: formData });
+      const res = await authFetch(`${API_URL}/home-content`, { method: 'POST', body: formData });
       if (!res.ok) throw new Error("Failed");
 
       await MySwal.fire({ title: 'สำเร็จ!', text: 'บันทึกข้อมูลหน้าแรกเรียบร้อยแล้ว', icon: 'success', confirmButtonColor: '#2563eb', confirmButtonText: 'ตกลง' });

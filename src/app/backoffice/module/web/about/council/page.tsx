@@ -17,6 +17,7 @@ import {
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import styles from "./council.module.css";
+import { authFetch } from '@/app/utils/authFetch';
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -103,7 +104,7 @@ export default function CouncilPage() {
 
   const fetchMembers = async () => {
     try {
-      const res = await fetch(`${API_URL}/council`);
+      const res = await authFetch(`${API_URL}/council`);
       const data = await res.json();
       setMembers(data);
     } catch (err) {
@@ -163,7 +164,7 @@ export default function CouncilPage() {
         : `${API_URL}/council`;
       const method = editingId ? "PUT" : "POST";
 
-      const res = await fetch(url, { method, body: form });
+      const res = await authFetch(url, { method, body: form });
       if (res.ok) {
         await MySwal.fire("สำเร็จ", "บันทึกข้อมูลเรียบร้อย", "success");
         setIsModalOpen(false);
@@ -187,7 +188,7 @@ export default function CouncilPage() {
     });
 
     if (confirm.isConfirmed) {
-      await fetch(`${API_URL}/council/${id}`, { method: "DELETE" });
+      await authFetch(`${API_URL}/council/${id}`, { method: "DELETE" });
       fetchMembers();
       MySwal.fire("ลบสำเร็จ", "", "success");
     }

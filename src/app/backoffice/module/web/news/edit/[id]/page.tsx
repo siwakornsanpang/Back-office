@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import NewsForm, { NewsItem } from '../../NewsForm';
 import styles from '../../news.module.css';
+import { authFetch } from '@/app/utils/authFetch';
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/news`;
 
@@ -18,7 +19,7 @@ export default function EditNewsPage() {
 
         const fetchNewsItem = async () => {
             try {
-                const res = await fetch(`${API_URL}/${id}`);
+                const res = await authFetch(`${API_URL}/${id}`);
                 if (!res.ok) throw new Error('Failed to fetch news item');
                 const data = await res.json();
                 setInitialData(data);

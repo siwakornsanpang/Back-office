@@ -6,6 +6,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import './quill-size.css'; // ✅ Global CSS สำหรับ Font Size Picker
 import styles from './editor.module.css';
 import Swal from 'sweetalert2';
+import { authFetch } from '@/app/utils/authFetch';
 
 // ✅ ขนาดที่อนุญาตให้เลือก
 const Font_Size = ['16px', '18px', '20px', '24px', '28px', '32px', '48px', '64px'];
@@ -90,7 +91,7 @@ export default function Editor({ label, value, onChange, placeholder, variant = 
                 });
 
                 try {
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/upload-image`, {
+                    const res = await authFetch(`${process.env.NEXT_PUBLIC_API_URL}/news/upload-image`, {
                         method: 'POST',
                         body: formData,
                     });

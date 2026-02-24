@@ -15,6 +15,7 @@ import {
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import styles from "../council/council.module.css"; // ใช้ CSS ตัวเดียวกับหน้า Council ได้เลย หรือก๊อปมาวาง
+import { authFetch } from '@/app/utils/authFetch';
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -100,7 +101,7 @@ export default function HistoryPage() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch(`${API_URL}/history`);
+      const res = await authFetch(`${API_URL}/history`);
       const data = await res.json();
       setItems(data);
     } catch (err) {
@@ -164,7 +165,7 @@ export default function HistoryPage() {
         : `${API_URL}/history`;
       const method = editingId ? "PUT" : "POST";
 
-      const res = await fetch(url, { method, body: form });
+      const res = await authFetch(url, { method, body: form });
       if (res.ok) {
         await MySwal.fire("สำเร็จ", "บันทึกข้อมูลเรียบร้อย", "success");
         setIsModalOpen(false);
@@ -187,7 +188,7 @@ export default function HistoryPage() {
       confirmButtonText: "ลบข้อมูล",
     });
     if (confirm.isConfirmed) {
-      await fetch(`${API_URL}/history/${id}`, { method: "DELETE" });
+      await authFetch(`${API_URL}/history/${id}`, { method: "DELETE" });
       fetchItems();
       MySwal.fire("ลบสำเร็จ", "", "success");
     }

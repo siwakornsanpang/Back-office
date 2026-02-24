@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import styles from './news.module.css';
-import Editor from '@/app/components/editor/editor'; // หรือ path ที่ถูกต้อง
+import Editor from '@/app/components/editor/editor';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Save, X } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { authFetch } from '@/app/utils/authFetch';
 
 // Types
 export type NewsStatus = 'published' | 'draft';
@@ -63,7 +64,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
 
         try {
             // ✅ ตรวจสอบลำดับซ้ำ (Proactive check)
-            const checkRes = await fetch(API_URL);
+            const checkRes = await authFetch(API_URL);
             if (checkRes.ok) {
                 const existingNews: NewsItem[] = await checkRes.json();
                 const duplicate = existingNews.find(item =>
@@ -96,7 +97,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 method = 'PUT';
             }
 
-            const res = await fetch(url, {
+            const res = await authFetch(url, {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json', // ✅ สำคัญ: ต้องระบุว่าเป็น JSON

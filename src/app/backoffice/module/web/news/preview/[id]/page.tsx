@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Tag, Smartphone, Tablet, Laptop, Monitor } from 'lucide-react';
 import styles from '../preview.module.css';
 import 'react-quill-new/dist/quill.snow.css';
+import { authFetch } from '@/app/utils/authFetch';
 
 interface NewsItem {
     id: number;
@@ -34,7 +35,7 @@ export default function NewsPreviewPage() {
         const fetchNews = async () => {
             try {
                 if (!id) return;
-                const res = await fetch(`${API_URL}/${id}`);
+                const res = await authFetch(`${API_URL}/${id}`);
                 if (!res.ok) throw new Error('Failed to fetch news data');
                 const data = await res.json();
                 setNews(data);

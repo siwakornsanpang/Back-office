@@ -10,6 +10,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import styles from "./law.module.css";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { authFetch } from '@/app/utils/authFetch';
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -66,7 +67,7 @@ export default function LawDynamicPage() {
     if (!API_URL) return;
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_URL}/laws/${categorySlug}`);
+      const res = await authFetch(`${API_URL}/laws/${categorySlug}`);
       if (!res.ok) { setLaws([]); return; }
       const data = await res.json();
       setLaws(Array.isArray(data) ? data : []);
@@ -115,7 +116,7 @@ export default function LawDynamicPage() {
       const form = new FormData();
       form.append('status', newStatus); // ส่งไปแค่ status ก็พอ
 
-      const res = await fetch(`${API_URL}/laws/${item.id}`, {
+      const res = await authFetch(`${API_URL}/laws/${item.id}`, {
         method: 'PUT',
         body: form
       });
@@ -178,7 +179,7 @@ export default function LawDynamicPage() {
       if (pdfFile) data.append("pdf", pdfFile);
 
       const url = editId ? `${API_URL}/laws/${editId}` : `${API_URL}/laws`;
-      const res = await fetch(url, { method: editId ? "PUT" : "POST", body: data });
+      const res = await authFetch(url, { method: editId ? "PUT" : "POST", body: data });
 
       if (res.ok) {
         await MySwal.fire({ icon: "success", title: "สำเร็จ!", timer: 1500, showConfirmButton: false });
@@ -198,7 +199,7 @@ export default function LawDynamicPage() {
       showCancelButton: true, confirmButtonColor: "#d33", confirmButtonText: "ลบเลย"
     });
     if (!result.isConfirmed) return;
-    await fetch(`${API_URL}/laws/${id}`, { method: "DELETE" });
+    await authFetch(`${API_URL}/laws/${id}`, { method: "DELETE" });
     fetchLaws();
     MySwal.fire("ลบสำเร็จ", "", "success");
   };

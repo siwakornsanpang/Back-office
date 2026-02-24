@@ -4,6 +4,9 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Search, ChevronLeft, Eye, X, Users } from "lucide-react";
 import Link from "next/link";
 import styles from "../register.module.css";
+import { authFetch } from "@/app/utils/authFetch";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type Pharmacist = {
     id: string;
@@ -31,8 +34,8 @@ export default function RegisterList() {
     useEffect(() => {
         const fetchPharmacists = async () => {
             try {
-                const res = await fetch(
-                    "https://pharmacy-api-6w5d.onrender.com/pharmacists"
+                const res = await authFetch(
+                    `${API_URL}/pharmacists`
                 );
                 if (!res.ok) throw new Error("Fetch failed");
 

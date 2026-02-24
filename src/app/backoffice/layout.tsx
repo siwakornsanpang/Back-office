@@ -23,12 +23,16 @@ export default function BackOfficeLayout({
   // sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  // ข้อมูล User จาก Cookie
+  const [userRole, setUserRole] = useState('viewer');
+  const [userName, setUserName] = useState('User');
+
   // เช็คว่า mount แล้ว
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // เช็ค auth หลัง mount เท่านั้น
+  // เช็ค auth + อ่านข้อมูล user หลัง mount
   useEffect(() => {
     if (!isMounted) return;
 
@@ -39,6 +43,9 @@ export default function BackOfficeLayout({
       router.replace("/login");
     } else {
       setIsAuthorized(true);
+      // อ่านข้อมูล user จาก cookies
+      setUserRole(Cookies.get("user_role") || 'viewer');
+      setUserName(Cookies.get("user_display_name") || 'User');
     }
   }, [isMounted, router]);
 
@@ -63,11 +70,19 @@ export default function BackOfficeLayout({
 
   return (
     <div className="bg-[#f3f4f6] min-h-screen font-sans">
-      {/* Header */}
-      <Header onToggle={() => setIsSidebarOpen((prev) => !prev)} />
+      {/* Header — ส่ง userName + userRole */}
+      <Header 
+        onToggle={() => setIsSidebarOpen((prev) => !prev)} 
+        userName={userName}
+        userRole={userRole}
+      />
 
-      {/* Sidebar */}
-      <Sidebar isOpen={isSidebarOpen} />
+      {/* Sidebar — ส่ง userRole + userName */}
+      <Sidebar 
+        isOpen={isSidebarOpen} 
+        userRole={userRole}
+        userName={userName}
+      />
 
       {/* Main Content */}
       <main

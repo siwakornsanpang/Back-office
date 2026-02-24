@@ -5,11 +5,11 @@ import Cookies from 'js-cookie';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
-// import Image from 'next/image'; 
-
 
 // ✅ Import Styles
 import styles from './LoginPage.module.css';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,28 +21,51 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Function Login จำลอง
+  // Function Login — เรียก API จริง
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Simulate API Call (หน่วงเวลา 1.5 วิ)
-    setTimeout(() => {
-      // Logic ตรวจสอบเบื้องต้น
-      if (username === 'admin' && password === '1234') {
-        
-        // ✅ สร้าง Cookie
-        Cookies.set('auth_token', 'mock-token-123456', { expires: 1, path: '/' });
+    try {
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
 
-        // ไปหน้า Backoffice
-        router.push('/backoffice'); 
-        
-      } else {
-        setError('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่');
         setIsLoading(false);
+        return;
       }
-    }, 1500);
+
+      // ✅ บันทึก JWT Token + ข้อมูล User ลง Cookie
+      const cookieOptions = { expires: 1, path: '/' }; // 1 วัน
+      
+      Cookies.set('auth_token', data.token, cookieOptions);
+      Cookies.set('user_role', data.user.role, cookieOptions);
+      Cookies.set('user_display_name', data.user.displayName, cookieOptions);
+      Cookies.set('user_id', String(data.user.id), cookieOptions);
+
+      // ไปหน้าตาม role
+      const role = data.user.role;
+      if (role === 'admin') {
+        router.push('/backoffice');
+      } else if (role === 'web_editor' || role === 'editor') {
+        router.push('/backoffice/module/web/home');
+      } else if (role === 'viewer') {
+        router.push('/backoffice/module/web/home');
+      } else {
+        router.push('/backoffice');
+      }
+
+    } catch (err) {
+      setError('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -92,7 +115,7 @@ export default function LoginPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   required
-                  className={`${styles.inputField} pr-10`} /* pr-10 เผื่อที่ให้ปุ่มตา */
+                  className={`${styles.inputField} pr-10`}
                   placeholder="กรอกรหัสผ่าน"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -114,9 +137,6 @@ export default function LoginPage() {
                 <input type="checkbox" className={styles.checkbox} />
                 <span>จำรหัสผ่าน</span>
               </label>
-              <a href="#" className={styles.link}>
-                ลืมรหัสผ่าน?
-              </a>
             </div>
 
             {/* Error Message */}

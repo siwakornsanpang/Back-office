@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import {
   Users,
   Megaphone,
@@ -13,9 +15,20 @@ import {
   Building2,
 } from "lucide-react";
 import styles from "./Dashboard.module.css";
+import { authFetch } from "@/app/utils/authFetch";
 
 // API URL from environment
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// กำหนดหน้าแรกของแต่ละ role (ไม่ใช่ admin)
+function getDefaultPageForRole(role: string): string {
+  switch (role) {
+    case 'web_editor': return '/backoffice/module/web/home';
+    case 'editor':     return '/backoffice/module/web/home';
+    case 'viewer':     return '/backoffice/module/web/home';
+    default:           return '/backoffice/module/web/home';
+  }
+}
 
 // Types
 type Pharmacist = {
@@ -66,6 +79,19 @@ const QUICK_ACTIONS = [
 ];
 
 export default function Dashboard() {
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+  // เช็ค role — ถ้าไม่ใช่ admin ให้ redirect ออก
+  useEffect(() => {
+    const role = Cookies.get("user_role") || '';
+    if (role !== 'admin') {
+      router.replace(getDefaultPageForRole(role));
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [router]);
+
   // State for real data from API
   const [pharmacists, setPharmacists] = useState<Pharmacist[]>([]);
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
@@ -75,29 +101,26 @@ export default function Dashboard() {
 
   // Fetch all data from API
   useEffect(() => {
+    if (!isAuthorized) return;
+
     const fetchAllData = async () => {
       try {
         setIsLoading(true);
 
         const [pharmacistRes, newsRes, councilRes] = await Promise.allSettled([
-          fetch(`${API_URL}/pharmacists`),
-          fetch(`${API_URL}/news`),
-          fetch(`${API_URL}/council`),
+          authFetch(`${API_URL}/pharmacists`),
+          authFetch(`${API_URL}/news`),
+          authFetch(`${API_URL}/council`),
         ]);
 
-        // Pharmacists
         if (pharmacistRes.status === "fulfilled" && pharmacistRes.value.ok) {
           const data = await pharmacistRes.value.json();
           setPharmacists(data);
         }
-
-        // News
         if (newsRes.status === "fulfilled" && newsRes.value.ok) {
           const data = await newsRes.value.json();
           setNewsList(data);
         }
-
-        // Council
         if (councilRes.status === "fulfilled" && councilRes.value.ok) {
           const data = await councilRes.value.json();
           setCouncilMembers(data);
@@ -116,7 +139,12 @@ export default function Dashboard() {
       setIsLoading(false);
       setError("ยังไม่ได้ตั้งค่า API_URL");
     }
-  }, []);
+  }, [isAuthorized]);
+
+  // ถ้ายังไม่รู้สิทธิ์ หรือกำลัง redirect → แสดงหน้าว่าง
+  if (!isAuthorized) {
+    return null;
+  }
 
   // Calculate stats from real data
   const totalPharmacists = pharmacists.length;
@@ -125,80 +153,38 @@ export default function Dashboard() {
   const publishedNews = newsList.filter((n) => n.status === "published").length;
   const totalCouncil = councilMembers.length;
 
-  // Get latest 5 pharmacists for the table
   const latestPharmacists = pharmacists.slice(0, 5).map((p) => {
     const cleanName = (p.name || "").trim();
-    return {
-      id: p.id,
-      name: cleanName,
-      license: p.registrationId || "-",
-      province: p.province || "-",
-    };
+    return { id: p.id, name: cleanName, license: p.registrationId || "-", province: p.province || "-" };
   });
 
-  // Get latest 5 news for the table
   const latestNews = newsList.slice(0, 5).map((n) => {
     const date = n.createdAt ? new Date(n.createdAt) : null;
     const formattedDate = date
       ? date.toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" })
       : "-";
-    return {
-      id: n.id,
-      title: n.title,
-      date: formattedDate,
-    };
+    return { id: n.id, title: n.title, date: formattedDate };
   });
 
-  // Stats Cards data (only real data)
   const STATS_DATA = [
-    {
-      id: 1,
-      title: "เภสัชกรทั้งหมด",
-      value: isLoading ? "..." : totalPharmacists.toLocaleString(),
-      change: `${activePharmacists} ใช้งาน`,
-      icon: Users,
-      iconClass: "iconBlue",
-    },
-    {
-      id: 2,
-      title: "ข่าวประชาสัมพันธ์",
-      value: isLoading ? "..." : totalNews.toLocaleString(),
-      change: `${publishedNews} เผยแพร่แล้ว`,
-      icon: Megaphone,
-      iconClass: "iconGreen",
-    },
-    {
-      id: 3,
-      title: "กรรมการสภา",
-      value: isLoading ? "..." : totalCouncil.toLocaleString(),
-      change: "คน",
-      icon: Building2,
-      iconClass: "iconPurple",
-    },
+    { id: 1, title: "เภสัชกรทั้งหมด", value: isLoading ? "..." : totalPharmacists.toLocaleString(), change: `${activePharmacists} ใช้งาน`, icon: Users, iconClass: "iconBlue" },
+    { id: 2, title: "ข่าวประชาสัมพันธ์", value: isLoading ? "..." : totalNews.toLocaleString(), change: `${publishedNews} เผยแพร่แล้ว`, icon: Megaphone, iconClass: "iconGreen" },
+    { id: 3, title: "กรรมการสภา", value: isLoading ? "..." : totalCouncil.toLocaleString(), change: "คน", icon: Building2, iconClass: "iconPurple" },
   ];
 
   return (
     <div className={styles.dashboard}>
-      {/* Page Header */}
       <div className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Dashboard</h1>
         <p className={styles.pageSubtitle}>ภาพรวมระบบ Back-office สภาเภสัชกรรม</p>
       </div>
 
-      {/* Error Message */}
       {error && (
-        <div style={{ 
-          background: "#fee2e2", 
-          color: "#dc2626", 
-          padding: "1rem", 
-          borderRadius: "0.5rem", 
-          marginBottom: "1rem" 
-        }}>
+        <div style={{ background: "#fee2e2", color: "#dc2626", padding: "1rem", borderRadius: "0.5rem", marginBottom: "1rem" }}>
           ⚠️ {error}
         </div>
       )}
 
-      {/* Stats Cards */}
       <div className={styles.statsGrid}>
         {STATS_DATA.map((stat) => {
           const IconComponent = stat.icon;
@@ -207,11 +193,7 @@ export default function Dashboard() {
               <div className={styles.statContent}>
                 <h3>{stat.title}</h3>
                 <p className={styles.statValue}>
-                  {isLoading ? (
-                    <Loader2 size={24} className={styles.spinner} />
-                  ) : (
-                    stat.value
-                  )}
+                  {isLoading ? <Loader2 size={24} className={styles.spinner} /> : stat.value}
                 </p>
                 <span className={`${styles.statChange} ${styles.statChangeUp}`}>
                   <TrendingUp size={12} />
@@ -226,7 +208,6 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* Quick Actions */}
       <div className={styles.quickActionsCard}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>ทางลัดด่วน</h2>
@@ -246,9 +227,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Data Tables */}
       <div className={styles.tablesGrid}>
-        {/* Recent News (Real Data) */}
         <div className={styles.tableCard}>
           <div className={styles.tableCardHeader}>
             <h3 className={styles.tableCardTitle}>📰 ข่าวล่าสุด</h3>
@@ -262,12 +241,7 @@ export default function Dashboard() {
             ) : latestNews.length > 0 ? (
               <>
                 <table className={styles.dataTable}>
-                  <thead>
-                    <tr>
-                      <th>หัวข้อ</th>
-                      <th>วันที่</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>หัวข้อ</th><th>วันที่</th></tr></thead>
                   <tbody>
                     {latestNews.map((news) => (
                       <tr key={news.id}>
@@ -277,19 +251,14 @@ export default function Dashboard() {
                     ))}
                   </tbody>
                 </table>
-                <Link href="/backoffice/module/web/news" className={styles.viewAllLink}>
-                  ดูทั้งหมด →
-                </Link>
+                <Link href="/backoffice/module/web/news" className={styles.viewAllLink}>ดูทั้งหมด →</Link>
               </>
             ) : (
-              <div style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>
-                ไม่พบข้อมูลข่าว
-              </div>
+              <div style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>ไม่พบข้อมูลข่าว</div>
             )}
           </div>
         </div>
 
-        {/* New Pharmacists (Real Data) */}
         <div className={styles.tableCard}>
           <div className={styles.tableCardHeader}>
             <h3 className={styles.tableCardTitle}>👤 เภสัชกรลงทะเบียนใหม่</h3>
@@ -303,33 +272,21 @@ export default function Dashboard() {
             ) : latestPharmacists.length > 0 ? (
               <>
                 <table className={styles.dataTable}>
-                  <thead>
-                    <tr>
-                      <th>ชื่อ</th>
-                      <th>เลขที่</th>
-                      <th>จังหวัด</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>ชื่อ</th><th>เลขที่</th><th>จังหวัด</th></tr></thead>
                   <tbody>
                     {latestPharmacists.map((p) => (
                       <tr key={p.id}>
                         <td style={{ fontWeight: 500 }}>{p.name}</td>
-                        <td>
-                          <span className={styles.statusBadge}>{p.license}</span>
-                        </td>
+                        <td><span className={styles.statusBadge}>{p.license}</span></td>
                         <td>{p.province}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-                <Link href="/backoffice/module/register" className={styles.viewAllLink}>
-                  ดูทั้งหมด →
-                </Link>
+                <Link href="/backoffice/module/register" className={styles.viewAllLink}>ดูทั้งหมด →</Link>
               </>
             ) : (
-              <div style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>
-                ไม่พบข้อมูลเภสัชกร
-              </div>
+              <div style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>ไม่พบข้อมูลเภสัชกร</div>
             )}
           </div>
         </div>

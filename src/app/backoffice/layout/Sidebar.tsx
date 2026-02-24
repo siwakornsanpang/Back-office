@@ -6,20 +6,27 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, LogOut } from 'lucide-react';
 import Cookies from 'js-cookie';
-import { SIDEBAR_DATA, MenuItem } from './menuConfig'; // เช็ค path ให้ถูก
+import { SIDEBAR_DATA, MenuItem, filterMenuByRole } from './menuConfig';
 import styles from './Sidebar.module.css';
 
-// 1. รับ Props isOpen
+// Props
 interface SidebarProps {
   isOpen: boolean;
+  userRole: string;
+  userName: string;
 }
 
-export default function Sidebar({ isOpen }: SidebarProps) {
+export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
   const router = useRouter();
-  const visibleMenuItems = SIDEBAR_DATA;
+
+  // ✅ กรองเมนูตาม Role
+  const visibleMenuItems = filterMenuByRole(SIDEBAR_DATA, userRole);
 
   const handleLogout = () => {
     Cookies.remove('auth_token', { path: '/' });
+    Cookies.remove('user_role', { path: '/' });
+    Cookies.remove('user_display_name', { path: '/' });
+    Cookies.remove('user_id', { path: '/' });
     router.refresh();
     router.replace('/login');
   };
@@ -27,11 +34,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   return (
     <aside
       className={styles.sidebar}
-      // 2. ใส่ Inline Style เพื่อควบคุมการเลื่อนเข้า-ออก
       style={{
-        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)', // ถ้าปิด ให้เลื่อนไปทางซ้ายจนพ้นจอ
-        transition: 'transform 0.3s ease-in-out', // ใส่ Animation ให้นุ่มนวล
-        visibility: isOpen ? 'visible' : 'hidden' // กันไม่ให้กดโดนตอนซ่อน
+        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.3s ease-in-out',
+        visibility: isOpen ? 'visible' : 'hidden'
       }}
     >
       <div className={styles.sidebarContent}>
@@ -40,12 +46,13 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         ))}
       </div>
 
-      {/* <div className={styles.sidebarFooter}>
+      {/* Footer — แสดงข้อมูล User + Logout */}
+      <div className={styles.sidebarFooter}>
         <div className={styles.userProfile}>
-          <div className={styles.avatar}>A</div> 
+          <div className={styles.avatar}>{userName.charAt(0).toUpperCase()}</div>
           <div className={styles.userInfo}>
-            <div className={styles.userName}>Admin</div>
-            <div className={styles.userRole}>Admin Test</div>
+            <div className={styles.userName}>{userName}</div>
+            <div className={styles.userRole}>{getRoleLabel(userRole)}</div>
           </div>
           <button 
             onClick={handleLogout} 
@@ -55,17 +62,24 @@ export default function Sidebar({ isOpen }: SidebarProps) {
             <LogOut size={18} />
           </button>
         </div>
-      </div> */}
+      </div>
     </aside>
   );
 }
 
-// ... (Sub Component SidebarItem ใช้โค้ดเดิมได้เลย ไม่ต้องแก้) ...
+// แปลง role เป็นชื่อภาษาไทย
+function getRoleLabel(role: string): string {
+  switch (role) {
+    case 'admin': return 'ผู้ดูแลระบบ';
+    case 'editor': return 'ผู้แก้ไข';
+    case 'web_editor': return 'ผู้จัดการเว็บ';
+    case 'viewer': return 'ผู้ดู';
+    default: return role;
+  }
+}
+
+// Sub Component SidebarItem
 function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
-  // (ใส่โค้ด SidebarItem เดิมของคุณตรงนี้...)
-  // ...
-  // เพื่อความกระชับ ผมละไว้ในฐานที่เข้าใจนะครับ 
-  // ให้คงโค้ดเดิมส่วนล่างนี้ไว้ทั้งหมดครับ
   if (item.isHeader) {
     return <div className={styles.sectionHeader}>{item.title}</div>;
   }

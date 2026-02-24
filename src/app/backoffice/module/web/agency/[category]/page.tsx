@@ -6,6 +6,7 @@ import { Edit, Trash2, Plus, Image as ImageIcon, Link as LinkIcon, Save, UploadC
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import styles from "./agency.module.css"; // Reuse CSS ของ Council ได้เลย หรือสร้างใหม่
+import { authFetch } from '@/app/utils/authFetch';
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -44,7 +45,7 @@ export default function AgencyDynamicPage() {
     setIsLoading(true);
     try {
       // ส่ง query ?category=xxxx ไปกรองที่ API
-      const res = await fetch(`${API_URL}/agencies?category=${currentConfig.dbValue}`);
+      const res = await authFetch(`${API_URL}/agencies?category=${currentConfig.dbValue}`);
       const data = await res.json();
       setAgencies(data);
     } catch (err) {
@@ -102,7 +103,7 @@ export default function AgencyDynamicPage() {
         const url = editingId ? `${API_URL}/agencies/${editingId}` : `${API_URL}/agencies`;
         const method = editingId ? "PUT" : "POST";
         
-        const res = await fetch(url, { method, body: form });
+        const res = await authFetch(url, { method, body: form });
         if(!res.ok) throw new Error();
 
         await MySwal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย', 'success');
@@ -124,7 +125,7 @@ export default function AgencyDynamicPage() {
           confirmButtonColor: '#ef4444'
       });
       if(res.isConfirmed) {
-          await fetch(`${API_URL}/agencies/${id}`, { method: 'DELETE' });
+          await authFetch(`${API_URL}/agencies/${id}`, { method: 'DELETE' });
           fetchData();
           MySwal.fire('ลบสำเร็จ', '', 'success');
       }

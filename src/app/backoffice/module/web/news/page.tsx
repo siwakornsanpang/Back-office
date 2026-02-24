@@ -3,8 +3,9 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import styles from './news.module.css';
-import { Edit, Trash2, Search, Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-react'; // เพิ่ม Icon
+import { Edit, Trash2, Search, Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { authFetch } from '@/app/utils/authFetch';
 
 // --- Types & Interfaces ---
 type NewsStatus = 'published' | 'draft';
@@ -77,7 +78,7 @@ export default function NewsPage() {
   const fetchNews = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(API_URL);
+      const res = await authFetch(API_URL);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       // ตรวจสอบว่า data เป็น array จริงไหม
@@ -113,7 +114,7 @@ export default function NewsPage() {
 
     if (result.isConfirmed) {
       try {
-        const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        const res = await authFetch(`${API_URL}/${id}`, { method: 'DELETE' });
         if (!res.ok) throw new Error('Failed to delete');
 
         setNewsList(prev => prev.filter(item => item.id !== id));
