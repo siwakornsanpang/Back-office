@@ -7,11 +7,6 @@ import {
     MapPin,
     Share2,
     Save,
-    RotateCcw,
-    Globe,
-    Facebook,
-    MessageCircle,
-    Youtube
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
@@ -25,19 +20,20 @@ export default function SettingPage() {
     const [settings, setSettings] = useState({
         // General
         siteNameTh: 'สภาเภสัชกรรม',
-        siteNameEn: 'The Pharmacy Council',
+        siteNameEn: 'The Pharmacy Council of Thailand',
         slogan: 'เพื่อความปลอดภัยด้านยาและสุขภาพของประชาชน',
         logo: '',
         // Contact
-        address: '88/19 หมู่ที่ 4 อาคารสภาวิชาชีพ ชั้น 3 กระทรวงสาธารณสุข ถ.ติวานนท์ ต.ตลาดขวัญ อ.เมือง จ.นนทบุรี 11000',
+        address: 'สำนักงานเลขาธิการสภาเภสัชกรรม อาคารมหิตลาธิเบศร ชั้น 8 กระทรวงสาธารณสุข เลขที่ 88/19 หมู่ 4 ถนนติวานนท์ ตำบลตลาดขวัญ อำเภอเมือง จังหวัดนนทบุรี 11000',
         phone: '0-2591-9992',
-        fax: '0-2591-9991',
-        email: 'secretariat@pharmacycouncil.org',
-        googleMaps: 'https://goo.gl/maps/example',
+        fax: '0-2591-9996',
+        email: 'pharthai@pharmacycouncil.org',
+        googleMaps: 'https://www.google.com/maps?ll=13.847316,100.530202&z=16&t=m&hl=en&gl=TH&mapclient=embed&cid=12946339027475420293',
+        googleMapsEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3873.8619933126433!2d100.52762687592553!3d13.847321395073111!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29b5cb4ca105b%3A0xb3aaa2c0ba72d485!2sThe%20Pharmacy%20Council%20of%20Thailand!5e0!3m2!1sen!2sth!4v1687225265014!5m2!1sen!2sth',
         // Social
-        facebook: 'https://facebook.com/PharmacyCouncil',
+        facebook: 'https://www.facebook.com/pharmacycouncil',
         line: '@PharmacyCouncil',
-        youtube: 'https://youtube.com/PharmacyCouncil'
+        youtube: 'https://www.youtube.com/@pharmacycouncil'
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -100,7 +96,7 @@ export default function SettingPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>สโลแกน (Slogan)</label>
+                            <label className={styles.label}>สโลแกน</label>
                             <textarea
                                 name="slogan"
                                 className={styles.textarea}
@@ -132,7 +128,7 @@ export default function SettingPage() {
                         <h2 className={styles.tabTitle}>ข้อมูลติดต่อสำนักงาน</h2>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>ที่อยู่สำนักงาน</label>
+                            <label className={styles.label}>Address</label>
                             <textarea
                                 name="address"
                                 className={styles.textarea}
@@ -144,7 +140,7 @@ export default function SettingPage() {
 
                         <div className={styles.formRow} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                             <div className={styles.formGroup}>
-                                <label className={styles.label}>เบอร์โทรศัพท์</label>
+                                <label className={styles.label}>Phone</label>
                                 <input
                                     type="text"
                                     name="phone"
@@ -154,7 +150,7 @@ export default function SettingPage() {
                                 />
                             </div>
                             <div className={styles.formGroup}>
-                                <label className={styles.label}>เบอร์โทรสาร (Fax)</label>
+                                <label className={styles.label}>Fax</label>
                                 <input
                                     type="text"
                                     name="fax"
@@ -166,7 +162,7 @@ export default function SettingPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>อีเมลสภา</label>
+                            <label className={styles.label}>Email</label>
                             <input
                                 type="email"
                                 name="email"
@@ -177,15 +173,34 @@ export default function SettingPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Google Maps URL (Embed)</label>
+                            <label className={styles.label}>Google Maps URL</label>
                             <input
                                 type="text"
                                 name="googleMaps"
                                 className={styles.input}
                                 value={settings.googleMaps}
                                 onChange={handleInputChange}
+                                placeholder="คัดลอก 'src' จากโค้ดฝังแผนที่ Google Maps"
                             />
                         </div>
+
+                        {settings.googleMaps && (
+                            <div className={styles.mapPreviewArea}>
+                                <label className={styles.label}>ตัวอย่างการแสดงผลแผนที่</label>
+                                <div className={styles.mapContainer}>
+                                    <iframe
+                                        title="Google Maps Preview"
+                                        src={settings.googleMapsEmbed}
+                                        width="100%"
+                                        height="500"
+                                        style={{ border: 0, borderRadius: '8px' }}
+                                        allowFullScreen={true}
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    ></iframe>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 );
 
@@ -195,7 +210,7 @@ export default function SettingPage() {
                         <h2 className={styles.tabTitle}>โซเชียลมีเดีย</h2>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}><Facebook size={14} style={{ marginRight: '5px' }} /> Facebook Page URL</label>
+                            <label className={styles.label}>Facebook Page URL</label>
                             <input
                                 type="text"
                                 name="facebook"
@@ -206,7 +221,7 @@ export default function SettingPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}><MessageCircle size={14} style={{ marginRight: '5px' }} /> Line Official (ID)</label>
+                            <label className={styles.label}>Line Official (ID)</label>
                             <input
                                 type="text"
                                 name="line"
@@ -217,7 +232,7 @@ export default function SettingPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}><Youtube size={14} style={{ marginRight: '5px' }} /> YouTube Channel URL</label>
+                            <label className={styles.label}>YouTube Channel URL</label>
                             <input
                                 type="text"
                                 name="youtube"
@@ -276,10 +291,6 @@ export default function SettingPage() {
                     {renderTabContent()}
 
                     <div className={styles.actions}>
-                        <button className={`${styles.btn} ${styles.btnSecondary}`}>
-                            <RotateCcw size={18} />
-                            คืนค่าเริ่มต้น
-                        </button>
                         <button
                             className={`${styles.btn} ${styles.btnPrimary}`}
                             onClick={handleSave}

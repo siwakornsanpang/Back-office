@@ -64,6 +64,15 @@ export default function NewsPage() {
   const [filterCategory, setFilterCategory] = useState<FilterCategory>('all');
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'order', direction: 'desc' });
 
+  // --- Pagination States ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  // Reset page when filtering
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterStatus, filterCategory]);
+
   // --- Fetch Data ---
   const fetchNews = useCallback(async () => {
     setIsLoading(true);
@@ -140,7 +149,7 @@ export default function NewsPage() {
   };
 
   // --- Process Data ---
-  const processedNews = useMemo(() => {
+  const { currentNews, totalPages, totalProcessed } = useMemo(() => {
     let result = [...newsList];
 
     // Search
@@ -166,8 +175,13 @@ export default function NewsPage() {
       return 0;
     });
 
-    return result;
-  }, [newsList, searchQuery, filterStatus, filterCategory, sortConfig, getEffectiveStatus]); // Added getEffectiveStatus dependency
+    const totalProcessed = result.length;
+    const totalPages = Math.ceil(totalProcessed / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const currentNews = result.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+    return { currentNews, totalPages, totalProcessed };
+  }, [newsList, searchQuery, filterStatus, filterCategory, sortConfig, getEffectiveStatus, currentPage]); // Added getEffectiveStatus dependency
 
   // --- Render ---
   return (
@@ -234,10 +248,10 @@ export default function NewsPage() {
           <tbody>
             {isLoading ? (
               <tr><td colSpan={7} className="text-center py-8 text-gray-500">กำลังโหลดข้อมูล...</td></tr>
-            ) : processedNews.length === 0 ? (
+            ) : currentNews.length === 0 ? (
               <tr><td colSpan={7} className="text-center py-8 text-gray-400">ไม่พบข้อมูลตามเงื่อนไข</td></tr>
             ) : (
-              processedNews.map((item) => (
+              currentNews.map((item) => (
                 <tr key={item.id}>
                   <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#555' }}>{item.order}</td>
                   <td><div style={{ fontWeight: 550 }}>{item.title}</div></td>
@@ -280,6 +294,40 @@ export default function NewsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination UI */}
+      {!isLoading && totalProcessed > 0 && (
+        <div className={styles.pagination}>
+          <div className={styles.pageInfo}>
+            แสดง {((currentPage - 1) * ITEMS_PER_PAGE) + 1} ถึง {Math.min(currentPage * ITEMS_PER_PAGE, totalProcessed)} จากทั้งหมด {totalProcessed} ข่าว
+          </div>
+          <button
+            className={styles.pageBtn}
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+          >
+            &lt;
+          </button>
+
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i + 1}
+              className={`${styles.pageBtn} ${currentPage === i + 1 ? styles.active : ''}`}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            className={styles.pageBtn}
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(p => p + 1)}
+          >
+            &gt;
+          </button>
+        </div>
+      )}
     </div>
   );
 }
