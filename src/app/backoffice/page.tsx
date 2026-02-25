@@ -74,14 +74,35 @@ export default function Dashboard() {
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
-  // เช็ค role — ถ้าไม่ใช่ admin ให้ redirect ออก
+  // เช็ค permission view_dashboard จาก API
   useEffect(() => {
-    const role = Cookies.get("user_role") || '';
-    if (role !== 'admin') {
-      router.replace(getDefaultPage(role));
-    } else {
-      setIsAuthorized(true);
-    }
+    const checkPermission = async () => {
+      const role = Cookies.get("user_role") || '';
+      // admin ผ่านเสมอ
+      if (role === 'admin') {
+        setIsAuthorized(true);
+        return;
+      }
+
+      try {
+        const token = Cookies.get("auth_token");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/permissions/my`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const perms = await res.json();
+          if (Array.isArray(perms) && perms.includes('view_dashboard')) {
+            setIsAuthorized(true);
+            return;
+          }
+        }
+      } catch {}
+
+      // ไม่มีสิทธิ์ → redirect ไปหน้าแรกของ role
+      router.replace(getDefaultPage(Cookies.get("user_role") || ''));
+    };
+
+    checkPermission();
   }, [router]);
 
   // State for real data from API
