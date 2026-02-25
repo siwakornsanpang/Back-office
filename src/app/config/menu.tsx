@@ -75,7 +75,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
     ]
   },
   { id: 'web-news', title: 'ข่าวประชาสัมพันธ์', href: '/backoffice/module/web/news', icon: <Megaphone size={20} />, permission: 'manage_news' },
-  { id: 'web-service', title: 'บริการ', href: '/backoffice/module/web/service', icon: <LayoutGrid size={20} />, permission: 'manage_web_settings' },
+  { id: 'web-service', title: 'บริการ', href: '/backoffice/module/web/service', icon: <LayoutGrid size={20} />, permission: 'manage_service' },
 
   { id: 'web-agency', title: 'หน่วยงาน', icon: <Landmark size={20} />,
     permission: 'manage_agency',
@@ -124,14 +124,14 @@ export const SIDEBAR_DATA: MenuItem[] = [
     id: 'header-royalcollege',
     title: 'ราชวิทยาลัย',
     isHeader: true,
-    permission: 'manage_register',
+    permission: 'manage_royalcollege',
   },
   {
     id: 'module-royalcollege',
     title: 'จัดการราชวิทยาลัย',
     icon: <Book size={20} />,
     href: '/backoffice/module/royalcollege',
-    permission: 'manage_register',
+    permission: 'manage_royalcollege',
   },
 
   // --- Placeholder modules ---
@@ -139,14 +139,14 @@ export const SIDEBAR_DATA: MenuItem[] = [
     id: 'header-eservice',
     title: 'E-Service',
     isHeader: true,
-    permission: 'manage_register',
+    permission: 'manage_eservice',
   },
   {
     id: 'module-eservice',
     title: 'E-Service',
     icon: <Users size={20} />,
     href: "/backoffice/module/e-service",
-    permission: 'manage_register',
+    permission: 'manage_eservice',
   },
 
 
@@ -154,14 +154,14 @@ export const SIDEBAR_DATA: MenuItem[] = [
     id: 'header-tran',
     title: 'การเงิน/ธุรกรรม',
     isHeader: true,
-    permission: 'manage_register',
+    permission: 'manage_tran',
   },
   {
     id: 'module-tran',
     title: 'การเงิน/ธุรกรรม',
     icon: <FileText size={20} />,
     href: '/backoffice/module/bill',
-    permission: 'manage_register',
+    permission: 'manage_tran',
   },
 
   // --- การตั้งค่า (admin only) ---
