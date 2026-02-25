@@ -1,10 +1,8 @@
 // ============================================
-// Role Configuration — Single Source of Truth
+// Role Configuration
 // ============================================
-// เพิ่ม role ใหม่ → แก้แค่ไฟล์นี้ไฟล์เดียว
-// ทุก component (Sidebar, Header, Setting, etc.) import จากที่นี่
-
-export type RoleKey = 'admin' | 'editor' | 'web_editor' | 'viewer';
+// Built-in roles มี config สำหรับ styling
+// Dynamic roles จะใช้ default config
 
 export interface RoleConfig {
   label: string;       // English label
@@ -14,7 +12,8 @@ export interface RoleConfig {
   defaultPage: string; // หน้าแรกหลัง login
 }
 
-export const ROLES: Record<RoleKey, RoleConfig> = {
+// Config สำหรับ built-in roles (ใช้แค่เรื่อง styling)
+const BUILT_IN_ROLES: Record<string, RoleConfig> = {
   admin: {
     label: 'Admin',
     labelTh: 'ผู้ดูแลระบบ',
@@ -45,32 +44,33 @@ export const ROLES: Record<RoleKey, RoleConfig> = {
   },
 };
 
+// Default config สำหรับ role ที่สร้างใหม่ (dynamic roles)
+const DEFAULT_ROLE_CONFIG: RoleConfig = {
+  label: '',
+  labelTh: '',
+  color: '#8b5cf6',
+  bg: '#f5f3ff',
+  defaultPage: '/backoffice/module/web/home',
+};
+
 // --- Helper functions ---
 
-/** ดึง config ของ role (ถ้าไม่เจอ return default viewer) */
+/** ดึง config ของ role (ถ้าไม่ใช่ built-in จะใช้ default + ชื่อ role เป็น label) */
 export function getRoleConfig(role: string): RoleConfig {
-  return ROLES[role as RoleKey] || ROLES.viewer;
+  if (BUILT_IN_ROLES[role]) return BUILT_IN_ROLES[role];
+  return {
+    ...DEFAULT_ROLE_CONFIG,
+    label: role,
+    labelTh: role,
+  };
 }
 
-/** ดึง label ภาษาไทย */
+/** ดึง label — ใช้ labelTh ถ้ามี, ไม่งั้นใช้ชื่อ role */
 export function getRoleLabel(role: string): string {
-  return getRoleConfig(role).labelTh;
+  return getRoleConfig(role).labelTh || role;
 }
 
 /** ดึงหน้าแรกของ role */
 export function getDefaultPage(role: string): string {
   return getRoleConfig(role).defaultPage;
-}
-
-/** ดึง role ทั้งหมดสำหรับ dropdown */
-export function getRoleOptions(): { value: string; label: string }[] {
-  return Object.entries(ROLES).map(([key, config]) => ({
-    value: key,
-    label: `${config.label} (${config.labelTh})`,
-  }));
-}
-
-/** ดึง validRoles array สำหรับ validation */
-export function getValidRoles(): string[] {
-  return Object.keys(ROLES);
 }

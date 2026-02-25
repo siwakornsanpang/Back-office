@@ -4,13 +4,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { UserPlus, Trash2, Loader2, Users } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
-import { getRoleOptions } from '@/app/config/roles';
 import RoleBadge from '@/app/components/ui/RoleBadge';
 import styles from './users.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-const ROLE_OPTIONS = getRoleOptions();
 
 type User = {
   id: number;
@@ -24,6 +21,7 @@ export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [roleOptions, setRoleOptions] = useState<{ value: string; label: string }[]>([]);
 
   // Form state
   const [username, setUsername] = useState('');
@@ -47,9 +45,31 @@ export default function UserManagementPage() {
     }
   }, []);
 
+  // Fetch roles จาก API (dynamic)
+  const fetchRoles = useCallback(async () => {
+    try {
+      const res = await authFetch(`${API_URL}/permissions/roles`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setRoleOptions(data.map((r: any) => ({ value: r.role, label: r.role })));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch roles', err);
+      // fallback
+      setRoleOptions([
+        { value: 'admin', label: 'admin' },
+        { value: 'editor', label: 'editor' },
+        { value: 'viewer', label: 'viewer' },
+      ]);
+    }
+  }, []);
+
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+    fetchRoles();
+  }, [fetchUsers, fetchRoles]);
 
   // Create user
   const handleCreateUser = async (e: React.FormEvent) => {
@@ -190,7 +210,7 @@ export default function UserManagementPage() {
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
               >
-                {ROLE_OPTIONS.map((opt) => (
+                {roleOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
