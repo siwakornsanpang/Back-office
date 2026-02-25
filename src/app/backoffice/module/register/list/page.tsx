@@ -134,6 +134,29 @@ export default function RegisterList() {
         setSelectedPharmacist(null);
     };
 
+    // Keyboard Navigation for Pagination
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Don't trigger if user is typing in an input or textarea
+            if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            if (e.key === "ArrowLeft") {
+                if (currentPage > 1) {
+                    handlePageChange(currentPage - 1);
+                }
+            } else if (e.key === "ArrowRight") {
+                if (currentPage < totalPages) {
+                    handlePageChange(currentPage + 1);
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [currentPage, totalPages]);
+
     return (
         <div className={styles.container}>
             {/* Header */}
