@@ -8,6 +8,7 @@ import { User, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 
 // ✅ Import Styles
 import styles from './LoginPage.module.css';
+import { getDefaultPage } from '@/app/config/roles';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -51,16 +52,7 @@ export default function LoginPage() {
       Cookies.set('user_id', String(data.user.id), cookieOptions);
 
       // ไปหน้าตาม role
-      const role = data.user.role;
-      if (role === 'admin') {
-        router.push('/backoffice');
-      } else if (role === 'web_editor' || role === 'editor') {
-        router.push('/backoffice/module/web/home');
-      } else if (role === 'viewer') {
-        router.push('/backoffice/module/web/home');
-      } else {
-        router.push('/backoffice');
-      }
+      router.push(getDefaultPage(data.user.role));
 
     } catch (err) {
       setError('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่');

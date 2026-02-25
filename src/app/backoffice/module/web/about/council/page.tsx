@@ -18,6 +18,9 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import styles from "./council.module.css";
 import { authFetch } from '@/app/utils/authFetch';
+import ImagePreviewModal from '@/app/components/ui/ImagePreviewModal';
+import CrudModal from '@/app/components/ui/CrudModal';
+import ImageUploader from '@/app/components/ui/ImageUploader';
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -396,94 +399,56 @@ export default function CouncilPage() {
         </div>
       </div>
 
-      {/* --- Modals (Popup) --- */}
-      {isModalOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalBox}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>
-                {editingId ? "แก้ไขข้อมูล" : "เพิ่มรายชื่อใหม่"}
-              </h3>
-              <button onClick={() => setIsModalOpen(false)} className={styles.btnClose}>✕</button>
-            </div>
-            <form onSubmit={handleSubmit} className={styles.modalBody}>
-               {/* (Form fields... copy logic เดิมมาใส่) */}
-               <div className={styles.imageUploadContainer}>
-                <label className={styles.imageUploadLabel}>
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onClick={(e) => { (e.target as HTMLInputElement).value = ""; }}
-                    onChange={(e) => {
-                      if (e.target.files?.[0]) {
-                        setFormData({
-                          ...formData,
-                          file: e.target.files[0],
-                          preview: URL.createObjectURL(e.target.files[0]),
-                        });
-                      }
-                    }}
-                  />
-                  <div className={styles.circleWrapper}>
-                    {formData.preview ? (
-                      <>
-                        <img src={formData.preview} className={styles.previewImage} alt="Preview" />
-                        <div className={styles.uploadOverlay}><ImageIcon size={24} /><span className="text-xs font-medium mt-1">เปลี่ยนรูป</span></div>
-                      </>
-                    ) : (
-                      <div className={styles.placeholderContent}><UploadCloud size={32} /><span className="text-xs">เพิ่มรูปภาพ</span></div>
-                    )}
-                  </div>
-                  <span className={styles.helperText}>{formData.preview ? <><Edit size={14} /> คลิกที่รูปเพื่อเปลี่ยน</> : "คลิกเพื่ออัปโหลดรูปภาพ"}</span>
-                </label>
-              </div>
+      {/* CRUD Modal */}
+      <CrudModal
+        isOpen={isModalOpen}
+        title={editingId ? "แก้ไขข้อมูล" : "เพิ่มรายชื่อใหม่"}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+      >
+        <ImageUploader
+          preview={formData.preview}
+          onFileChange={(e) => {
+            if (e.target.files?.[0]) {
+              setFormData({
+                ...formData,
+                file: e.target.files[0],
+                preview: URL.createObjectURL(e.target.files[0]),
+              });
+            }
+          }}
+        />
 
-              <div className={styles.gridTwo}>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>ประเภท</label>
-                  <select className={styles.formSelect} value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} >
-                    <option value="elected">🗳️ การเลือกตั้ง</option>
-                    <option value="appointed">📜 การแต่งตั้ง</option>
-                  </select>
-                </div>
-                <div>
-                  <label className={styles.formLabel}>ลำดับ (Sorting)</label>
-                  <input type="number" className={styles.formInput} value={formData.order} onChange={(e) => { const val = e.target.value; setFormData({ ...formData, order: val === "" ? "" : parseInt(val), }); }} />
-                </div>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>ชื่อ-นามสกุล <span className="text-red-500">*</span></label>
-                <input type="text" required className={styles.formInput} placeholder="เช่น ภก.สมชาย ใจดี" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>ตำแหน่ง <span className="text-red-500">*</span></label>
-                <input type="text" required className={styles.formInput} placeholder="เช่น นายกสภา..." value={formData.position} onChange={(e) => setFormData({ ...formData, position: e.target.value })} />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>ประวัติ / ภูมิหลัง</label>
-                <textarea className={styles.formInput} placeholder="ระบุรายละเอียดประวัติ..." rows={4} style={{ resize: "vertical", minHeight: "80px" }} value={formData.background} onChange={(e) => setFormData({ ...formData, background: e.target.value })} />
-              </div>
-
-              <div className="pt-2 flex gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className={styles.btnCancel}>ยกเลิก</button>
-                <button type="submit" className={styles.btnSubmit}>บันทึกข้อมูล</button>
-              </div>
-            </form>
+        <div className={styles.gridTwo}>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>ประเภท</label>
+            <select className={styles.formSelect} value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })}>
+              <option value="elected">🗳️ การเลือกตั้ง</option>
+              <option value="appointed">📜 การแต่งตั้ง</option>
+            </select>
+          </div>
+          <div>
+            <label className={styles.formLabel}>ลำดับ (Sorting)</label>
+            <input type="number" className={styles.formInput} value={formData.order} onChange={(e) => { const val = e.target.value; setFormData({ ...formData, order: val === "" ? "" : parseInt(val), }); }} />
           </div>
         </div>
-      )}
+
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>ชื่อ-นามสกุล <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+          <input type="text" required className={styles.formInput} placeholder="เช่น ภก.สมชาย ใจดี" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+        </div>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>ตำแหน่ง <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+          <input type="text" required className={styles.formInput} placeholder="เช่น นายกสภา..." value={formData.position} onChange={(e) => setFormData({ ...formData, position: e.target.value })} />
+        </div>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>ประวัติ / ภูมิหลัง</label>
+          <textarea className={styles.formInput} placeholder="ระบุรายละเอียดประวัติ..." rows={4} style={{ resize: 'vertical', minHeight: '80px' }} value={formData.background} onChange={(e) => setFormData({ ...formData, background: e.target.value })} />
+        </div>
+      </CrudModal>
 
       {/* Image Preview Modal */}
-      {previewImage && (
-        <div className={styles.imagePreviewOverlay} onClick={() => setPreviewImage(null)}>
-          <div className={styles.imagePreviewContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.closePreviewBtn} onClick={(e) => { e.stopPropagation(); setPreviewImage(null); }} title="ปิด"><X size={32} /></button>
-            <img src={previewImage} alt="Full Size" className={styles.fullSizeImage} />
-          </div>
-        </div>
-      )}
+      <ImagePreviewModal imageUrl={previewImage} onClose={() => setPreviewImage(null)} />
 
       {/* Bio Modal */}
       {viewingBio && (

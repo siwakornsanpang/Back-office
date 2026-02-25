@@ -1,40 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { UserPlus, Trash2, Loader2, Shield, Users } from 'lucide-react';
+import { UserPlus, Trash2, Loader2, Users } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
+import { getRoleOptions } from '@/app/config/roles';
+import RoleBadge from '@/app/components/ui/RoleBadge';
 import styles from './users.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Role config
-const ROLE_OPTIONS = [
-  { value: 'admin', label: 'Admin (ผู้ดูแลระบบ)' },
-  { value: 'editor', label: 'Editor (ผู้แก้ไข)' },
-  { value: 'web_editor', label: 'Web Editor (ผู้จัดการเว็บ)' },
-  { value: 'viewer', label: 'Viewer (ผู้ดู)' },
-];
-
-function getRoleBadgeClass(role: string): string {
-  switch (role) {
-    case 'admin': return styles.roleAdmin;
-    case 'editor': return styles.roleEditor;
-    case 'web_editor': return styles.roleWebEditor;
-    case 'viewer': return styles.roleViewer;
-    default: return styles.roleDefault;
-  }
-}
-
-function getRoleLabel(role: string): string {
-  switch (role) {
-    case 'admin': return 'Admin';
-    case 'editor': return 'Editor';
-    case 'web_editor': return 'Web Editor';
-    case 'viewer': return 'Viewer';
-    default: return role;
-  }
-}
+const ROLE_OPTIONS = getRoleOptions();
 
 type User = {
   id: number;
@@ -270,10 +246,7 @@ export default function UserManagementPage() {
                       </div>
                     </td>
                     <td>
-                      <span className={`${styles.roleBadge} ${getRoleBadgeClass(user.role)}`}>
-                        <Shield size={12} style={{ marginRight: 4 }} />
-                        {getRoleLabel(user.role)}
-                      </span>
+                      <RoleBadge role={user.role} />
                     </td>
                     <td>
                       {user.createdAt

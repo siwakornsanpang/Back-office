@@ -32,14 +32,14 @@
 }
 
 .subtitle {
-  color: #6b7280; /* gray-500 */
+  color: var(--color-text-muted); /* gray-500 */
   font-size: 0.875rem; /* sm */
   margin: 0.25rem 0 0 0;
 }
 
 /* --- Buttons --- */
 .btnAdd {
-  background-color: #2563eb; /* blue-600 */
+  background-color: var(--color-primary); /* blue-600 */
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
@@ -53,12 +53,12 @@
   font-weight: 500;
 }
 .btnAdd:hover {
-  background-color: #1d4ed8;
+  background-color: var(--color-primary-hover);
 } /* blue-700 */
 
 .btnIconEdit {
   padding: 0.5rem;
-  color: #2563eb;
+  color: var(--color-primary);
   border-radius: 0.5rem;
   transition: background-color 0.2s;
   border: 1px solid #90cdf4;
@@ -66,12 +66,12 @@
   cursor: pointer;
 }
 .btnIconEdit:hover {
-  background-color: #eff6ff;
+  background-color: var(--color-primary-light);
 }
 
 .btnIconDelete {
   padding: 0.5rem;
-  color: #ef4444;
+  color: var(--color-danger);
   border-radius: 0.5rem;
   transition: background-color 0.2s;
   border: 1px solid #fa5252;
@@ -86,7 +86,7 @@
   flex: 1;
   padding: 0.5rem 1rem;
   border: 1px solid #d1d5db;
-  color: #374151;
+  color: var(--color-text-secondary);
   border-radius: 0.5rem;
   background-color: white;
   font-weight: 500;
@@ -94,13 +94,13 @@
   transition: background-color 0.2s;
 }
 .btnCancel:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-bg-subtle);
 }
 
 .btnSubmit {
   flex: 1;
   padding: 0.5rem 1rem;
-  background-color: #2563eb;
+  background-color: var(--color-primary);
   color: white;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -110,13 +110,13 @@
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 .btnSubmit:hover {
-  background-color: #1d4ed8;
+  background-color: var(--color-primary-hover);
 }
 
 /* --- Table --- */
 .tableContainer {
   background-color: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 0.75rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   overflow: hidden;
@@ -134,7 +134,7 @@
 
 .tableHead {
   background-color: #f8f9fa;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-bg-hover);
 }
 .tableTh {
   padding: 1rem;
@@ -182,15 +182,15 @@
   vertical-align: middle;
 }
 .tableRow {
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-bg-hover);
   transition: background-color 0.2s;
 }
 .tableRow:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-bg-subtle);
 }
 
 .orderBadge {
-  background-color: #f3f4f6;
+  background-color: var(--color-bg-hover);
   color: #4b5563;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
@@ -203,8 +203,8 @@
   height: 3rem;
   border-radius: 50%;
   overflow: hidden;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background-color: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,7 +216,7 @@
   object-fit: cover;
 }
 .avatarPlaceholder {
-  color: #9ca3af;
+  color: var(--color-text-light);
 }
 
 .badgeElected,
@@ -276,11 +276,11 @@
 
 .modalHeader {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-bg-hover);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-subtle);
 }
 .modalTitle {
   font-weight: 700;
@@ -289,7 +289,7 @@
   margin: 0;
 }
 .btnClose {
-  color: #9ca3af;
+  color: var(--color-text-light);
   border: none;
   background: none;
   font-size: 1.25rem;
@@ -314,7 +314,7 @@
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-secondary);
   margin-bottom: 0.25rem;
 }
 .formInput,
@@ -332,7 +332,7 @@
   color: #1f2937;
 }
 .formInput::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-light);
 }
 .formInput:focus,
 .formSelect:focus {
@@ -371,7 +371,7 @@
   height: 8rem;
   border-radius: 50%;
   overflow: hidden;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-subtle);
   border: 2px dashed #d1d5db; /* ขอบประสีเทา */
   display: flex;
   flex-direction: column;
@@ -383,14 +383,14 @@
 /* ตอนเอาเมาส์ชี้ที่ Label ใหญ่ -> ให้กรอบวงกลมเปลี่ยนสี */
 .imageUploadLabel:hover .circleWrapper {
   border-color: #3b82f6; /* สีฟ้า */
-  background-color: #eff6ff;
+  background-color: var(--color-primary-light);
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); /* เงาฟุ้งๆ */
 }
 
 /* ข้อความใต้รูป */
 .helperText {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -400,7 +400,7 @@
 
 /* ตอนเอาเมาส์ชี้ -> ข้อความเปลี่ยนสีด้วย */
 .imageUploadLabel:hover .helperText {
-  color: #2563eb;
+  color: var(--color-primary);
 }
 
 /* รูปภาพ Preview */
@@ -415,7 +415,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #9ca3af;
+  color: var(--color-text-light);
   gap: 0.25rem;
 }
 .imageUploadLabel:hover .placeholderContent {
@@ -562,7 +562,7 @@
 /* 🔥 เพิ่มใหม่: ข้อความ "ดูภาพเต็ม" */
 .viewImageLabel {
   font-size: 0.7rem; /* ตัวเล็กๆ ไม่รก */
-  color: #6b7280;    /* สีเทา */
+  color: var(--color-text-muted);    /* สีเทา */
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -574,7 +574,7 @@
 
 .viewImageLabel:hover, 
 .imageCell:hover .viewImageLabel {
-  color: #2563eb;    /* สีน้ำเงิน */
+  color: var(--color-primary);    /* สีน้ำเงิน */
   text-decoration: underline;
 }
 
@@ -599,7 +599,7 @@
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af; /* gray-400 */
+  color: var(--color-text-light); /* gray-400 */
   pointer-events: none;
 }
 
@@ -647,10 +647,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  color: #2563eb;       /* สีน้ำเงิน */
+  color: var(--color-primary);       /* สีน้ำเงิน */
   font-size: 0.8rem;
   font-weight: 500;
-  background-color: #eff6ff; /* พื้นหลังฟ้าอ่อนๆ */
+  background-color: var(--color-primary-light); /* พื้นหลังฟ้าอ่อนๆ */
   padding: 0.35rem 0.85rem;
   border-radius: 9999px;     /* ทรงแคปซูล */
   border: 1px solid #bfdbfe;
@@ -667,9 +667,9 @@
 }
 
 .btnReadBioDisabled {
-  color: #9ca3af;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  color: var(--color-text-light);
+  background-color: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
   cursor: default;
   display: inline-flex;
   align-items: center;
@@ -681,14 +681,14 @@
 
 /* 🔥 สไตล์กล่องข้อความใน Modal (ให้อ่านง่าย) */
 .bioContent {
-  color: #374151;
+  color: var(--color-text-secondary);
   font-size: 0.95rem;
   line-height: 1.7;        /* เพิ่มระยะห่างบรรทัดให้อ่านสบายตา */
   white-space: pre-wrap;   /* ✅ สำคัญ! เพื่อให้เว้นวรรค/ขึ้นบรรทัดใหม่ตามที่พิมพ์มา */
-  background-color: #f9fafb;
+  background-color: var(--color-bg-subtle);
   padding: 1.5rem;
   border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   max-height: 60vh;        /* ถ้าประวัติยาวมาก ให้ Scroll ได้ */
   overflow-y: auto;
 }

@@ -16,19 +16,11 @@ import {
 } from "lucide-react";
 import styles from "./Dashboard.module.css";
 import { authFetch } from "@/app/utils/authFetch";
+import { getDefaultPage } from "@/app/config/roles";
 
 // API URL from environment
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// กำหนดหน้าแรกของแต่ละ role (ไม่ใช่ admin)
-function getDefaultPageForRole(role: string): string {
-  switch (role) {
-    case 'web_editor': return '/backoffice/module/web/home';
-    case 'editor':     return '/backoffice/module/web/home';
-    case 'viewer':     return '/backoffice/module/web/home';
-    default:           return '/backoffice/module/web/home';
-  }
-}
 
 // Types
 type Pharmacist = {
@@ -86,7 +78,7 @@ export default function Dashboard() {
   useEffect(() => {
     const role = Cookies.get("user_role") || '';
     if (role !== 'admin') {
-      router.replace(getDefaultPageForRole(role));
+      router.replace(getDefaultPage(role));
     } else {
       setIsAuthorized(true);
     }

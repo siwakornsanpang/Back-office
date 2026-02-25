@@ -11,19 +11,19 @@
 .title {
     font-size: 1.875rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--color-text-primary);
     margin: 0;
 }
 
 .breadcrumb {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
     margin-top: 0.5rem;
 }
 
 /* Card */
 .card {
-    background: #ffffff;
+    background: var(--color-bg-card);
     border-radius: 0.75rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
@@ -33,7 +33,7 @@
 .cardTitle {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--color-text-primary);
     margin: 0 0 1.25rem 0;
     display: flex;
     align-items: center;
@@ -60,7 +60,7 @@
 .label {
     font-size: 0.8125rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--color-text-secondary);
 }
 
 .input,
@@ -70,7 +70,7 @@
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    color: #111827;
+    color: var(--color-text-primary);
     background: #fff;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -78,7 +78,7 @@
 .input:focus,
 .select:focus {
     outline: none;
-    border-color: #2563eb;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -104,13 +104,13 @@
 }
 
 .btnPrimary {
-    background: #2563eb;
+    background: var(--color-primary);
     color: #fff;
-    border-color: #2563eb;
+    border-color: var(--color-primary);
 }
 
 .btnPrimary:hover {
-    background: #1d4ed8;
+    background: var(--color-primary-hover);
 }
 
 .btnPrimary:disabled {
@@ -142,27 +142,27 @@
 }
 
 .table thead th {
-    background: #f9fafb;
+    background: var(--color-bg-subtle);
     padding: 0.75rem 1rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     text-align: left;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .table tbody td {
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
-    color: #374151;
-    border-bottom: 1px solid #f3f4f6;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-bg-hover);
     vertical-align: middle;
 }
 
 .table tbody tr:hover {
-    background: #f9fafb;
+    background: var(--color-bg-subtle);
 }
 
 .table tbody tr:last-child td {
@@ -190,17 +190,17 @@
 }
 
 .roleWebEditor {
-    background: #eff6ff;
-    color: #2563eb;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
 }
 
 .roleViewer {
-    background: #f9fafb;
-    color: #6b7280;
+    background: var(--color-bg-subtle);
+    color: var(--color-text-muted);
 }
 
 .roleDefault {
-    background: #f3f4f6;
+    background: var(--color-bg-hover);
     color: #4b5563;
 }
 
@@ -208,7 +208,7 @@
 .emptyState {
     padding: 2rem;
     text-align: center;
-    color: #9ca3af;
+    color: var(--color-text-light);
     font-size: 0.875rem;
 }
 
@@ -222,8 +222,8 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #eff6ff;
-    color: #2563eb;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -234,12 +234,12 @@
 
 .userName {
     font-weight: 500;
-    color: #111827;
+    color: var(--color-text-primary);
 }
 
 .userUsername {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-text-light);
 }
 
 /* Loading */
@@ -248,7 +248,7 @@
     align-items: center;
     justify-content: center;
     padding: 3rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
     gap: 0.5rem;
 }
 

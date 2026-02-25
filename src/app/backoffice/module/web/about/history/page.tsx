@@ -14,8 +14,11 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import styles from "../council/council.module.css"; // ใช้ CSS ตัวเดียวกับหน้า Council ได้เลย หรือก๊อปมาวาง
+import styles from "../council/council.module.css";
 import { authFetch } from '@/app/utils/authFetch';
+import ImagePreviewModal from '@/app/components/ui/ImagePreviewModal';
+import CrudModal from '@/app/components/ui/CrudModal';
+import ImageUploader from '@/app/components/ui/ImageUploader';
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -194,52 +197,6 @@ export default function HistoryPage() {
     }
   };
 
-  // Component ย่อยสำหรับอัปโหลดรูป (เหมือน council)
-  const ImageUploader = ({ label, preview, onFileChange }: any) => (
-    <div className={styles.imageUploadContainer}>
-      <span className="text-sm font-semibold text-gray-700">{label}</span>
-      <label className={styles.imageUploadLabel}>
-        <input
-          type="file"
-          hidden
-          accept="image/*"
-          onClick={(e) => {
-            (e.target as HTMLInputElement).value = "";
-          }}
-          onChange={onFileChange}
-        />
-        <div className={styles.circleWrapper}>
-          {preview ? (
-            <>
-              <img
-                src={preview}
-                className={styles.previewImage}
-                alt="Preview"
-              />
-              <div className={styles.uploadOverlay}>
-                <ImageIcon size={24} />
-                <span className="text-xs font-medium mt-1">เปลี่ยนรูป</span>
-              </div>
-            </>
-          ) : (
-            <div className={styles.placeholderContent}>
-              <UploadCloud size={32} />
-              <span className="text-xs">เพิ่มรูปภาพ</span>
-            </div>
-          )}
-        </div>
-        <span className={styles.helperText}>
-          {preview ? (
-            <>
-              <Edit size={14} /> คลิกที่รูปเพื่อเปลี่ยน
-            </>
-          ) : (
-            "คลิกเพื่ออัปโหลดรูปภาพ"
-          )}
-        </span>
-      </label>
-    </div>
-  );
 
   return (
     <div className={styles.container}>
@@ -410,171 +367,65 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalBox} style={{ maxWidth: "40rem" }}>
-            {" "}
-            {/* ขยาย Modal หน่อยเพราะข้อมูลเยอะ */}
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>
-                {editingId ? "แก้ไขข้อมูล" : "เพิ่มข้อมูลทำเนียบ"}
-              </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className={styles.btnClose}
-              >
-                ✕
-              </button>
-            </div>
-            <form onSubmit={handleSubmit} className={styles.modalBody}>
-              {/* แถว 1: วาระ + ปี */}
-              <div className={styles.gridTwo}>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>วาระที่</label>
-                  <input
-                    type="text"
-                    required
-                    className={styles.formInput}
-                    placeholder="เช่น 13"
-                    value={formData.term}
-                    onChange={(e) =>
-                      setFormData({ ...formData, term: e.target.value })
-                    }
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>ปีที่ดำรงตำแหน่ง</label>
-                  <input
-                    type="text"
-                    required
-                    className={styles.formInput}
-                    placeholder="เช่น 2568-2570"
-                    value={formData.years}
-                    onChange={(e) =>
-                      setFormData({ ...formData, years: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="border-t border-gray-100 my-2"></div>
-
-              {/* แถว 2: รูปภาพคู่ (นายก - เลขา) */}
-              <div
-                className={styles.gridTwo}
-                style={{
-                  justifyItems: "center",
-                  paddingTop: "0.5rem",
-                  paddingBottom: "0.5rem",
-                }}
-              >
-                <ImageUploader
-                  label="รูปนายกสภา"
-                  preview={formData.presidentPreview}
-                  onFileChange={(e: any) =>
-                    e.target.files[0] &&
-                    setFormData({
-                      ...formData,
-                      presidentFile: e.target.files[0],
-                      presidentPreview: URL.createObjectURL(e.target.files[0]),
-                    })
-                  }
-                />
-
-                <ImageUploader
-                  label="รูปเลขาธิการ"
-                  preview={formData.secretaryPreview}
-                  onFileChange={(e: any) =>
-                    e.target.files[0] &&
-                    setFormData({
-                      ...formData,
-                      secretaryFile: e.target.files[0],
-                      secretaryPreview: URL.createObjectURL(e.target.files[0]),
-                    })
-                  }
-                />
-              </div>
-
-              {/* แถว 3: ชื่อนายก */}
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  ชื่อนายกสภา <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  className={styles.formInput}
-                  placeholder="ระบุชื่อนายก..."
-                  value={formData.presidentName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, presidentName: e.target.value })
-                  }
-                />
-              </div>
-
-              {/* แถว 4: ชื่อเลขา */}
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  ชื่อเลขาธิการ <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  className={styles.formInput}
-                  placeholder="ระบุชื่อเลขา..."
-                  value={formData.secretaryName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, secretaryName: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="pt-2 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className={styles.btnCancel}
-                >
-                  ยกเลิก
-                </button>
-                <button type="submit" className={styles.btnSubmit}>
-                  บันทึกข้อมูล
-                </button>
-              </div>
-            </form>
+      {/* CRUD Modal */}
+      <CrudModal
+        isOpen={isModalOpen}
+        title={editingId ? "แก้ไขข้อมูล" : "เพิ่มข้อมูลทำเนียบ"}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        maxWidth="40rem"
+      >
+        {/* วาระ + ปี */}
+        <div className={styles.gridTwo}>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>วาระที่</label>
+            <input type="text" required className={styles.formInput} placeholder="เช่น 13" value={formData.term} onChange={(e) => setFormData({ ...formData, term: e.target.value })} />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>ปีที่ดำรงตำแหน่ง</label>
+            <input type="text" required className={styles.formInput} placeholder="เช่น 2568-2570" value={formData.years} onChange={(e) => setFormData({ ...formData, years: e.target.value })} />
           </div>
         </div>
-      )}
 
-      {/* Popup ดูรูปใหญ่ */}
-      {previewImage && (
-        <div
-          className={styles.imagePreviewOverlay}
-          onClick={() => setPreviewImage(null)}
-        >
-          <div
-            className={styles.imagePreviewContent}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className={styles.closePreviewBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                setPreviewImage(null);
-              }}
-              title="ปิด"
-            >
-              <X size={32} />
-            </button>
-            <img
-              src={previewImage}
-              alt="Full Size"
-              className={styles.fullSizeImage}
-            />
-          </div>
+        <div style={{ borderTop: '1px solid var(--color-border-light)', margin: '0.5rem 0' }} />
+
+        {/* รูปภาพคู่ */}
+        <div className={styles.gridTwo} style={{ justifyItems: 'center', padding: '0.5rem 0' }}>
+          <ImageUploader
+            label="รูปนายกสภา"
+            preview={formData.presidentPreview}
+            onFileChange={(e) => e.target.files?.[0] && setFormData({
+              ...formData,
+              presidentFile: e.target.files[0],
+              presidentPreview: URL.createObjectURL(e.target.files[0]),
+            })}
+          />
+          <ImageUploader
+            label="รูปเลขาธิการ"
+            preview={formData.secretaryPreview}
+            onFileChange={(e) => e.target.files?.[0] && setFormData({
+              ...formData,
+              secretaryFile: e.target.files[0],
+              secretaryPreview: URL.createObjectURL(e.target.files[0]),
+            })}
+          />
         </div>
-      )}
+
+        {/* ชื่อนายก */}
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>ชื่อนายกสภา <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+          <input type="text" required className={styles.formInput} placeholder="ระบุชื่อนายก..." value={formData.presidentName} onChange={(e) => setFormData({ ...formData, presidentName: e.target.value })} />
+        </div>
+
+        {/* ชื่อเลขา */}
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>ชื่อเลขาธิการ <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+          <input type="text" required className={styles.formInput} placeholder="ระบุชื่อเลขา..." value={formData.secretaryName} onChange={(e) => setFormData({ ...formData, secretaryName: e.target.value })} />
+        </div>
+      </CrudModal>
+
+      {/* Image Preview Modal */}
+      <ImagePreviewModal imageUrl={previewImage} onClose={() => setPreviewImage(null)} />
     </div>
   );
 }

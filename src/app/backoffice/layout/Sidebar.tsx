@@ -1,13 +1,17 @@
 // src/components/layout/Sidebar.tsx
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, LogOut } from 'lucide-react';
 import Cookies from 'js-cookie';
-import { SIDEBAR_DATA, MenuItem, filterMenuByRole } from './menuConfig';
+import { SIDEBAR_DATA, MenuItem, filterMenuByPermission } from '@/app/config/menu';
 import styles from './Sidebar.module.css';
+import { getRoleLabel } from '@/app/config/roles';
+import { authFetch } from '@/app/utils/authFetch';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Props
 interface SidebarProps {
@@ -18,9 +22,30 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
   const router = useRouter();
+  const [userPermissions, setUserPermissions] = useState<string[]>([]);
+  const [permissionsLoaded, setPermissionsLoaded] = useState(false);
 
-  // ✅ กรองเมนูตาม Role
-  const visibleMenuItems = filterMenuByRole(SIDEBAR_DATA, userRole);
+  // ดึง permissions ของ user จาก API
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/permissions/my`);
+        if (res.ok) {
+          const data = await res.json();
+          setUserPermissions(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch permissions:', err);
+      } finally {
+        setPermissionsLoaded(true);
+      }
+    };
+
+    fetchPermissions();
+  }, [userRole]);
+
+  // ✅ กรองเมนูตาม permissions จาก DB (ไม่ใช่ hardcode อีกต่อไป)
+  const visibleMenuItems = filterMenuByPermission(SIDEBAR_DATA, userPermissions);
 
   const handleLogout = () => {
     Cookies.remove('auth_token', { path: '/' });
@@ -41,9 +66,13 @@ export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
       }}
     >
       <div className={styles.sidebarContent}>
-        {visibleMenuItems.map((item) => (
-          <SidebarItem key={item.id} item={item} level={0} />
-        ))}
+        {!permissionsLoaded ? (
+          <div style={{ padding: '1rem', color: '#999', fontSize: '0.875rem' }}>กำลังโหลดเมนู...</div>
+        ) : (
+          visibleMenuItems.map((item) => (
+            <SidebarItem key={item.id} item={item} level={0} />
+          ))
+        )}
       </div>
 
       {/* Footer — แสดงข้อมูล User + Logout */}
@@ -67,16 +96,7 @@ export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
   );
 }
 
-// แปลง role เป็นชื่อภาษาไทย
-function getRoleLabel(role: string): string {
-  switch (role) {
-    case 'admin': return 'ผู้ดูแลระบบ';
-    case 'editor': return 'ผู้แก้ไข';
-    case 'web_editor': return 'ผู้จัดการเว็บ';
-    case 'viewer': return 'ผู้ดู';
-    default: return role;
-  }
-}
+
 
 // Sub Component SidebarItem
 function SidebarItem({ item, level }: { item: MenuItem; level: number }) {

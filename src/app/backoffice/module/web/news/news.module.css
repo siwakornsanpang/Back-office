@@ -65,7 +65,7 @@
 /* Cards */
 .card {
     background: white;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 1.25rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -75,7 +75,7 @@
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: #111827;
+    color: var(--color-text-primary);
 }
 
 /* Form Elements */
@@ -88,7 +88,7 @@
     margin-bottom: 0.5rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--color-text-secondary);
 }
 
 .input,
@@ -127,7 +127,7 @@
 }
 
 .radioItem input[type="radio"] {
-    accent-color: #2563eb;
+    accent-color: var(--color-primary);
     transform: scale(1.1);
 }
 
@@ -146,12 +146,12 @@
 }
 
 .btnSave {
-    background-color: #2563eb;
+    background-color: var(--color-primary);
     color: white;
 }
 
 .btnSave:hover {
-    background-color: #1d4ed8;
+    background-color: var(--color-primary-hover);
     transform: translateY(-1px);
     box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
 }
@@ -169,7 +169,7 @@
 }
 
 .btnPreview {
-    background-color: #ffffff;
+    background-color: var(--color-bg-card);
     color: #4b5563;
     border-color: #d1d5db;
 }
@@ -197,8 +197,8 @@
 }
 
 .draft {
-    background-color: #f3f4f6;
-    color: #374151;
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-secondary);
 }
 
 .tableSelect {
@@ -229,12 +229,12 @@
 .table td {
     padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--color-bg-hover);
     vertical-align: middle;
 }
 
 .table th {
-    background-color: #f9fafb;
+    background-color: var(--color-bg-subtle);
     font-weight: 600;
     color: #4b5563;
 }
@@ -255,12 +255,12 @@
 }
 
 .btnEdit:hover {
-    background-color: #eff6ff;
+    background-color: var(--color-primary-light);
 }
 
 .btnDelete {
     background-color: #fff;
-    color: #ef4444;
+    color: var(--color-danger);
     border: 1px solid #fca5a5;
     padding: 0.3rem 0.5rem;
     border-radius: 4px;
@@ -271,7 +271,7 @@
 }
 
 .breadcrumb {
-    color: #6b7280;
+    color: var(--color-text-muted);
     font-size: 0.875rem;
     margin-top: 0.25rem;
 }
@@ -311,16 +311,16 @@
 }
 
 .thSortable:hover {
-    background-color: #f3f4f6;
+    background-color: var(--color-bg-hover);
 }
 
 .btnAdd {
-    background-color: #2563eb;
+    background-color: var(--color-primary);
     color: white;
 }
 
 .btnAdd:hover {
-    background-color: #1d4ed8;
+    background-color: var(--color-primary-hover);
 }
 
 /* Pagination */
@@ -349,25 +349,25 @@
 }
 
 .pageBtn:hover:not(:disabled) {
-    background-color: #f3f4f6;
+    background-color: var(--color-bg-hover);
     border-color: #3b82f6;
     color: #3b82f6;
 }
 
 .pageBtn.active {
-    background-color: #2563eb;
-    border-color: #2563eb;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
     color: white;
 }
 
 .pageBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background-color: #f9fafb;
+    background-color: var(--color-bg-subtle);
 }
 
 .pageInfo {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
     margin-right: 1rem;
 }

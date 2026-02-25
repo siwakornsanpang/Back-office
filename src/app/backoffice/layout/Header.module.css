@@ -5,12 +5,12 @@
   height: 64px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
-  color: #374151;
+  color: var(--color-text-secondary);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
   position: fixed;
   top: 0;
   left: 0;
@@ -26,8 +26,8 @@
 
 .toggleBtn {
   background: transparent;
-  border: 1px solid #e5e7eb;
-  color: #6b7280;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
   cursor: pointer;
   padding: 8px;
   border-radius: 8px;
@@ -38,14 +38,14 @@
 }
 
 .toggleBtn:hover {
-  background-color: #f3f4f6;
-  color: #111827;
+  background-color: var(--color-bg-hover);
+  color: var(--color-text-primary);
 }
 
 .brandName {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-primary);
   letter-spacing: -0.025em;
 }
 
@@ -62,7 +62,7 @@
   gap: 12px;
   padding: 6px 12px 6px 6px; /* ปรับ padding ให้สมดุล */
   border-radius: 30px;
-  border: 1px solid #e5e7eb; /* มีขอบบางๆ ให้ดูเป็นปุ่ม */
+  border: 1px solid var(--color-border); /* มีขอบบางๆ ให้ดูเป็นปุ่ม */
   cursor: pointer;
   transition: all 0.2s;
   background-color: white;
@@ -76,14 +76,14 @@
 
 .userProfile:hover .userName,
 .userProfile:hover .logoutIcon {
-  color: #ef4444; /* ตัวหนังสือเปลี่ยนเป็นสีแดง */
+  color: var(--color-danger); /* ตัวหนังสือเปลี่ยนเป็นสีแดง */
 }
 
 .avatar {
   width: 36px;
   height: 36px;
   background-color: #dbeafe; /* สีฟ้า */
-  color: #2563eb;
+  color: var(--color-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -102,17 +102,17 @@
 .userName {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-secondary);
   transition: color 0.2s;
 }
 
 .userRole {
     font-size: 0.7rem;
-    color: #9ca3af;
+    color: var(--color-text-light);
 }
 
 .logoutIcon {
-    color: #9ca3af;
+    color: var(--color-text-light);
     margin-left: 4px;
     transition: color 0.2s;
 }

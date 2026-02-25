@@ -21,7 +21,7 @@
 .titleGroup h2 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-primary);
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -29,13 +29,13 @@
 }
 
 .breadcrumb {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
 
 .mainActionBtn {
-  background-color: #2563eb;
+  background-color: var(--color-primary);
   color: white;
   padding: 0.6rem 1.25rem; /* ปุ่มใหญ่ขึ้น */
   border-radius: 0.5rem;
@@ -50,7 +50,7 @@
 }
 
 .mainActionBtn:hover {
-  background-color: #1d4ed8;
+  background-color: var(--color-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -59,7 +59,7 @@
   background: white;
   border-radius: 1rem; /* โค้งมนมากขึ้น */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); /* เงาละมุนสไตล์ Mac */
-  border: 1px solid #f3f4f6;
+  border: 1px solid var(--color-bg-hover);
   overflow: hidden;
   margin-bottom: 2rem;
   animation: slideDown 0.3s ease-out;
@@ -71,15 +71,15 @@
 }
 
 .formHeader {
-  background-color: #f9fafb;
+  background-color: var(--color-bg-subtle);
   padding: 1.25rem 2rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .formTitle {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -109,11 +109,11 @@
 .label {
   font-size: 0.925rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-secondary);
 }
 
 .required {
-  color: #ef4444;
+  color: var(--color-danger);
   margin-left: 0.25rem;
 }
 
@@ -146,7 +146,7 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-subtle);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -156,7 +156,7 @@
 
 .fileUploadBox:hover {
   border-color: #3b82f6;
-  background-color: #eff6ff;
+  background-color: var(--color-primary-light);
 }
 
 .fileUploadText {
@@ -165,7 +165,7 @@
 }
 
 .fileUploadHint {
-  color: #9ca3af;
+  color: var(--color-text-light);
   font-size: 0.85rem;
 }
 
@@ -176,14 +176,14 @@
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--color-bg-hover);
 }
 
 .cancelBtn {
   padding: 0.6rem 1.5rem;
   background-color: white;
   border: 1px solid #d1d5db;
-  color: #374151;
+  color: var(--color-text-secondary);
   border-radius: 0.5rem;
   font-weight: 500;
   cursor: pointer;
@@ -191,12 +191,12 @@
 }
 
 .cancelBtn:hover {
-  background-color: #f3f4f6;
+  background-color: var(--color-bg-hover);
 }
 
 .saveBtn {
   padding: 0.6rem 1.5rem;
-  background-color: #2563eb;
+  background-color: var(--color-primary);
   border: none;
   color: white;
   border-radius: 0.5rem;
@@ -209,7 +209,7 @@
 }
 
 .saveBtn:hover {
-  background-color: #1d4ed8;
+  background-color: var(--color-primary-hover);
 }
 
 /* --- Table Section --- */
@@ -254,7 +254,7 @@
 
 /* Link Style */
 .pdfLink {
-  color: #2563eb;
+  color: var(--color-primary);
   text-decoration: none;
   font-weight: 500;
   display: inline-flex;
@@ -266,11 +266,11 @@
 }
 
 .pdfLink:hover {
-  background-color: #eff6ff;
+  background-color: var(--color-primary-light);
 }
 
 .deleteBtn {
-  color: #ef4444;
+  color: var(--color-danger);
   background: white;
   border: 1px solid #fca5a5;
   padding: 0.4rem;
@@ -284,7 +284,7 @@
 
 .deleteBtn:hover {
   background-color: #fef2f2;
-  border-color: #ef4444;
+  border-color: var(--color-danger);
 }
 
 
@@ -334,12 +334,12 @@
 }
 
 .statusOffline {
-  background-color: #f3f4f6; /* เทาอ่อน */
+  background-color: var(--color-bg-hover); /* เทาอ่อน */
   color: #4b5563;           /* เทาเข้ม */
-  border-color: #e5e7eb;
+  border-color: var(--color-border);
 }
 .statusOffline:hover {
-  background-color: #e5e7eb; /* เทาเข้มขึ้นตอนชี้ */
+  background-color: var(--color-border); /* เทาเข้มขึ้นตอนชี้ */
 }
 
 /* เพิ่ม Icon หมุนๆ ตอนกำลังโหลดสถานะ (เผื่อไว้) */
@@ -375,7 +375,7 @@
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--color-text-light);
   pointer-events: none;
 }
 
@@ -408,7 +408,7 @@
   border-radius: 0.5rem;
   background-color: white;
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--color-text-secondary);
   outline: none;
   cursor: pointer;
 }
@@ -419,7 +419,7 @@
 
 .dateLabel {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   white-space: nowrap;
 }
 
