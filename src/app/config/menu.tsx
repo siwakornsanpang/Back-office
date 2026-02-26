@@ -173,7 +173,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
   },
   {
     id: 'module-settings',
-    title: 'ตั้งค่าระบบ',
+    title: 'จัดการผู้ใช้',
     icon: <Settings size={20} />,
     href: '/backoffice/module/setting',
     permission: 'manage_users',
