@@ -50,7 +50,7 @@ const DEFAULT_ROLE_CONFIG: RoleConfig = {
   labelTh: '',
   color: '#8b5cf6',
   bg: '#f5f3ff',
-  defaultPage: '/backoffice/module/web/home',
+  defaultPage: '/backoffice',
 };
 
 // --- Helper functions ---

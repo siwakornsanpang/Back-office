@@ -76,22 +76,7 @@ export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
       </div>
 
       {/* Footer — แสดงข้อมูล User + Logout */}
-      <div className={styles.sidebarFooter}>
-        <div className={styles.userProfile}>
-          <div className={styles.avatar}>{userName.charAt(0).toUpperCase()}</div>
-          <div className={styles.userInfo}>
-            <div className={styles.userName}>{userName}</div>
-            <div className={styles.userRole}>{getRoleLabel(userRole)}</div>
-          </div>
-          <button 
-            onClick={handleLogout} 
-            className={styles.logoutBtn}
-            title="ออกจากระบบ"
-          >
-            <LogOut size={18} />
-          </button>
-        </div>
-      </div>
+      
     </aside>
   );
 }
