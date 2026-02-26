@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './setting.module.css';
 import {
     Settings,
@@ -9,43 +9,109 @@ import {
     Save,
 } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { authFetch } from '@/app/utils/authFetch';
+import Image from 'next/image';
 
 type TabType = 'general' | 'contact' | 'social';
+
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/web-settings`;
 
 export default function SettingPage() {
     const [activeTab, setActiveTab] = useState<TabType>('general');
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetching, setIsFetching] = useState(true);
 
     // Form States
     const [settings, setSettings] = useState({
         // General
-        siteNameTh: 'สภาเภสัชกรรม',
-        siteNameEn: 'The Pharmacy Council of Thailand',
-        slogan: 'เพื่อความปลอดภัยด้านยาและสุขภาพของประชาชน',
-        logo: '',
+        siteNameTh: '',
+        siteNameEn: '',
+        slogan: '',
+        logoPath: '',
         // Contact
-        address: 'สำนักงานเลขาธิการสภาเภสัชกรรม อาคารมหิตลาธิเบศร ชั้น 8 กระทรวงสาธารณสุข เลขที่ 88/19 หมู่ 4 ถนนติวานนท์ ตำบลตลาดขวัญ อำเภอเมือง จังหวัดนนทบุรี 11000',
-        phone: '0-2591-9992',
-        fax: '0-2591-9996',
-        email: 'pharthai@pharmacycouncil.org',
-        googleMaps: 'https://www.google.com/maps?ll=13.847316,100.530202&z=16&t=m&hl=en&gl=TH&mapclient=embed&cid=12946339027475420293',
-        googleMapsEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3873.8619933126433!2d100.52762687592553!3d13.847321395073111!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29b5cb4ca105b%3A0xb3aaa2c0ba72d485!2sThe%20Pharmacy%20Council%20of%20Thailand!5e0!3m2!1sen!2sth!4v1687225265014!5m2!1sen!2sth',
+        address: '',
+        phone: '',
+        fax: '',
+        email: '',
+        googleMapsUrl: '',
+        googleMapsEmbed: '',
         // Social
-        facebook: 'https://www.facebook.com/pharmacycouncil',
-        line: '@PharmacyCouncil',
-        youtube: 'https://www.youtube.com/@pharmacycouncil'
+        facebookUrl: '',
+        lineId: '',
+        youtubeUrl: ''
     });
+
+    const [logoFile, setLogoFile] = useState<File | null>(null);
+    const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+    // Fetch Initial Data
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await authFetch(API_URL);
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings(prev => ({
+                        ...prev,
+                        ...data
+                    }));
+                    if (data.logoPath) {
+                        setLogoPreview(data.logoPath);
+                    }
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            } finally {
+                setIsFetching(false);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setSettings(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setLogoFile(file);
+            setLogoPreview(URL.createObjectURL(file));
+        }
+    };
+
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            // Simulate API Call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const formData = new FormData();
+
+            // Append all fields
+            Object.entries(settings).forEach(([key, value]) => {
+                if (value !== null && value !== undefined) {
+                    formData.append(key, value as string);
+                }
+            });
+
+            // Append logo if changed
+            if (logoFile) {
+                formData.append('logo', logoFile);
+            }
+
+            const res = await authFetch(API_URL, {
+                method: 'POST',
+                body: formData // authFetch handles headers IF not multipart, but here we pass body directly
+            });
+
+            if (!res.ok) throw new Error('Failed to save');
+
+            const result = await res.json();
+
+            if (result.logoUrl) {
+                setSettings(prev => ({ ...prev, logoPath: result.logoUrl }));
+                setLogoPreview(result.logoUrl);
+                setLogoFile(null);
+            }
 
             Swal.fire({
                 icon: 'success',
@@ -65,6 +131,10 @@ export default function SettingPage() {
     };
 
     const renderTabContent = () => {
+        if (isFetching) {
+            return <div className="p-8 text-center text-gray-500">กำลังโหลดข้อมูล...</div>;
+        }
+
         switch (activeTab) {
             case 'general':
                 return (
@@ -72,50 +142,64 @@ export default function SettingPage() {
                         <h2 className={styles.tabTitle}>ข้อมูลพื้นฐานเว็บไซต์</h2>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>ชื่อเว็บไซต์ (ภาษาไทย)</label>
+                            <label className={styles.label}>ชื่อหน่วยงาน (ภาษาไทย)</label>
                             <input
                                 type="text"
                                 name="siteNameTh"
                                 className={styles.input}
                                 value={settings.siteNameTh}
                                 onChange={handleInputChange}
-                                placeholder="ระบุชื่อภาษาไทย..."
+                                placeholder="ระบุชื่อหน่วยงานภาษาไทย..."
                             />
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>ชื่อเว็บไซต์ (ภาษาอังกฤษ)</label>
+                            <label className={styles.label}>ชื่อหน่วยงาน (ภาษาอังกฤษ)</label>
                             <input
                                 type="text"
                                 name="siteNameEn"
                                 className={styles.input}
                                 value={settings.siteNameEn}
                                 onChange={handleInputChange}
-                                placeholder="ระบุชื่อภาษาอังกฤษ..."
+                                placeholder="ระบุชื่อหน่วยงานภาษาอังกฤษ..."
                             />
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>สโลแกน</label>
+                            <label className={styles.label}>สโลแกน / คำขวัญหน่วยงาน</label>
                             <textarea
                                 name="slogan"
                                 className={styles.textarea}
                                 value={settings.slogan}
                                 onChange={handleInputChange}
-                                placeholder="คำอธิบายสั้นๆ ใต้โลโก้..."
+                                placeholder="ระบุสโลแกนหรือคำขวัญที่จะแสดงใต้ชื่อหน่วยงาน..."
                             />
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>โลโก้หน่วยงาน</label>
+                            <label className={styles.label}>ตราสัญลักษณ์หน่วยงาน (Logo)</label>
                             <div className={styles.logoUploadArea}>
                                 <div className={styles.logoPreview}>
-                                    {/* Placeholder icon if no logo */}
-                                    <Settings size={40} color="#d1d5db" />
+                                    {logoPreview ? (
+                                        <Image
+                                            src={logoPreview}
+                                            alt="Logo Preview"
+                                            width={100}
+                                            height={100}
+                                            style={{ objectFit: 'contain' }}
+                                        />
+                                    ) : (
+                                        <Settings size={40} color="#d1d5db" />
+                                    )}
                                 </div>
                                 <div>
-                                    <input type="file" accept="image/*" />
-                                    <p className={styles.uploadHint}>แนะนำขนาด 512x512px ไฟล์ PNG หรือ JPG เท่านั้น</p>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        title="เลือกไฟล์โลโก้"
+                                    />
+                                    <p className={styles.uploadHint}>แนะนำขนาด 512x512px ไฟล์ PNG หรือ JPG (พื้นหลังโปร่งใสจะดีที่สุด)</p>
                                 </div>
                             </div>
                         </div>
@@ -125,71 +209,86 @@ export default function SettingPage() {
             case 'contact':
                 return (
                     <div className={styles.formGrid}>
-                        <h2 className={styles.tabTitle}>ข้อมูลติดต่อสำนักงาน</h2>
+                        <h2 className={styles.tabTitle}>ข้อมูลการติดต่อหน่วยงาน</h2>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Address</label>
+                            <label className={styles.label}>สถานที่ตั้ง / ที่อยู่สำนักงาน</label>
                             <textarea
                                 name="address"
                                 className={styles.textarea}
                                 value={settings.address}
                                 onChange={handleInputChange}
-                                placeholder="เลขที่อาคาร ถนน แขวง เขต..."
+                                placeholder="ระบุเลขที่อาคาร, ชั้น, ถนน, แขวง, เขต, จังหวัด และรหัสไปรษณีย์..."
                             />
                         </div>
 
                         <div className={styles.formRow} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                             <div className={styles.formGroup}>
-                                <label className={styles.label}>Phone</label>
+                                <label className={styles.label}>หมายเลขโทรศัพท์</label>
                                 <input
                                     type="text"
                                     name="phone"
                                     className={styles.input}
                                     value={settings.phone}
                                     onChange={handleInputChange}
+                                    placeholder="เช่น 0-2591-9992"
                                 />
                             </div>
                             <div className={styles.formGroup}>
-                                <label className={styles.label}>Fax</label>
+                                <label className={styles.label}>หมายเลขโทรสาร (Fax)</label>
                                 <input
                                     type="text"
                                     name="fax"
                                     className={styles.input}
                                     value={settings.fax}
                                     onChange={handleInputChange}
+                                    placeholder="เช่น 0-2591-9996"
                                 />
                             </div>
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Email</label>
+                            <label className={styles.label}>อีเมลติดต่อกลาง</label>
                             <input
                                 type="email"
                                 name="email"
                                 className={styles.input}
                                 value={settings.email}
                                 onChange={handleInputChange}
+                                placeholder="เช่น contact@pharmacycouncil.org"
                             />
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Google Maps URL</label>
+                            <label className={styles.label}>ที่ตั้งบน Google Maps (URL)</label>
                             <input
                                 type="text"
-                                name="googleMaps"
+                                name="googleMapsUrl"
                                 className={styles.input}
-                                value={settings.googleMaps}
+                                value={settings.googleMapsUrl}
                                 onChange={handleInputChange}
-                                placeholder="คัดลอก 'src' จากโค้ดฝังแผนที่ Google Maps"
+                                placeholder="คัดลอกลิงก์ (URL) จาก Google Maps เพื่อใช้เป็นลิงก์นำทาง..."
                             />
                         </div>
 
-                        {settings.googleMaps && (
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>ที่ตั้งบน Google Maps (Embed Code)</label>
+                            <input
+                                type="text"
+                                name="googleMapsEmbed"
+                                className={styles.input}
+                                value={settings.googleMapsEmbed}
+                                onChange={handleInputChange}
+                                placeholder="วางค่า 'src' จากโค้ด iframe ที่ได้จากเมนูแชร์แชร์ > ฝังแผนที่..."
+                            />
+                        </div>
+
+                        {settings.googleMapsEmbed && (
                             <div className={styles.mapPreviewArea}>
-                                <label className={styles.label}>ตัวอย่างการแสดงผลแผนที่</label>
+                                <label className={styles.label}>ตัวอย่างการแสดงผลแผนที่หน้าเว็บไซต์</label>
                                 <div className={styles.mapContainer}>
                                     <iframe
-                                        title="Google Maps Preview"
+                                        title="ตัวอย่าง Google Maps"
                                         src={settings.googleMapsEmbed}
                                         width="100%"
                                         height="500"
@@ -207,38 +306,41 @@ export default function SettingPage() {
             case 'social':
                 return (
                     <div className={styles.formGrid}>
-                        <h2 className={styles.tabTitle}>โซเชียลมีเดีย</h2>
+                        <h2 className={styles.tabTitle}>บัญชีโซเชียลมีเดีย</h2>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Facebook Page URL</label>
+                            <label className={styles.label}>Facebook Page (URL)</label>
                             <input
                                 type="text"
-                                name="facebook"
+                                name="facebookUrl"
                                 className={styles.input}
-                                value={settings.facebook}
+                                value={settings.facebookUrl}
                                 onChange={handleInputChange}
+                                placeholder="เช่น https://www.facebook.com/pharmacycouncil"
                             />
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Line Official (ID)</label>
+                            <label className={styles.label}>Line Official Account (ID)</label>
                             <input
                                 type="text"
-                                name="line"
+                                name="lineId"
                                 className={styles.input}
-                                value={settings.line}
+                                value={settings.lineId}
                                 onChange={handleInputChange}
+                                placeholder="เช่น @PharmacyCouncil"
                             />
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>YouTube Channel URL</label>
+                            <label className={styles.label}>YouTube Channel (URL)</label>
                             <input
                                 type="text"
-                                name="youtube"
+                                name="youtubeUrl"
                                 className={styles.input}
-                                value={settings.youtube}
+                                value={settings.youtubeUrl}
                                 onChange={handleInputChange}
+                                placeholder="เช่น https://www.youtube.com/@pharmacycouncil"
                             />
                         </div>
                     </div>
@@ -290,16 +392,18 @@ export default function SettingPage() {
                 <div className={styles.tabContent}>
                     {renderTabContent()}
 
-                    <div className={styles.actions}>
-                        <button
-                            className={`${styles.btn} ${styles.btnPrimary}`}
-                            onClick={handleSave}
-                            disabled={isLoading}
-                        >
-                            <Save size={18} />
-                            {isLoading ? 'กำลังบันทึก...' : 'บันทึกการเปลี่ยนแปลง'}
-                        </button>
-                    </div>
+                    {!isFetching && (
+                        <div className={styles.actions}>
+                            <button
+                                className={`${styles.btn} ${styles.btnPrimary}`}
+                                onClick={handleSave}
+                                disabled={isLoading}
+                            >
+                                <Save size={18} />
+                                {isLoading ? 'กำลังบันทึก...' : 'บันทึกการเปลี่ยนแปลง'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
