@@ -5,7 +5,6 @@ import { useParams } from "next/navigation"; // 🔥 เอาไว้ดึง
 import { Edit, Trash2, Plus, Image as ImageIcon, Link as LinkIcon, Save, UploadCloud, X } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import styles from "./agency.module.css"; // Reuse CSS ของ Council ได้เลย หรือสร้างใหม่
 import { authFetch } from '@/app/utils/authFetch';
 
 const MySwal = withReactContent(Swal);
