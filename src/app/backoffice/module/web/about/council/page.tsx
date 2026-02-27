@@ -8,11 +8,14 @@ import {
   Plus,
   User,
   ImageIcon,
+  Upload,
   UploadCloud,
   X,
   ZoomIn,
+  ZoomOut,
   Search,
   FileText,
+  Crop,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -20,7 +23,8 @@ import styles from "./council.module.css";
 import { authFetch } from '@/app/utils/authFetch';
 import ImagePreviewModal from '@/app/components/ui/ImagePreviewModal';
 import CrudModal from '@/app/components/ui/CrudModal';
-import ImageUploader from '@/app/components/ui/ImageUploader';
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '../../../../../components/editor/cropImage';
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -31,6 +35,7 @@ interface CouncilMember {
   position: string;
   type: "elected" | "appointed";
   imageUrl: string | null;
+  originalImageUrl?: string | null;
   order: number;
   background?: string;
 }
@@ -94,7 +99,9 @@ export default function CouncilPage() {
     order: number | string;
     background: string;
     file: File | null;
+    originalFile: File | null;
     preview: string | null;
+    originalPreview: string | null;
   }>({
     name: "",
     position: "",
@@ -102,8 +109,46 @@ export default function CouncilPage() {
     order: 1,
     background: "",
     file: null,
+    originalFile: null,
     preview: null,
+    originalPreview: null,
   });
+
+  const [isCropping, setIsCropping] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+
+  const onCropComplete = (_: any, pixels: any) => setCroppedAreaPixels(pixels);
+
+  const handleConfirmCrop = async () => {
+    if (!imageToCrop || !croppedAreaPixels) return;
+    try {
+      const croppedFile = await getCroppedImg(imageToCrop, croppedAreaPixels, `council-${Date.now()}.jpg`);
+      if (!croppedFile) throw new Error("Crop failed");
+      const croppedUrl = URL.createObjectURL(croppedFile);
+      setFormData(prev => ({ ...prev, preview: croppedUrl, file: croppedFile }));
+      setIsCropping(false);
+      setImageToCrop(null);
+    } catch (e) {
+      console.error(e);
+      Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถตัดรูปภาพได้", "error");
+    }
+  };
+
+  const onSelectImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const imageUrl = URL.createObjectURL(file);
+      setFormData(prev => ({ ...prev, originalPreview: imageUrl, originalFile: file }));
+      setImageToCrop(imageUrl);
+      setIsCropping(true);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      e.target.value = '';
+    }
+  };
 
   const fetchMembers = async () => {
     try {
@@ -131,7 +176,9 @@ export default function CouncilPage() {
         order: member.order,
         background: member.background || "",
         file: null,
+        originalFile: null,
         preview: member.imageUrl || null,
+        originalPreview: member.originalImageUrl || member.imageUrl || null,
       });
     } else {
       setEditingId(null);
@@ -144,7 +191,9 @@ export default function CouncilPage() {
         order: maxOrder + 1,
         background: "",
         file: null,
+        originalFile: null,
         preview: null,
+        originalPreview: null,
       });
     }
     setIsModalOpen(true);
@@ -161,6 +210,7 @@ export default function CouncilPage() {
       form.append("order", formData.order.toString());
       form.append("background", formData.background);
       if (formData.file) form.append("image", formData.file);
+      if (formData.originalFile) form.append("originalImage", formData.originalFile);
 
       const url = editingId
         ? `${API_URL}/council/${editingId}`
@@ -406,18 +456,29 @@ export default function CouncilPage() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
       >
-        <ImageUploader
-          preview={formData.preview}
-          onFileChange={(e) => {
-            if (e.target.files?.[0]) {
-              setFormData({
-                ...formData,
-                file: e.target.files[0],
-                preview: URL.createObjectURL(e.target.files[0]),
-              });
-            }
-          }}
-        />
+        <div style={{ marginBottom: '1.5rem' }}>
+          <label className={styles.modalUploadArea}>
+            {formData.preview ? (
+              <img src={formData.preview} className={styles.modalPreviewImage} />
+            ) : (
+              <div className={styles.modalUploadPlaceholder}>
+                <Upload size={36} /><span>คลิกเพื่ออัปโหลดรูปภาพ</span>
+                <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>แนะนำขนาด 4:3</span>
+              </div>
+            )}
+            <input type="file" hidden accept="image/*" onChange={onSelectImage} />
+          </label>
+          {formData.preview && (
+            <div className={styles.imageActionRow}>
+              <button type="button" onClick={() => { setImageToCrop(formData.originalPreview || formData.preview); setIsCropping(true); setCrop({ x: 0, y: 0 }); setZoom(1); }} className={styles.changeImageBtn}>
+                <Crop size={14} /> ครอปใหม่
+              </button>
+              <button type="button" onClick={() => document.querySelector<HTMLInputElement>(`.${styles.modalUploadArea} input`)?.click()} className={styles.changeImageBtn}>
+                <Upload size={14} /> เปลี่ยนรูป
+              </button>
+            </div>
+          )}
+        </div>
 
         <div className={styles.gridTwo}>
           <div className={styles.formGroup}>
@@ -462,6 +523,40 @@ export default function CouncilPage() {
               <div className={styles.bioContent}>{viewingBio.text}</div>
               <div className="flex justify-end pt-2">
                 <button onClick={() => setViewingBio(null)} className={styles.btnCancel} style={{ flex: "none" }}>ปิดหน้าต่าง</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CROP MODAL */}
+      {isCropping && imageToCrop && (
+        <div className={styles.cropModalOverlay}>
+          <div className={styles.cropModalContent}>
+            <div className={styles.cropperContainer}>
+              <Cropper
+                image={imageToCrop}
+                crop={crop}
+                zoom={zoom}
+                aspect={4 / 3}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+              />
+            </div>
+            <div className={styles.cropControls}>
+              <div className={styles.zoomSliderContainer}>
+                <ZoomOut size={20} color="#9ca3af" />
+                <input type="range" value={zoom} min={1} max={3} step={0.1} onChange={(e) => setZoom(Number(e.target.value))} className={styles.zoomSlider} />
+                <ZoomIn size={20} color="#9ca3af" />
+              </div>
+              <div className={styles.cropActions}>
+                <button onClick={() => { setIsCropping(false); setImageToCrop(null); }} className={styles.btnCropCancel}>
+                  ยกเลิก
+                </button>
+                <button onClick={handleConfirmCrop} className={styles.btnCropConfirm}>
+                  ครอปและบันทึก
+                </button>
               </div>
             </div>
           </div>

@@ -68,10 +68,11 @@ export const SIDEBAR_DATA: MenuItem[] = [
     id: 'web-about',
     title: 'เกี่ยวกับองค์กร',
     icon: <Building2 size={20} />,
-    permission: 'manage_council',
+    permission: 'manage_about',
     submenu: [
-      { id: 'web-about-history', title: 'ทำเนียบสภา', href: '/backoffice/module/web/about/history', permission: 'manage_history' },
-      { id: 'web-about-board', title: 'กรรมการสภา', href: '/backoffice/module/web/about/council', permission: 'manage_council' },
+      { id: 'web-about-history', title: 'ทำเนียบสภา', href: '/backoffice/module/web/about/history',  },
+      { id: 'web-about-board', title: 'กรรมการสภา', href: '/backoffice/module/web/about/council', },
+      { id: 'web-about-honor', title: 'เกียรติประวัติ', href: '/backoffice/module/web/about/honor',  },
     ]
   },
   { id: 'web-news', title: 'ข่าวประชาสัมพันธ์', href: '/backoffice/module/web/news', icon: <Megaphone size={20} />, permission: 'manage_news' },
