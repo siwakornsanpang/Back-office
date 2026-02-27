@@ -292,16 +292,16 @@
     border-color: #bfdbfe;
 }
 
-.badge[data-category="announcement"] {
-    background-color: #fef3c7;
-    color: #92400e;
-    border-color: #fde68a;
+.badge[data-category="recruitment"] {
+    background-color: #dcfce7;
+    color: #166534;
+    border-color: #bbf7d0;
 }
 
-.badge[data-category="activity"] {
-    background-color: #f3e8ff;
-    color: #6b21a8;
-    border-color: #e9d5ff;
+.badge[data-category="procurement"] {
+    background-color: #ffedd5;
+    color: #9a3412;
+    border-color: #fed7aa;
 }
 
 /* Sortable Table Columns */

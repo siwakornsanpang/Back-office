@@ -12,7 +12,7 @@ interface NewsItem {
     id: number;
     title: string;
     content: string;
-    category: 'news' | 'announcement' | 'activity';
+    category: 'news' | 'recruitment' | 'procurement';
     status: 'published' | 'draft';
     publishedAt?: string;
     createdAt: string;
@@ -62,8 +62,8 @@ export default function NewsPreviewPage() {
     const getCategoryLabel = (cat: string) => {
         switch (cat) {
             case 'news': return 'ข่าวประชาสัมพันธ์';
-            case 'announcement': return 'ประกาศ';
-            case 'activity': return 'กิจกรรม';
+            case 'recruitment': return 'ข่าวรับสมัครงานสภา';
+            case 'procurement': return 'ข่าวประกาศจัดซื้อจัดจ้าง';
             default: return cat;
         }
     };

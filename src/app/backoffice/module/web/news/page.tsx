@@ -9,17 +9,16 @@ import { authFetch } from '@/app/utils/authFetch';
 
 // --- Types & Interfaces ---
 type NewsStatus = 'published' | 'draft';
-type NewsCategory = 'news' | 'announcement' | 'activity';
+type NewsCategory = 'news' | 'recruitment' | 'procurement';
 
 interface NewsItem {
   id: number;
-  order: number;
   title: string;
   content: string; // HTML Content
-  // year: number; // เอาออกถ้าไม่ได้ใช้ หรือใส่กลับถ้ามีใน DB
   category: NewsCategory;
   status: NewsStatus;
-  publishedAt?: string; // Updated to publishedAt
+  isHighlight: boolean;
+  publishedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,7 +62,7 @@ export default function NewsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [filterCategory, setFilterCategory] = useState<FilterCategory>('all');
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'order', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'isHighlight', direction: 'desc' });
 
   // --- Pagination States ---
   const [currentPage, setCurrentPage] = useState(1);
@@ -130,7 +129,7 @@ export default function NewsPage() {
   const handleSort = (key: SortConfig['key']) => {
     setSortConfig(current => ({
       key,
-      direction: current.key === key && current.direction === 'desc' ? 'asc' : 'desc'
+      direction: key === 'isHighlight' ? 'desc' : (current.key === key && current.direction === 'desc' ? 'asc' : 'desc')
     }));
   };
 
@@ -233,9 +232,9 @@ export default function NewsPage() {
 
           <select className={styles.filterSelect} value={filterCategory} onChange={(e) => setFilterCategory(e.target.value as FilterCategory)}>
             <option value="all">ทุกประเภท</option>
-            <option value="news">ข่าว</option>
-            <option value="announcement">ประกาศ</option>
-            <option value="activity">กิจกรรม</option>
+            <option value="news">ข่าวประชาสัมพันธ์</option>
+            <option value="recruitment">ข่าวรับสมัครงานสภา</option>
+            <option value="procurement">ข่าวประกาศจัดซื้อจัดจ้าง</option>
           </select>
 
           <select className={styles.filterSelect} value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}>
@@ -254,11 +253,14 @@ export default function NewsPage() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th className={styles.thSortable} onClick={() => handleSort('order')} style={{ width: '80px', textAlign: 'center', cursor: 'pointer' }}>
-                <div className="flex items-center justify-center gap-1">ลำดับ {getSortIcon('order')}</div>
+
+              <th className={styles.thSortable} onClick={() => handleSort('isHighlight')} style={{ cursor: 'pointer' }}>
+                <div className="flex items-center gap-1">หัวข้อข่าว {getSortIcon('isHighlight')}</div>
               </th>
-              <th>หัวข้อข่าว</th>
               <th style={{ width: '130px', textAlign: 'center' }}>ประเภท</th>
+              <th className={styles.thSortable} onClick={() => handleSort('publishedAt')} style={{ width: '150px', cursor: 'pointer' }}>
+                <div className="flex items-center gap-1">วันที่เผยแพร่ {getSortIcon('publishedAt')}</div>
+              </th>
               <th className={styles.thSortable} onClick={() => handleSort('createdAt')} style={{ width: '140px', cursor: 'pointer' }}>
                 <div className="flex items-center gap-1">วันที่สร้าง {getSortIcon('createdAt')}</div>
               </th>
@@ -277,14 +279,23 @@ export default function NewsPage() {
             ) : (
               currentNews.map((item) => (
                 <tr key={item.id}>
-                  <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#555' }}>{item.order}</td>
-                  <td><div style={{ fontWeight: 550 }}>{item.title}</div></td>
+
+                  <td>
+                    <div className="flex items-center gap-2">
+                      {item.isHighlight && <span title="ข่าวเด่น" style={{ color: '#f59e0b' }}>⭐</span>}
+                      <div style={{ fontWeight: 550 }}>{item.title}</div>
+                    </div>
+                  </td>
                   <td style={{ textAlign: 'center' }}>
                     <span className={styles.badge} data-category={item.category}>
-                      {item.category === 'news' && 'ข่าว'}
-                      {item.category === 'announcement' && 'ประกาศ'}
-                      {item.category === 'activity' && 'กิจกรรม'}
+                      {item.category === 'news' && 'ประชาสัมพันธ์'}
+                      {item.category === 'recruitment' && 'รับสมัครงาน'}
+                      {item.category === 'procurement' && 'จัดซื้อจัดจ้าง'}
                     </span>
+                  </td>
+                  <td>
+                    <div>{formatDateTime(item.publishedAt || '').date}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#999' }}>{formatDateTime(item.publishedAt || '').time}</div>
                   </td>
                   <td>
                     <div>{formatDateTime(item.createdAt).date}</div>
