@@ -11,17 +11,16 @@ import { authFetch } from '@/app/utils/authFetch';
 
 // Types
 export type NewsStatus = 'published' | 'draft';
-export type NewsCategory = 'news' | 'announcement' | 'activity';
+export type NewsCategory = 'news' | 'recruitment' | 'procurement';
 
 export interface NewsItem {
     id: number;
-    order: number;
     title: string;
     content: string;
     category: NewsCategory;
     status: NewsStatus;
+    isHighlight: boolean;
     publishedAt?: string;
-    // images field ไม่ต้องใช้ใน Form แล้ว เพราะอยู่ใน content
 }
 
 interface NewsFormProps {
@@ -49,7 +48,8 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
         }
         return '';
     });
-    const [order, setOrder] = useState<number | string>(initialData?.order || 0);
+    const [isHighlight, setIsHighlight] = useState(initialData?.isHighlight || false);
+
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -63,21 +63,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
         setIsSubmitting(true);
 
         try {
-            // ✅ ตรวจสอบลำดับซ้ำ (Proactive check)
-            const checkRes = await authFetch(API_URL);
-            if (checkRes.ok) {
-                const existingNews: NewsItem[] = await checkRes.json();
-                const duplicate = existingNews.find(item =>
-                    Number(item.order) === Number(order) &&
-                    (mode === 'create' || item.id !== initialData?.id)
-                );
 
-                if (duplicate) {
-                    Swal.fire('แจ้งเตือน', 'มีลำดับนี้อยู่แล้วในระบบ กรุณาแก้ลำดับ', 'warning');
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
 
             // ✅ เปลี่ยนกลับมาส่ง JSON ปกติ (เพราะรูปเป็น URL ใน content แล้ว)
             const payload = {
@@ -86,7 +72,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 category,
                 status,
                 publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null, // ส่งเป็น ISO String หรือ null
-                order: Number(order)
+                isHighlight: isHighlight
             };
 
             let url = API_URL;
@@ -212,6 +198,18 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                                 onChange={e => setPublishedAt(e.target.value)}
                             />
                         </div>
+
+                        <div className={styles.formGroup} style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
+                            <label className={styles.label} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={isHighlight}
+                                    onChange={e => setIsHighlight(e.target.checked)}
+                                    style={{ width: '18px', height: '18px' }}
+                                />
+                                <span>⭐ข่าวเด่น</span>
+                            </label>
+                        </div>
                     </div>
 
                     {/* Categorization Card */}
@@ -229,40 +227,32 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                                         checked={category === 'news'}
                                         onChange={e => setCategory(e.target.value as any)}
                                     />
-                                    ข่าว
+                                    ข่าวประชาสัมพันธ์
                                 </label>
                                 <label className={styles.radioItem}>
                                     <input
                                         type="radio"
                                         name="category"
-                                        value="announcement"
-                                        checked={category === 'announcement'}
+                                        value="recruitment"
+                                        checked={category === 'recruitment'}
                                         onChange={e => setCategory(e.target.value as any)}
                                     />
-                                    ประกาศ
+                                    ข่าวรับสมัครงานสภา
                                 </label>
                                 <label className={styles.radioItem}>
                                     <input
                                         type="radio"
                                         name="category"
-                                        value="activity"
-                                        checked={category === 'activity'}
+                                        value="procurement"
+                                        checked={category === 'procurement'}
                                         onChange={e => setCategory(e.target.value as any)}
                                     />
-                                    กิจกรรม
+                                    ข่าวประกาศจัดซื้อจัดจ้าง
                                 </label>
                             </div>
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>ลำดับที่</label>
-                            <input
-                                type="number"
-                                className={styles.input}
-                                value={order}
-                                onChange={e => setOrder(e.target.value)}
-                            />
-                        </div>
+
                     </div>
                 </div>
             </div>
