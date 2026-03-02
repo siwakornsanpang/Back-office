@@ -71,6 +71,10 @@
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
+.cardCompact {
+    padding: 0.75rem;
+}
+
 .cardTitle {
     font-size: 1rem;
     font-weight: 600;
@@ -79,6 +83,18 @@
 }
 
 /* Form Elements */
+.formRow {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+    .formRow {
+        flex-direction: column;
+    }
+}
+
 .formGroup {
     margin-bottom: 1rem;
 }
@@ -370,4 +386,187 @@
     font-size: 0.875rem;
     color: var(--color-text-muted);
     margin-right: 1rem;
+}
+
+/* --- Thumbnail Upload Styles --- */
+.thumbnailContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.thumbnailUploadArea {
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 16/9;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.thumbnailUploadArea:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.thumbnailPreview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.uploadPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: #9ca3af;
+    font-size: 0.85rem;
+}
+
+.thumbnailActions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.thumbnailActionBtn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.thumbnailActionBtn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+/* --- Crop Modal Styles --- */
+.cropModalOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.cropModalContent {
+    width: 100%;
+    max-width: 800px;
+    background: #1f2937;
+    border-radius: 1rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.cropperContainer {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    background: #000;
+}
+
+.cropControls {
+    padding: 1.5rem;
+    background: #1f2937;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.zoomSliderContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+}
+
+.zoomSlider {
+    flex: 1;
+    height: 6px;
+    border-radius: 4px;
+    background: #4b5563;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.zoomSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+}
+
+.cropActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btnCropCancel {
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    background: transparent;
+    color: #d1d5db;
+    border: 1px solid #4b5563;
+    cursor: pointer;
+}
+
+.btnCropConfirm {
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* --- Table Thumbnail --- */
+.tableThumbnail {
+    width: 60px;
+    aspect-ratio: 16/9;
+    background: #f3f4f6;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid #eee;
+}
+
+.tableThumbnailEmpty {
+    width: 60px;
+    aspect-ratio: 16/9;
+    background: #f3f4f6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d1d5db;
+    border: 1px solid #eee;
 }
