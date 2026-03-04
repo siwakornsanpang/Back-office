@@ -80,11 +80,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
 
   { id: 'web-agency', title: 'หน่วยงาน', icon: <Landmark size={20} />,
     permission: 'manage_agency',
-    submenu: [
-      { id: 'web-pharmacy', title: 'สำนักงานเลขาธิการ', href: '/backoffice/module/web/agency/pharmacy' },
-      { id: 'web-royal-college', title: 'ราชวิทยาลัย', href: '/backoffice/module/web/agency/royal-college' },
-      { id: 'web-supervised-organization', title: 'องค์กรในกำกับ', href: '/backoffice/module/web/agency/supervised-organization' },
-    ]
+    href: '/backoffice/module/web/agency',
   },
 
   {
