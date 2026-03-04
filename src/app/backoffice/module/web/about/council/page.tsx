@@ -1,7 +1,7 @@
 // src/app/backoffice/module/web/about/council/page.tsx
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Edit,
   Trash2,
@@ -16,6 +16,7 @@ import {
   Search,
   FileText,
   Crop,
+  GripVertical,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -31,6 +32,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface CouncilMember {
   id: number;
+  prefix?: string | null;
   name: string;
   position: string;
   type: "elected" | "appointed";
@@ -45,7 +47,7 @@ export default function CouncilPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("");
+  const [activeTab, setActiveTab] = useState<"elected" | "appointed">("elected");
   const [filterPosition, setFilterPosition] = useState("");
 
   const [viewingBio, setViewingBio] = useState<{
@@ -55,6 +57,10 @@ export default function CouncilPage() {
 
   // Sorting
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  // Drag and Drop
+  const dragItem = useRef<number | null>(null);
+  const dragOverItem = useRef<number | null>(null);
 
   const uniquePositions = useMemo(() => {
     const positions = Array.from(new Set(members.map((m) => m.position)));
@@ -68,7 +74,7 @@ export default function CouncilPage() {
         const matchSearch =
           member.name.toLowerCase().includes(searchLower) ||
           member.position.toLowerCase().includes(searchLower);
-        const matchType = filterType ? member.type === filterType : true;
+        const matchType = member.type === activeTab;
         const matchPosition = filterPosition
           ? member.position === filterPosition
           : true;
@@ -78,7 +84,7 @@ export default function CouncilPage() {
         if (sortDirection === "asc") return a.order - b.order;
         return b.order - a.order;
       });
-  }, [members, searchTerm, filterType, filterPosition, sortDirection]);
+  }, [members, searchTerm, activeTab, filterPosition, sortDirection]);
 
   const handleSort = () => {
     setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -93,6 +99,7 @@ export default function CouncilPage() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<{
+    prefix: string;
     name: string;
     position: string;
     type: string;
@@ -103,9 +110,10 @@ export default function CouncilPage() {
     preview: string | null;
     originalPreview: string | null;
   }>({
+    prefix: "",
     name: "",
     position: "",
-    type: "elected",
+    type: activeTab,
     order: 1,
     background: "",
     file: null,
@@ -150,11 +158,95 @@ export default function CouncilPage() {
     }
   };
 
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
+    dragItem.current = index;
+    // Fix for Firefox/Safari empty drag image issue
+    e.dataTransfer.effectAllowed = "move";
+    // Optional: make it look slightly transparent while dragging
+    setTimeout(() => { if (e.target instanceof HTMLElement) e.target.style.opacity = "0.5"; }, 0);
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
+    e.preventDefault();
+    if (sortDirection !== "asc") return; // Cannot drag sort if not ascending
+    dragOverItem.current = index;
+  };
+  
+  const handleDragOver = (e: React.DragEvent<HTMLTableRowElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDragEnd = async (e: React.DragEvent<HTMLTableRowElement>) => {
+    if (e.target instanceof HTMLElement) e.target.style.opacity = "1";
+    
+    if (dragItem.current === null || dragOverItem.current === null || dragItem.current === dragOverItem.current || sortDirection !== "asc") {
+      dragItem.current = null;
+      dragOverItem.current = null;
+      return;
+    }
+
+    // copy filtered array to recalculate orders
+    const copyFiltered = [...filteredMembers];
+    const draggedItemContent = copyFiltered[dragItem.current];
+    
+    // remove item from original position
+    copyFiltered.splice(dragItem.current, 1);
+    // insert item into new position (dragOverItem.current)
+    copyFiltered.splice(dragOverItem.current, 0, draggedItemContent);
+
+    // Now, create the payload mapping new logical order
+    // Order should just be sequential 1, 2, 3 ... based on position in copyFiltered
+    const payload = copyFiltered.map((item, index) => ({
+      id: item.id,
+      order: index + 1 // 1-based ordering
+    }));
+
+    // Update the local state optimistically for the active tab scope
+    // We update the main members array
+    const newMembers = members.map(m => {
+      // If the member is in our affected payload, update its order
+      const payloadMatch = payload.find(p => p.id === m.id);
+      if (payloadMatch) {
+         return { ...m, order: payloadMatch.order };
+      }
+      return m;
+    });
+
+    setMembers(newMembers);
+
+    dragItem.current = null;
+    dragOverItem.current = null;
+
+    // Send to backend
+    try {
+      MySwal.fire({ title: 'กำลังบันทึกการจัดเรียง...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      const res = await authFetch(`${API_URL}/council/reorder`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error();
+      MySwal.close();
+      const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1200 });
+      Toast.fire({ icon: 'success', title: 'จัดเรียงสำเร็จ' });
+    } catch(err) {
+      console.error(err);
+      MySwal.fire('Error', 'เกิดข้อผิดพลาดในการบันทึกลำดับ', 'error');
+      fetchMembers(); // Revert on failure
+    }
+  };
+
   const fetchMembers = async () => {
     try {
       const res = await authFetch(`${API_URL}/council`);
       const data = await res.json();
-      setMembers(data);
+      if (Array.isArray(data)) {
+        setMembers(data);
+      } else {
+        console.error("API returned non-array data:", data);
+        setMembers([]);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -170,6 +262,7 @@ export default function CouncilPage() {
     if (member) {
       setEditingId(member.id);
       setFormData({
+        prefix: member.prefix || "",
         name: member.name,
         position: member.position,
         type: member.type,
@@ -182,12 +275,14 @@ export default function CouncilPage() {
       });
     } else {
       setEditingId(null);
+      const membersInActiveTab = members.filter((m) => m.type === activeTab);
       const maxOrder =
-        members.length > 0 ? Math.max(...members.map((m) => m.order)) : 0;
+        membersInActiveTab.length > 0 ? Math.max(...membersInActiveTab.map((m) => m.order)) : 0;
       setFormData({
+        prefix: "",
         name: "",
         position: "",
-        type: "elected",
+        type: activeTab,
         order: maxOrder + 1,
         background: "",
         file: null,
@@ -204,6 +299,7 @@ export default function CouncilPage() {
     MySwal.fire({ title: "กำลังบันทึก...", didOpen: () => Swal.showLoading() });
     try {
       const form = new FormData();
+      form.append("prefix", formData.prefix);
       form.append("name", formData.name);
       form.append("position", formData.position);
       form.append("type", formData.type);
@@ -258,6 +354,21 @@ export default function CouncilPage() {
         </div>
       </div>
       
+      <div className={styles.tabContainer}>
+        <button
+          className={`${styles.tabButton} ${activeTab === "elected" ? styles.tabButtonActive : ""}`}
+          onClick={() => setActiveTab("elected")}
+        >
+          🗳️ เลือกตั้ง
+        </button>
+        <button
+          className={`${styles.tabButton} ${activeTab === "appointed" ? styles.tabButtonActive : ""}`}
+          onClick={() => setActiveTab("appointed")}
+        >
+          📜 แต่งตั้ง
+        </button>
+      </div>
+
       <div className={styles.toolbar}>
         <div className={styles.searchWrapper}>
           <Search size={18} className={styles.searchIcon} />
@@ -283,16 +394,6 @@ export default function CouncilPage() {
           ))}
         </select>
 
-        <select
-          className={styles.filterSelect}
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-        >
-          <option value="">ทุกประเภท</option>
-          <option value="elected">🗳️ การเลือกตั้ง</option>
-          <option value="appointed">📜 การแต่งตั้ง</option>
-        </select>
-
         <button onClick={() => openModal()} className={styles.btnAdd}>
           <Plus size={20} /> เพิ่มข้อมูลใหม่
         </button>
@@ -313,15 +414,17 @@ export default function CouncilPage() {
                 </th>
                 {/* 2. รูปภาพ */}
                 <th className={`${styles.tableTh} text-center w-24`}>รูปภาพ</th>
-                {/* 3. ชื่อ */}
+                {/* 3. คำนำหน้าชื่อ */}
+                <th className={`${styles.tableTh} w-32`}>คำนำหน้าชื่อ</th>
+                {/* 4. ชื่อ */}
                 <th className={styles.tableTh}>ชื่อ-นามสกุล</th>
-                {/* 4. ตำแหน่ง */}
+                {/* 5. ตำแหน่ง */}
                 <th className={styles.tableTh}>ตำแหน่ง</th>
-                {/* 5. ประเภท */}
-               <th className={`${styles.tableTh} text-center`}>ประเภท</th>
-                {/* 6. ประวัติ */}
+                {/* 6. ประเภท */}
+                <th className={`${styles.tableTh} text-center`}>ประเภท</th>
+                {/* 7. ประวัติ */}
                 <th className={`${styles.tableTh} text-center w-32`}>ประวัติ</th>
-                {/* 7. จัดการ */}
+                {/* 8. จัดการ */}
                 <th className={`${styles.tableTh} text-center w-32`}>จัดการ</th>
               </tr>
             </thead>
@@ -333,11 +436,24 @@ export default function CouncilPage() {
                   </td>
                 </tr>
               ) : (
-                filteredMembers.map((member) => (
-                  <tr key={member.id} className={styles.tableRow}>
+                filteredMembers.map((member, index) => (
+                  <tr
+                    key={member.id}
+                    className={`${styles.tableRow} ${sortDirection === "asc" ? styles.draggableRow : ""}`}
+                    draggable={sortDirection === "asc"}
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragEnter={(e) => handleDragEnter(e, index)}
+                    onDragOver={handleDragOver}
+                    onDragEnd={handleDragEnd}
+                  >
                     {/* 1. ลำดับ */}
                     <td className={`${styles.tableTd} text-center`}>
-                      <span className={styles.orderBadge}>{member.order}</span>
+                      <div className="flex items-center justify-center gap-2">
+                        {sortDirection === "asc" && (
+                          <GripVertical size={16} className="text-gray-400 cursor-grab active:cursor-grabbing hover:text-gray-600 transition-colors" />
+                        )}
+                        <span className={styles.orderBadge}>{member.order}</span>
+                      </div>
                     </td>
                     
                     {/* 2. รูปภาพ */}
@@ -375,17 +491,22 @@ export default function CouncilPage() {
                       </div>
                     </td>
 
-                    {/* 3. ชื่อ */}
+                    {/* 3. คำนำหน้าชื่อ */}
+                    <td className={`${styles.tableTd} text-gray-600`}>
+                      {member.prefix || "-"}
+                    </td>
+
+                    {/* 4. ชื่อ */}
                     <td className={`${styles.tableTd} font-medium text-gray-900`}>
                       {member.name}
                     </td>
 
-                    {/* 4. ตำแหน่ง */}
+                    {/* 5. ตำแหน่ง */}
                     <td className={`${styles.tableTd} text-gray-600`}>
                       {member.position}
                     </td>
 
-                    {/* 5. ประเภท */}
+                    {/* 6. ประเภท */}
                     <td className={`${styles.tableTd} text-center`}>
                       <span
                         className={
@@ -400,7 +521,7 @@ export default function CouncilPage() {
                       </span>
                     </td>
 
-                    {/* 6. ประวัติ (แก้ให้ตรงกลาง) */}
+                    {/* 7. ประวัติ (แก้ให้ตรงกลาง) */}
                     <td className={`${styles.tableTd} text-center`}>
                       {member.background && member.background.trim() !== "" ? (
                         <button
@@ -422,7 +543,7 @@ export default function CouncilPage() {
                       )}
                     </td>
 
-                    {/* 7. จัดการ (แก้ให้ตรงกลาง) */}
+                    {/* 8. จัดการ (แก้ให้ตรงกลาง) */}
                     <td className={`${styles.tableTd} text-center`}>
                       <div className="flex justify-center gap-2">
                         <button
@@ -494,9 +615,15 @@ export default function CouncilPage() {
           </div>
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>ชื่อ-นามสกุล <span style={{ color: 'var(--color-danger)' }}>*</span></label>
-          <input type="text" required className={styles.formInput} placeholder="เช่น ภก.สมชาย ใจดี" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+        <div className={styles.gridTwo}>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>คำนำหน้าชื่อ</label>
+            <input type="text" className={styles.formInput} placeholder="เช่น รศ., ดร., ภก." value={formData.prefix} onChange={(e) => setFormData({ ...formData, prefix: e.target.value })} />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>ชื่อ-นามสกุล <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+            <input type="text" required className={styles.formInput} placeholder="เช่น สมชาย ใจดี" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+          </div>
         </div>
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>ตำแหน่ง <span style={{ color: 'var(--color-danger)' }}>*</span></label>

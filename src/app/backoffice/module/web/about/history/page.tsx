@@ -10,10 +10,15 @@ import {
   UploadCloud,
   X,
   ZoomIn,
+  ZoomOut,
   Search,
+  Crop,
+  Upload,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '../../../../../components/editor/cropImage';
 import styles from "../council/council.module.css";
 import { authFetch } from '@/app/utils/authFetch';
 import ImagePreviewModal from '@/app/components/ui/ImagePreviewModal';
@@ -26,11 +31,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 interface HistoryItem {
   id: number;
   term: string;
-  years: string;
+  startYear: string;
+  endYear: string;
   presidentName: string;
   secretaryName: string;
   presidentImage: string | null;
+  originalPresidentImage: string | null;
   secretaryImage: string | null;
+  originalSecretaryImage: string | null;
 }
 
 export default function HistoryPage() {
@@ -65,7 +73,8 @@ export default function HistoryPage() {
         (item) =>
           item.presidentName.toLowerCase().includes(lowerTerm) ||
           item.secretaryName.toLowerCase().includes(lowerTerm) ||
-          item.years.includes(lowerTerm) ||
+          item.startYear.includes(lowerTerm) ||
+          item.endYear.includes(lowerTerm) ||
           item.term.includes(lowerTerm),
       );
     }
@@ -84,31 +93,96 @@ export default function HistoryPage() {
   // Form Data (มี 2 รูป)
   const [formData, setFormData] = useState<{
     term: string;
-    years: string;
+    startYear: string;
+    endYear: string;
     presidentName: string;
     secretaryName: string;
     presidentFile: File | null;
+    originalPresidentFile: File | null;
     secretaryFile: File | null;
+    originalSecretaryFile: File | null;
     presidentPreview: string | null;
     secretaryPreview: string | null;
+    originalPresidentPreview: string | null;
+    originalSecretaryPreview: string | null;
   }>({
     term: "",
-    years: "",
+    startYear: "",
+    endYear: "",
     presidentName: "",
     secretaryName: "",
     presidentFile: null,
+    originalPresidentFile: null,
     secretaryFile: null,
+    originalSecretaryFile: null,
     presidentPreview: null,
     secretaryPreview: null,
+    originalPresidentPreview: null,
+    originalSecretaryPreview: null,
   });
+
+  // --- 🔥 Cropper State สำหรับ 2 รูป (President / Secretary) ---
+  const [isCropping, setIsCropping] = useState(false);
+  const [cropType, setCropType] = useState<'president' | 'secretary' | null>(null);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+
+  const onCropComplete = (_: any, pixels: any) => setCroppedAreaPixels(pixels);
+
+  const handleConfirmCrop = async () => {
+    if (!imageToCrop || !croppedAreaPixels || !cropType) return;
+    try {
+      const croppedFile = await getCroppedImg(imageToCrop, croppedAreaPixels, `history-${cropType}-${Date.now()}.jpg`);
+      if (!croppedFile) throw new Error("Crop failed");
+      const croppedUrl = URL.createObjectURL(croppedFile);
+      
+      setFormData(prev => ({ 
+        ...prev, 
+        ...(cropType === 'president' ? { presidentPreview: croppedUrl, presidentFile: croppedFile } : { secretaryPreview: croppedUrl, secretaryFile: croppedFile }) 
+      }));
+      
+      setIsCropping(false);
+      setImageToCrop(null);
+      setCropType(null);
+    } catch (e) {
+      console.error(e);
+      Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถตัดรูปภาพได้", "error");
+    }
+  };
+
+  const onSelectImage = (e: React.ChangeEvent<HTMLInputElement>, type: 'president' | 'secretary') => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const imageUrl = URL.createObjectURL(file);
+      
+      setFormData(prev => ({ 
+        ...prev, 
+        ...(type === 'president' ? { originalPresidentPreview: imageUrl, originalPresidentFile: file } : { originalSecretaryPreview: imageUrl, originalSecretaryFile: file })
+      }));
+      
+      setCropType(type);
+      setImageToCrop(imageUrl);
+      setIsCropping(true);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      e.target.value = '';
+    }
+  };
 
   const fetchItems = async () => {
     try {
       const res = await authFetch(`${API_URL}/history`);
       const data = await res.json();
-      setItems(data);
+      if (Array.isArray(data)) {
+        setItems(data);
+      } else {
+        setItems([]);
+      }
     } catch (err) {
       console.error(err);
+      setItems([]);
     } finally {
       setIsLoading(false);
     }
@@ -123,25 +197,35 @@ export default function HistoryPage() {
       setEditingId(item.id);
       setFormData({
         term: item.term,
-        years: item.years,
+        startYear: item.startYear,
+        endYear: item.endYear,
         presidentName: item.presidentName,
         secretaryName: item.secretaryName,
         presidentFile: null,
+        originalPresidentFile: null,
         secretaryFile: null,
+        originalSecretaryFile: null,
         presidentPreview: item.presidentImage,
         secretaryPreview: item.secretaryImage,
+        originalPresidentPreview: item.originalPresidentImage || item.presidentImage,
+        originalSecretaryPreview: item.originalSecretaryImage || item.secretaryImage,
       });
     } else {
       setEditingId(null);
       setFormData({
         term: "",
-        years: "",
+        startYear: "",
+        endYear: "",
         presidentName: "",
         secretaryName: "",
         presidentFile: null,
+        originalPresidentFile: null,
         secretaryFile: null,
+        originalSecretaryFile: null,
         presidentPreview: null,
         secretaryPreview: null,
+        originalPresidentPreview: null,
+        originalSecretaryPreview: null,
       });
     }
     setIsModalOpen(true);
@@ -153,15 +237,17 @@ export default function HistoryPage() {
     try {
       const form = new FormData();
       form.append("term", formData.term);
-      form.append("years", formData.years);
+      form.append("startYear", formData.startYear);
+      form.append("endYear", formData.endYear);
       form.append("presidentName", formData.presidentName);
       form.append("secretaryName", formData.secretaryName);
 
       // ส่งรูปเฉพาะที่มีการเปลี่ยน/เพิ่ม
-      if (formData.presidentFile)
-        form.append("presidentImage", formData.presidentFile);
-      if (formData.secretaryFile)
-        form.append("secretaryImage", formData.secretaryFile);
+      if (formData.presidentFile) form.append("presidentImage", formData.presidentFile);
+      if (formData.originalPresidentFile) form.append("originalPresidentImage", formData.originalPresidentFile);
+      
+      if (formData.secretaryFile) form.append("secretaryImage", formData.secretaryFile);
+      if (formData.originalSecretaryFile) form.append("originalSecretaryImage", formData.originalSecretaryFile);
 
       const url = editingId
         ? `${API_URL}/history/${editingId}`
@@ -240,7 +326,8 @@ export default function HistoryPage() {
                   วาระ{" "}
                   <span className={styles.sortIconActive}>{getSortIcon()}</span>
                 </th>
-                <th className={`${styles.tableTh} w-32`}>ปี (พ.ศ.)</th>
+                <th className={`${styles.tableTh} w-32`}>ปี (พ.ศ.) เริ่มวาระ</th>
+                <th className={`${styles.tableTh} w-32`}>ปี (พ.ศ.) สิ้นสุดวาระ</th>
                 <th className={`${styles.tableTh} text-center w-32`}>
                   รูปนายก
                 </th>
@@ -255,10 +342,14 @@ export default function HistoryPage() {
             <tbody className="divide-y divide-gray-100">
               {filteredItems.map((item) => (
                 <tr key={item.id} className={styles.tableRow}>
-                  <td className="p-4 text-center font-bold text-blue-600 text-lg">
-                    {item.term}
-                  </td>
-                  <td className="p-4 text-gray-600">{item.years}</td>
+                   <td className={`${styles.tableTd} text-center`}>
+                      <span className={styles.orderBadge}> {item.term}</span>
+                    </td>
+
+
+                  
+                  <td className="p-4 text-gray-600 text-center">{item.startYear}</td>
+                  <td className="p-4 text-gray-600 text-center">{item.endYear}</td>
 
                   {/* รูปนายก */}
                   <td className={styles.tableTd}>
@@ -378,38 +469,101 @@ export default function HistoryPage() {
         {/* วาระ + ปี */}
         <div className={styles.gridTwo}>
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>วาระที่</label>
+            <label className={styles.formLabel}>วาระที่ <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <input type="text" required className={styles.formInput} placeholder="เช่น 13" value={formData.term} onChange={(e) => setFormData({ ...formData, term: e.target.value })} />
           </div>
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>ปีที่ดำรงตำแหน่ง</label>
-            <input type="text" required className={styles.formInput} placeholder="เช่น 2568-2570" value={formData.years} onChange={(e) => setFormData({ ...formData, years: e.target.value })} />
+          <div className={styles.gridTwo} style={{ gap: '1rem' }}>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>ปีเริ่มวาระ (พ.ศ.) <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+              <input type="text" required className={styles.formInput} placeholder="เช่น 2568" value={formData.startYear} onChange={(e) => setFormData({ ...formData, startYear: e.target.value })} />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>ปีสิ้นสุดวาระ (พ.ศ.) <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+              <input type="text" required className={styles.formInput} placeholder="เช่น 2570" value={formData.endYear} onChange={(e) => setFormData({ ...formData, endYear: e.target.value })} />
+            </div>
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid var(--color-border-light)', margin: '0.5rem 0' }} />
+        <div style={{ borderTop: '1px solid var(--color-border-light)', margin: '1rem 0' }} />
 
-        {/* รูปภาพคู่ */}
-        <div className={styles.gridTwo} style={{ justifyItems: 'center', padding: '0.5rem 0' }}>
-          <ImageUploader
-            label="รูปนายกสภา"
-            preview={formData.presidentPreview}
-            onFileChange={(e) => e.target.files?.[0] && setFormData({
-              ...formData,
-              presidentFile: e.target.files[0],
-              presidentPreview: URL.createObjectURL(e.target.files[0]),
-            })}
-          />
-          <ImageUploader
-            label="รูปเลขาธิการ"
-            preview={formData.secretaryPreview}
-            onFileChange={(e) => e.target.files?.[0] && setFormData({
-              ...formData,
-              secretaryFile: e.target.files[0],
-              secretaryPreview: URL.createObjectURL(e.target.files[0]),
-            })}
-          />
+        {/* รูปภาพคู่ (President & Secretary) โดยใช้ Custom Uploader */}
+        <div className={styles.gridTwo} style={{ gap: '2rem' }}>
+          
+          {/* อัปโหลดรูปนายก */}
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>รูปนายกสภา</label>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <label htmlFor="president-upload" className={styles.modalUploadArea} style={{ width: '100%', margin: 0 }}>
+                {formData.presidentPreview ? (
+                  <img src={formData.presidentPreview} alt="President Preview" className={styles.modalPreviewImage} />
+                ) : (
+                  <div className={styles.modalUploadPlaceholder}>
+                    <Upload size={32} />
+                    <span style={{ fontWeight: 500 }}>คลิกเพื่ออัปโหลดรูปภาพ</span>
+                    <span style={{ fontSize: '0.8rem' }}>แนะนำขนาด 4:3</span>
+                  </div>
+                )}
+                <input id="president-upload" type="file" accept="image/*" className="hidden" onChange={(e) => onSelectImage(e, 'president')} />
+              </label>
+
+              {formData.presidentPreview && (
+                <div className={styles.imageActionRow} style={{ marginTop: '0.5rem' }}>
+                   <button type="button" className={styles.changeImageBtn} onClick={() => {
+                      setImageToCrop(formData.originalPresidentPreview || formData.presidentPreview);
+                      setCropType('president');
+                      setIsCropping(true);
+                      setCrop({ x: 0, y: 0 });
+                      setZoom(1);
+                   }}>
+                     <Crop size={14} /> ครอปใหม่
+                   </button>
+                   <button type="button" className={styles.changeImageBtn} onClick={() => document.getElementById('president-upload')?.click()}>
+                     <Upload size={14} /> เปลี่ยนรูป
+                   </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* อัปโหลดรูปเลขา */}
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>รูปเลขาธิการ</label>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <label htmlFor="secretary-upload" className={styles.modalUploadArea} style={{ width: '100%', margin: 0 }}>
+                {formData.secretaryPreview ? (
+                  <img src={formData.secretaryPreview} alt="Secretary Preview" className={styles.modalPreviewImage} />
+                ) : (
+                  <div className={styles.modalUploadPlaceholder}>
+                    <Upload size={32} />
+                    <span style={{ fontWeight: 500 }}>คลิกเพื่ออัปโหลดรูปภาพ</span>
+                    <span style={{ fontSize: '0.8rem' }}>แนะนำขนาด 4:3</span>
+                  </div>
+                )}
+                <input id="secretary-upload" type="file" accept="image/*" className="hidden" onChange={(e) => onSelectImage(e, 'secretary')} />
+              </label>
+
+              {formData.secretaryPreview && (
+                <div className={styles.imageActionRow} style={{ marginTop: '0.5rem' }}>
+                   <button type="button" className={styles.changeImageBtn} onClick={() => {
+                      setImageToCrop(formData.originalSecretaryPreview || formData.secretaryPreview);
+                      setCropType('secretary');
+                      setIsCropping(true);
+                      setCrop({ x: 0, y: 0 });
+                      setZoom(1);
+                   }}>
+                     <Crop size={14} /> ครอปใหม่
+                   </button>
+                   <button type="button" className={styles.changeImageBtn} onClick={() => document.getElementById('secretary-upload')?.click()}>
+                     <Upload size={14} /> เปลี่ยนรูป
+                   </button>
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
+
+        <div style={{ borderTop: '1px solid var(--color-border-light)', margin: '1rem 0' }} />
 
         {/* ชื่อนายก */}
         <div className={styles.formGroup}>
@@ -426,6 +580,40 @@ export default function HistoryPage() {
 
       {/* Image Preview Modal */}
       <ImagePreviewModal imageUrl={previewImage} onClose={() => setPreviewImage(null)} />
+
+      {/* Cropper Modal */}
+      {isCropping && imageToCrop && (
+        <div className={styles.cropModalOverlay}>
+          <div className={styles.cropModalContent}>
+            <div className={styles.cropperContainer}>
+              <Cropper
+                image={imageToCrop}
+                crop={crop}
+                zoom={zoom}
+                aspect={4 / 3}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+              />
+            </div>
+            <div className={styles.cropControls}>
+              <div className={styles.zoomSliderContainer}>
+                <ZoomOut size={20} color="#9ca3af" />
+                <input type="range" value={zoom} min={1} max={3} step={0.1} onChange={(e) => setZoom(Number(e.target.value))} className={styles.zoomSlider} />
+                <ZoomIn size={20} color="#9ca3af" />
+              </div>
+              <div className={styles.cropActions}>
+                <button onClick={() => { setIsCropping(false); setImageToCrop(null); }} className={styles.btnCropCancel}>
+                  ยกเลิก
+                </button>
+                <button onClick={handleConfirmCrop} className={styles.btnCropConfirm}>
+                  ครอปและบันทึก
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
