@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { Shield, Check, Loader2, ChevronDown, ChevronUp, Plus, X, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
+import CrudModal from '@/app/components/ui/CrudModal';
 import styles from './permissions.module.css';
+import councilStyles from '@/app/backoffice/module/web/about/council/council.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -31,26 +33,24 @@ export default function PermissionsPage() {
   const [seeded, setSeeded] = useState(false);
   const [hasChanges, setHasChanges] = useState<Record<string, boolean>>({});
 
-  // สร้าง Role ใหม่
-  const [showAddRole, setShowAddRole] = useState(false);
+  // Modal state สำหรับสร้าง Role ใหม่
+  const [isAddRoleOpen, setIsAddRoleOpen] = useState(false);
   const [newRoleName, setNewRoleName] = useState('');
+  const [selectedPerms, setSelectedPerms] = useState<string[]>([]);
 
   const fetchData = async () => {
     try {
-      // ดึง permissions
       const permsRes = await authFetch(`${API_URL}/permissions`);
       const permsData = await permsRes.json();
       const permsArray = Array.isArray(permsData) ? permsData : [];
       setPermissions(permsArray);
       setSeeded(permsArray.length > 0);
 
-      // ดึง roles ทั้งหมด
       const rolesRes = await authFetch(`${API_URL}/permissions/roles`);
       const rolesData = await rolesRes.json();
       const rolesArray = Array.isArray(rolesData) ? rolesData : [];
       setRoles(rolesArray);
 
-      // ดึง permissions ของแต่ละ role (ยกเว้น admin)
       const rolePermsMap: Record<string, string[]> = {};
       for (const r of rolesArray) {
         if (r.role === 'admin') continue;
@@ -125,8 +125,23 @@ export default function PermissionsPage() {
     setHasChanges(prev => ({ ...prev, [role]: false }));
   };
 
+  // เปิด Modal สร้าง Role
+  const openAddRoleModal = () => {
+    setNewRoleName('');
+    setSelectedPerms([]);
+    setIsAddRoleOpen(true);
+  };
+
+  // Toggle perm ใน modal
+  const toggleNewRolePerm = (permKey: string) => {
+    setSelectedPerms(prev =>
+      prev.includes(permKey) ? prev.filter(k => k !== permKey) : [...prev, permKey]
+    );
+  };
+
   // สร้าง Role ใหม่
-  const handleAddRole = async () => {
+  const handleAddRole = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!newRoleName.trim()) {
       Swal.fire('Error', 'กรุณากรอกชื่อ Role', 'error');
       return;
@@ -138,15 +153,29 @@ export default function PermissionsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: roleName }),
       });
-      if (res.ok) {
-        setNewRoleName('');
-        setShowAddRole(false);
-        Swal.fire({ icon: 'success', title: 'สร้าง Role สำเร็จ', text: `Role "${roleName}" ถูกสร้างแล้ว`, timer: 1500, showConfirmButton: false });
-        fetchData();
-      } else {
+      if (!res.ok) {
         const data = await res.json();
         Swal.fire('Error', data.message, 'error');
+        return;
       }
+
+      if (selectedPerms.length > 0) {
+        await authFetch(`${API_URL}/permissions/roles/${roleName}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ permissions: selectedPerms }),
+        });
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: 'สร้าง Role สำเร็จ',
+        text: `Role "${roleName}" ถูกสร้างแล้ว พร้อมกำหนด ${selectedPerms.length} สิทธิ์`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      setIsAddRoleOpen(false);
+      fetchData();
     } catch { Swal.fire('Error', 'ไม่สามารถเชื่อมต่อ API', 'error'); }
   };
 
@@ -232,7 +261,6 @@ export default function PermissionsPage() {
     );
   }
 
-  // แยก admin ออก — roles ที่แก้ไขได้
   const manageableRoles = roles.filter(r => r.role !== 'admin');
 
   return (
@@ -242,36 +270,10 @@ export default function PermissionsPage() {
           <h1 className={styles.title}>จัดการสิทธิ์การใช้งาน</h1>
           <p className={styles.subtitle}>กำหนดสิทธิ์ให้แต่ละ Role — ติ๊กเลือก แล้วกด "บันทึกสิทธิ์"</p>
         </div>
-        <button onClick={() => setShowAddRole(!showAddRole)} className={styles.btnAdd}>
-          {showAddRole ? <X size={18} /> : <Plus size={18} />}
-          {showAddRole ? 'ปิด' : 'เพิ่ม Role ใหม่'}
+        <button onClick={openAddRoleModal} className={styles.btnAdd}>
+          <Plus size={18} /> เพิ่ม Role ใหม่
         </button>
       </div>
-
-      {/* ฟอร์มเพิ่ม Role ใหม่ */}
-      {showAddRole && (
-        <div className={styles.addForm}>
-          <h3 className={styles.addFormTitle}>สร้าง Role ใหม่</h3>
-          <div className={styles.addFormGrid}>
-            <div>
-              <label className={styles.formLabel}>ชื่อ Role (ภาษาอังกฤษ, ไม่มีเว้นวรรค)</label>
-              <input
-                type="text"
-                placeholder="เช่น reporter"
-                value={newRoleName}
-                onChange={e => setNewRoleName(e.target.value)}
-                className={styles.formInput}
-              />
-            </div>
-          </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
-            สร้างแล้วสามารถกำหนดสิทธิ์ให้ Role นี้ได้ทันที + ตั้งค่าให้ผู้ใช้ในหน้า "ตั้งค่าระบบ"
-          </p>
-          <button onClick={handleAddRole} className={styles.btnSave}>
-            <Plus size={16} /> สร้าง Role
-          </button>
-        </div>
-      )}
 
       {/* Admin info */}
       <div className={styles.adminInfo}>
@@ -340,7 +342,6 @@ export default function PermissionsPage() {
                   </div>
                 ))}
 
-                {/* ปุ่มบันทึก / ยกเลิก */}
                 <div className={styles.actionBar}>
                   <button onClick={() => handleCancel(role)} className={styles.btnCancel} disabled={!changed}>
                     ยกเลิก
@@ -358,6 +359,55 @@ export default function PermissionsPage() {
           </div>
         );
       })}
+
+      {/* Add Role Modal */}
+      <CrudModal
+        isOpen={isAddRoleOpen}
+        title="สร้าง Role ใหม่"
+        onClose={() => setIsAddRoleOpen(false)}
+        onSubmit={handleAddRole}
+        maxWidth="36rem"
+      >
+        <div className={councilStyles.formGroup}>
+          <label className={councilStyles.formLabel}>ชื่อ Role (ภาษาอังกฤษ, ไม่มีเว้นวรรค) <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+          <input
+            type="text"
+            required
+            className={councilStyles.formInput}
+            placeholder="เช่น reporter"
+            value={newRoleName}
+            onChange={(e) => setNewRoleName(e.target.value)}
+          />
+        </div>
+
+        <div style={{ borderTop: '1px solid var(--color-border-light)', margin: '1rem 0' }} />
+
+        <div className={councilStyles.formGroup}>
+          <label className={councilStyles.formLabel}>กำหนดสิทธิ์เริ่มต้น</label>
+          <div style={{ maxHeight: '320px', overflowY: 'auto', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '0.75rem' }}>
+            {Object.entries(groupedPermissions).map(([group, perms]) => (
+              <div key={group} style={{ marginBottom: '0.75rem' }}>
+                <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' as const, letterSpacing: '0.05em', margin: '0 0 0.3rem 0', paddingBottom: '0.25rem', borderBottom: '1px solid #f3f4f6' }}>{group}</h4>
+                {perms.map(perm => {
+                  const isChecked = selectedPerms.includes(perm.key);
+                  return (
+                    <label key={perm.key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.3rem 0', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleNewRolePerm(perm.key)}
+                        style={{ width: '16px', height: '16px', accentColor: '#3b82f6', cursor: 'pointer' }}
+                      />
+                      <span style={{ color: '#374151' }}>{perm.label}</span>
+                      <span style={{ color: '#9ca3af', fontSize: '0.7rem', marginLeft: 'auto' }}>{perm.key}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </CrudModal>
     </div>
   );
 }

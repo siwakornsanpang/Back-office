@@ -5,7 +5,9 @@ import { UserPlus, Trash2, Loader2, Users } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
 import RoleBadge from '@/app/components/ui/RoleBadge';
+import CrudModal from '@/app/components/ui/CrudModal';
 import styles from './users.module.css';
+import councilStyles from '@/app/backoffice/module/web/about/council/council.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -20,14 +22,17 @@ type User = {
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [roleOptions, setRoleOptions] = useState<{ value: string; label: string }[]>([]);
 
-  // Form state
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [role, setRole] = useState('viewer');
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    displayName: '',
+    role: 'viewer',
+  });
 
   // Fetch users
   const fetchUsers = useCallback(async () => {
@@ -45,7 +50,7 @@ export default function UserManagementPage() {
     }
   }, []);
 
-  // Fetch roles จาก API (dynamic)
+  // Fetch roles
   const fetchRoles = useCallback(async () => {
     try {
       const res = await authFetch(`${API_URL}/permissions/roles`);
@@ -57,7 +62,6 @@ export default function UserManagementPage() {
       }
     } catch (err) {
       console.error('Failed to fetch roles', err);
-      // fallback
       setRoleOptions([
         { value: 'admin', label: 'admin' },
         { value: 'editor', label: 'editor' },
@@ -71,11 +75,16 @@ export default function UserManagementPage() {
     fetchRoles();
   }, [fetchUsers, fetchRoles]);
 
+  const openModal = () => {
+    setFormData({ username: '', password: '', displayName: '', role: roleOptions[0]?.value || 'viewer' });
+    setIsModalOpen(true);
+  };
+
   // Create user
-  const handleCreateUser = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username.trim() || !password.trim()) {
+    if (!formData.username.trim() || !formData.password.trim()) {
       Swal.fire('กรุณากรอกข้อมูล', 'ชื่อผู้ใช้และรหัสผ่านจำเป็นต้องกรอก', 'warning');
       return;
     }
@@ -86,10 +95,10 @@ export default function UserManagementPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: username.trim(),
-          password,
-          displayName: displayName.trim() || username.trim(),
-          role,
+          username: formData.username.trim(),
+          password: formData.password,
+          displayName: formData.displayName.trim() || formData.username.trim(),
+          role: formData.role,
         }),
       });
 
@@ -101,14 +110,7 @@ export default function UserManagementPage() {
       }
 
       Swal.fire({ icon: 'success', title: 'สร้างผู้ใช้สำเร็จ', text: `${data.user.displayName} (${data.user.role})`, timer: 2000, showConfirmButton: false });
-
-      // Reset form
-      setUsername('');
-      setPassword('');
-      setDisplayName('');
-      setRole('viewer');
-
-      // Refresh list
+      setIsModalOpen(false);
       fetchUsers();
     } catch {
       Swal.fire('Error', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
@@ -134,10 +136,7 @@ export default function UserManagementPage() {
     if (!result.isConfirmed) return;
 
     try {
-      const res = await authFetch(`${API_URL}/auth/users/${user.id}`, {
-        method: 'DELETE',
-      });
-
+      const res = await authFetch(`${API_URL}/auth/users/${user.id}`, { method: 'DELETE' });
       const data = await res.json();
 
       if (!res.ok) {
@@ -156,74 +155,15 @@ export default function UserManagementPage() {
     <div className={styles.container}>
       {/* Header */}
       <div className={styles.header}>
-        <h2 className={styles.title}>จัดการผู้ใช้งาน</h2>
-        <p className={styles.breadcrumb}>
-          ตั้งค่า / <span style={{ color: '#2563eb', fontWeight: 500 }}>จัดการผู้ใช้งาน</span>
-        </p>
-      </div>
-
-      {/* Create User Form */}
-      <div className={styles.card}>
-        <h3 className={styles.cardTitle}>
-          <UserPlus size={20} color="#2563eb" />
-          เพิ่มผู้ใช้ใหม่
-        </h3>
-
-        <form onSubmit={handleCreateUser}>
-          <div className={styles.formGrid}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>ชื่อผู้ใช้ (Username) *</label>
-              <input
-                className={styles.input}
-                type="text"
-                placeholder="เช่น webeditor01"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>รหัสผ่าน *</label>
-              <input
-                className={styles.input}
-                type="password"
-                placeholder="กรอกรหัสผ่าน"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>ชื่อที่แสดง</label>
-              <input
-                className={styles.input}
-                type="text"
-                placeholder="เช่น สมชาย ใจดี"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>บทบาท (Role)</label>
-              <select
-                className={styles.select}
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                {roleOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className={styles.formActions}>
-            <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={isSaving}>
-              {isSaving ? <Loader2 size={16} className={styles.spinner} /> : <UserPlus size={16} />}
-              {isSaving ? 'กำลังสร้าง...' : 'สร้างผู้ใช้'}
-            </button>
-          </div>
-        </form>
+        <div>
+          <h2 className={styles.title}>จัดการผู้ใช้งาน</h2>
+          <p className={styles.breadcrumb}>
+            ตั้งค่า / <span style={{ color: '#2563eb', fontWeight: 500 }}>จัดการผู้ใช้งาน</span>
+          </p>
+        </div>
+        <button onClick={openModal} className={`${styles.btn} ${styles.btnPrimary}`}>
+          <UserPlus size={16} /> สร้างผู้ใช้ใหม่
+        </button>
       </div>
 
       {/* User List */}
@@ -293,6 +233,65 @@ export default function UserManagementPage() {
           </div>
         )}
       </div>
+
+      {/* Create User Modal */}
+      <CrudModal
+        isOpen={isModalOpen}
+        title="สร้างผู้ใช้ใหม่"
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        maxWidth="32rem"
+      >
+        <div className={councilStyles.gridTwo}>
+          <div className={councilStyles.formGroup}>
+            <label className={councilStyles.formLabel}>ชื่อผู้ใช้ (Username) <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+            <input
+              type="text"
+              required
+              className={councilStyles.formInput}
+              placeholder="เช่น webeditor01"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            />
+          </div>
+          <div className={councilStyles.formGroup}>
+            <label className={councilStyles.formLabel}>รหัสผ่าน <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+            <input
+              type="password"
+              required
+              className={councilStyles.formInput}
+              placeholder="กรอกรหัสผ่าน"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className={councilStyles.gridTwo}>
+          <div className={councilStyles.formGroup}>
+            <label className={councilStyles.formLabel}>ชื่อที่แสดง</label>
+            <input
+              type="text"
+              className={councilStyles.formInput}
+              placeholder="เช่น สมชาย ใจดี"
+              value={formData.displayName}
+              onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+            />
+          </div>
+          <div className={councilStyles.formGroup}>
+            <label className={councilStyles.formLabel}>บทบาท (Role)</label>
+            <select
+              className={councilStyles.formSelect}
+              value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+            >
+              {roleOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </CrudModal>
     </div>
   );
 }

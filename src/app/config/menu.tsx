@@ -88,15 +88,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
     title: 'กฎหมาย',
     icon: <Scale size={20} />,
     permission: 'manage_law',
-    submenu: [
-      { id: 'web-law-1', title: 'พระราชบัญญัติวิชาชีพเภสัชกรรม', href: '/backoffice/module/web/law/law1' },
-      { id: 'web-law-2', title: 'ข้อบังคับสภาเภสัชกรรม', href: '/backoffice/module/web/law/law2' },
-      { id: 'web-law-3', title: 'ประกาศสภาเภสัชกรรม', href: '/backoffice/module/web/law/law3' },
-      { id: 'web-law-4', title: 'กฎกระทรวง', href: '/backoffice/module/web/law/law4' },
-      { id: 'web-law-5', title: 'กฎหมายอื่นที่เกี่ยวข้อง', href: '/backoffice/module/web/law/law5' },
-      { id: 'web-law-6', title: 'คำสั่งสภาเภสัชกรรม', href: '/backoffice/module/web/law/law6' },
-      { id: 'web-law-7', title: 'ระเบียบสภาเภสัชกรรม', href: '/backoffice/module/web/law/law7' },
-    ]
+    href: '/backoffice/module/web/law',
   },
 
   { id: 'web-setting', title: 'ตั้งค่าเว็บไซต์', href: '/backoffice/module/web/setting', icon: <Settings size={20} />, permission: 'manage_web_settings' },
