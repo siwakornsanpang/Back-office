@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import styles from './news.module.css';
-import { Edit, Trash2, Search, Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-react';
+import { Image as ImageIcon, Edit, Trash2, Search, Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
 
@@ -18,6 +18,7 @@ interface NewsItem {
   category: NewsCategory;
   status: NewsStatus;
   isHighlight: boolean;
+  thumbnailUrl?: string;
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -254,6 +255,7 @@ export default function NewsPage() {
           <thead>
             <tr>
 
+              <th style={{ width: '80px', textAlign: 'center' }}>รูป</th>
               <th className={styles.thSortable} onClick={() => handleSort('isHighlight')} style={{ cursor: 'pointer' }}>
                 <div className="flex items-center gap-1">หัวข้อข่าว {getSortIcon('isHighlight')}</div>
               </th>
@@ -273,13 +275,21 @@ export default function NewsPage() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={7} className="text-center py-8 text-gray-500">กำลังโหลดข้อมูล...</td></tr>
+              <tr><td colSpan={8} className="text-center py-8 text-gray-500">กำลังโหลดข้อมูล...</td></tr>
             ) : currentNews.length === 0 ? (
-              <tr><td colSpan={7} className="text-center py-8 text-gray-400">ไม่พบข้อมูลตามเงื่อนไข</td></tr>
+              <tr><td colSpan={8} className="text-center py-8 text-gray-400">ไม่พบข้อมูลตามเงื่อนไข</td></tr>
             ) : (
               currentNews.map((item) => (
                 <tr key={item.id}>
-
+                  <td style={{ textAlign: 'center' }}>
+                    {item.thumbnailUrl ? (
+                      <img src={item.thumbnailUrl} className={styles.tableThumbnail} alt="Thumb" />
+                    ) : (
+                      <div className={styles.tableThumbnailEmpty}>
+                        <ImageIcon size={16} />
+                      </div>
+                    )}
+                  </td>
                   <td>
                     <div className="flex items-center gap-2">
                       {item.isHighlight && <span title="ข่าวเด่น" style={{ color: '#f59e0b' }}>⭐</span>}

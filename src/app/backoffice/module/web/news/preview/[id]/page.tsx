@@ -12,6 +12,7 @@ interface NewsItem {
     id: number;
     title: string;
     content: string;
+    thumbnailUrl?: string;
     category: 'news' | 'recruitment' | 'procurement';
     status: 'published' | 'draft';
     publishedAt?: string;
@@ -164,38 +165,61 @@ export default function NewsPreviewPage() {
             <div className={styles.viewportContainer}>
                 <div className={`${styles.deviceFrame} ${styles[viewMode]}`}>
                     <div className={styles.articleWrapper}>
-                        <header className={styles.header}>
-                            <div className={styles.meta}>
-                                <span className={styles.categoryTag}>
-                                    {getCategoryLabel(news.category)}
-                                </span>
-                                {news.status === 'published' && (
-                                    <span className={styles.publishDate}>
-                                        <Calendar size={16} />
-                                        เผยแพร่เมื่อวันที่ {formatDate(news.publishedAt || news.createdAt)}
-                                    </span>
-                                )}
-                                <span className="flex items-center gap-1">
-                                    <User size={16} /> Admin
-                                </span>
+                        {news.thumbnailUrl ? (
+                            <div className={styles.bannerContainer}>
+                                <img src={news.thumbnailUrl} className={styles.bannerImage} alt="Banner" />
+                                <div className={styles.bannerOverlay}>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className={styles.categoryTag}>
+                                            {getCategoryLabel(news.category)}
+                                        </span>
+                                    </div>
+                                    <h1 className={styles.bannerTitle}>{news.title}</h1>
+                                    <div className={styles.bannerMeta}>
+                                        {news.status === 'published' && (
+                                            <span className={styles.publishDate}>
+                                                <Calendar size={18} />
+                                                {formatDate(news.publishedAt || news.createdAt)}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                            <h1 className={styles.title}>{news.title}</h1>
-                        </header>
-
-                        {/* Render HTML content safely with Quill styles */}
-                        <article className={`${styles.content} ql-snow`}>
-                            <div
-                                className="ql-editor"
-                                style={{ padding: 0 }} // Remove default quill padding to match preview layout
-                                dangerouslySetInnerHTML={{ __html: news.content }}
-                            />
-                        </article>
-
-                        {news.status === 'draft' && (
-                            <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-center">
-                                นี่คือ "ฉบับร่าง" ยังไม่ได้เผยแพร่สู่สาธารณะ
+                        ) : (
+                            <div className={styles.articleInner}>
+                                <header className={styles.header}>
+                                    <div className={styles.meta}>
+                                        <span className={styles.categoryTag}>
+                                            {getCategoryLabel(news.category)}
+                                        </span>
+                                        {news.status === 'published' && (
+                                            <span className={styles.publishDate}>
+                                                <Calendar size={16} />
+                                                เผยแพร่เมื่อวันที่ {formatDate(news.publishedAt || news.createdAt)}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <h1 className={styles.title}>{news.title}</h1>
+                                </header>
                             </div>
                         )}
+
+                        <div className={styles.articleInner} style={{ paddingTop: news.thumbnailUrl ? '2rem' : 0 }}>
+                            {news.status === 'draft' && (
+                                <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-center text-sm">
+                                    นี่คือ "ฉบับร่าง" ยังไม่ได้เผยแพร่สู่สาธารณะ
+                                </div>
+                            )}
+
+                            {/* Render HTML content safely with Quill styles */}
+                            <article className={`${styles.content} ql-snow`}>
+                                <div
+                                    className="ql-editor"
+                                    style={{ padding: 0 }} // Remove default quill padding to match preview layout
+                                    dangerouslySetInnerHTML={{ __html: news.content }}
+                                />
+                            </article>
+                        </div>
                     </div>
                 </div>
             </div>

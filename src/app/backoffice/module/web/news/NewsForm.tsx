@@ -5,9 +5,11 @@ import styles from './news.module.css';
 import Editor from '@/app/components/editor/editor';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Save, X } from 'lucide-react';
-import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '@/app/components/editor/cropImage';
+import { Image as ImageIcon, Upload, Trash2, Crop, ZoomIn, ZoomOut, Save, X } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 // Types
 export type NewsStatus = 'published' | 'draft';
@@ -20,6 +22,7 @@ export interface NewsItem {
     category: NewsCategory;
     status: NewsStatus;
     isHighlight: boolean;
+    thumbnailUrl?: string;
     publishedAt?: string;
 }
 
@@ -49,6 +52,78 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
         return '';
     });
     const [isHighlight, setIsHighlight] = useState(initialData?.isHighlight || false);
+    const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnailUrl || '');
+
+    // --- Crop States ---
+    const [isCropping, setIsCropping] = useState(false);
+    const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+    const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
+
+
+    // --- Thumbnail Logic ---
+    const onSelectThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                setImageToCrop(reader.result as string);
+                setIsCropping(true);
+            });
+            reader.readAsDataURL(file);
+            e.target.value = ''; // Reset input
+        }
+    };
+
+    const onCropComplete = (_: any, pixels: any) => {
+        setCroppedAreaPixels(pixels);
+    };
+
+    const handleConfirmCrop = async () => {
+        if (!imageToCrop || !croppedAreaPixels) return;
+
+        setIsUploadingThumbnail(true);
+        try {
+            const croppedFile = await getCroppedImg(imageToCrop, croppedAreaPixels, `news-thumb-${Date.now()}.jpg`);
+            if (!croppedFile) throw new Error('Crop failed');
+
+            // Upload to API
+            const formData = new FormData();
+            formData.append('file', croppedFile);
+
+            const res = await authFetch(`${process.env.NEXT_PUBLIC_API_URL}/news/upload-image`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!res.ok) throw new Error('Upload failed');
+            const data = await res.json();
+
+            setThumbnailUrl(data.url);
+            setIsCropping(false);
+            setImageToCrop(null);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'อัปโหลดรูปย่อสำเร็จ',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'อัปโหลดรูปไม่สำเร็จ', 'error');
+        } finally {
+            setIsUploadingThumbnail(false);
+        }
+    };
+
+    const removeThumbnail = () => {
+        setThumbnailUrl('');
+    };
 
 
     const handleSave = async (e: React.FormEvent) => {
@@ -72,7 +147,8 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 category,
                 status,
                 publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null, // ส่งเป็น ISO String หรือ null
-                isHighlight: isHighlight
+                isHighlight: isHighlight,
+                thumbnailUrl: thumbnailUrl || null
             };
 
             let url = API_URL;
@@ -147,22 +223,26 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 <div className={styles.mainColumn}>
                     {/* Title Input */}
                     <div className={styles.card}>
+                        <h3 className={styles.cardTitle}>หัวข้อข่าว</h3>
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>หัวข้อข่าว</label>
                             <input
                                 type="text"
                                 className={styles.input}
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
                                 required
+                                placeholder="ระบุหัวข้อข่าว..."
                             />
                         </div>
                     </div>
 
-                    {/* Editor */}
-                    <div className={styles.card} style={{ minHeight: '500px' }}>
+
+
+
+                    {/* Editor Card */}
+                    <div className={`${styles.card} ${styles.cardCompact}`}>
+                        <h3 className={styles.cardTitle} style={{ padding: '0.75rem 0.75rem 0 0.75rem', marginBottom: '0.5rem' }}>เนื้อหาข่าว</h3>
                         <Editor
-                            label="เนื้อหาข่าว"
                             value={content}
                             onChange={setContent}
                             placeholder="พิมพ์เนื้อหาข่าว หรือกดปุ่มรูปภาพเพื่ออัปโหลด..."
@@ -172,6 +252,57 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
 
                 {/* Sidebar Column */}
                 <div className={styles.sidebarColumn}>
+
+                    {/* Thumbnail Card */}
+                    <div className={styles.card}>
+                        <h3 className={styles.cardTitle}>รูปหน้าปก</h3>
+                        <div className={styles.thumbnailContainer}>
+                            <div
+                                className={styles.thumbnailUploadArea}
+                                onClick={() => document.getElementById('thumb-input')?.click()}
+                            >
+                                {thumbnailUrl ? (
+                                    <img src={thumbnailUrl} className={styles.thumbnailPreview} alt="Thumbnail" />
+                                ) : (
+                                    <div className={styles.uploadPlaceholder}>
+                                        <ImageIcon size={32} />
+                                        <span>คลิกเพื่ออัปโหลดรูปหน้าปก</span>
+                                        <span style={{ fontSize: '0.7rem' }}>สัดส่วน 16:9</span>
+                                    </div>
+                                )}
+                            </div>
+                            <input
+                                id="thumb-input"
+                                type="file"
+                                hidden
+                                accept="image/*"
+                                onChange={onSelectThumbnail}
+                            />
+
+                            {thumbnailUrl && (
+                                <div className={styles.thumbnailActions}>
+                                    <button
+                                        type="button"
+                                        className={styles.thumbnailActionBtn}
+                                        onClick={() => {
+                                            setImageToCrop(thumbnailUrl);
+                                            setIsCropping(true);
+                                        }}
+                                    >
+                                        <Crop size={14} /> ครอปใหม่
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={styles.thumbnailActionBtn}
+                                        style={{ color: '#ef4444' }}
+                                        onClick={removeThumbnail}
+                                    >
+                                        <Trash2 size={14} /> ลบออก
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
                     {/* Publishing Card */}
                     <div className={styles.card}>
@@ -211,6 +342,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                             </label>
                         </div>
                     </div>
+
 
                     {/* Categorization Card */}
                     <div className={styles.card}>
@@ -256,6 +388,61 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                     </div>
                 </div>
             </div>
+
+            {/* Crop Modal */}
+            {isCropping && imageToCrop && (
+                <div className={styles.cropModalOverlay}>
+                    <div className={styles.cropModalContent}>
+                        <div className={styles.cropperContainer}>
+                            <Cropper
+                                image={imageToCrop}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={16 / 9}
+                                onCropChange={setCrop}
+                                onCropComplete={onCropComplete}
+                                onZoomChange={setZoom}
+                            />
+                        </div>
+                        <div className={styles.cropControls}>
+                            <div className={styles.zoomSliderContainer}>
+                                <ZoomOut size={20} />
+                                <input
+                                    type="range"
+                                    value={zoom}
+                                    min={1}
+                                    max={3}
+                                    step={0.1}
+                                    aria-labelledby="Zoom"
+                                    onChange={(e) => setZoom(Number(e.target.value))}
+                                    className={styles.zoomSlider}
+                                />
+                                <ZoomIn size={20} />
+                            </div>
+                            <div className={styles.cropActions}>
+                                <button
+                                    type="button"
+                                    className={styles.btnCropCancel}
+                                    onClick={() => {
+                                        setIsCropping(false);
+                                        setImageToCrop(null);
+                                    }}
+                                >
+                                    ยกเลิก
+                                </button>
+                                <button
+                                    type="button"
+                                    className={styles.btnCropConfirm}
+                                    onClick={handleConfirmCrop}
+                                    disabled={isUploadingThumbnail}
+                                >
+                                    {isUploadingThumbnail ? 'กำลังอัปโหลด...' : 'ตกลงและบันทึก'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </form>
     );
 }
