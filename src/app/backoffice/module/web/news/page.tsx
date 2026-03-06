@@ -255,7 +255,7 @@ export default function NewsPage() {
           <thead>
             <tr>
 
-              <th style={{ width: '80px', textAlign: 'center' }}>รูป</th>
+              <th style={{ width: '80px', textAlign: 'center' }}>ภาพปก</th>
               <th className={styles.thSortable} onClick={() => handleSort('isHighlight')} style={{ cursor: 'pointer' }}>
                 <div className="flex items-center gap-1">หัวข้อข่าว {getSortIcon('isHighlight')}</div>
               </th>
