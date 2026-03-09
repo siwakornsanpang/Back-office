@@ -1,13 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './setting.module.css';
-import {
-    Settings,
-    MapPin,
-    Share2,
-    Save,
-} from 'lucide-react';
+import { Save, Globe, Phone, Mail, MapPin, Facebook, LineChart, Instagram, Youtube, X, Settings, Share2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
 import Image from 'next/image';
@@ -19,6 +14,7 @@ const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/web-settings`;
 export default function SettingPage() {
     const [activeTab, setActiveTab] = useState<TabType>('general');
     const [isLoading, setIsLoading] = useState(false);
+    const initialData = useRef<any>(null); // Added initialData ref
     const [isFetching, setIsFetching] = useState(true);
 
     // Form States
@@ -55,6 +51,7 @@ export default function SettingPage() {
                         ...prev,
                         ...data
                     }));
+                    initialData.current = data; // Set initialData
                     if (data.logoPath) {
                         setLogoPreview(data.logoPath);
                     }
@@ -81,13 +78,57 @@ export default function SettingPage() {
         }
     };
 
+    const handleCancel = () => {
+        const hasChanges =
+            JSON.stringify(settings) !== JSON.stringify(initialData.current) ||
+            !!logoFile;
+
+        if (hasChanges) {
+            Swal.fire({
+                title: 'คุณแน่ใจหรือไม่?',
+                text: 'การเปลี่ยนแปลงที่คุณยังไม่ได้บันทึกจะถูกยกเลิก',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#3b82f6',
+                confirmButtonText: 'ใช่, ยกเลิกการเปลี่ยนแปลง',
+                cancelButtonText: 'ไม่, กลับไปแก้ไขต่อ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    setSettings({ ...initialData.current });
+                    setLogoFile(null);
+                    if (initialData.current.logoPath) {
+                        setLogoPreview(initialData.current.logoPath);
+                    } else {
+                        setLogoPreview(null);
+                    }
+                    Swal.fire({
+                        title: 'ยกเลิกแล้ว!',
+                        text: 'การเปลี่ยนแปลงถูกยกเลิกเรียบร้อยแล้ว',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+    };
+
     const handleSave = async () => {
         setIsLoading(true);
         try {
             const formData = new FormData();
 
-            // Append all fields
-            Object.entries(settings).forEach(([key, value]) => {
+            // Append only allowed fields
+            const allowedFields = [
+                'siteNameTh', 'siteNameEn', 'slogan', 'logoPath',
+                'address', 'phone', 'fax', 'email',
+                'googleMapsUrl', 'googleMapsEmbed',
+                'facebookUrl', 'lineId', 'youtubeUrl'
+            ];
+
+            allowedFields.forEach(key => {
+                const value = (settings as any)[key];
                 if (value !== null && value !== undefined) {
                     formData.append(key, value as string);
                 }
@@ -112,6 +153,7 @@ export default function SettingPage() {
                 setLogoPreview(result.logoUrl);
                 setLogoFile(null);
             }
+            initialData.current = { ...initialData.current, ...settings, logoPath: result.logoUrl || settings.logoPath }; // Update initialData after successful save
 
             Swal.fire({
                 icon: 'success',
@@ -394,13 +436,24 @@ export default function SettingPage() {
 
                     {!isFetching && (
                         <div className={styles.actions}>
+                            {/* Added Cancel button */}
                             <button
+                                type="button"
+                                className={`${styles.btn} ${styles.btnCancel}`}
+                                onClick={handleCancel}
+                            >
+                                <X size={18} />
+                                ยกเลิก
+                            </button>
+                            {/* Modified Save button */}
+                            <button
+                                type="submit"
                                 className={`${styles.btn} ${styles.btnPrimary}`}
                                 onClick={handleSave}
                                 disabled={isLoading}
                             >
+                                {isLoading ? "กำลังบันทึก..." : "บันทึกการเปลี่ยนแปลง"}
                                 <Save size={18} />
-                                {isLoading ? 'กำลังบันทึก...' : 'บันทึกการเปลี่ยนแปลง'}
                             </button>
                         </div>
                     )}

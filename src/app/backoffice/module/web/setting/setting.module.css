@@ -188,6 +188,20 @@
     border-color: var(--color-primary-hover);
 }
 
+.btnCancel {
+    background: white;
+    color: #4b5563;
+    border: 1px solid #9ca3af;
+}
+
+.btnCancel:hover {
+    background: #f9fafb;
+    color: #111827;
+    border-color: #6b7280;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
 .mapPreviewArea {
     margin-top: 1rem;
     display: flex;

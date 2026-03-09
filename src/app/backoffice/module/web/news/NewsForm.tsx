@@ -190,6 +190,45 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
         }
     };
 
+    const handleCancel = () => {
+        const hasChanges =
+            title !== (initialData?.title || '') ||
+            content !== (initialData?.content || '') ||
+            category !== (initialData?.category || 'news') ||
+            status !== (initialData?.status || 'draft') ||
+            isHighlight !== (initialData?.isHighlight || false) ||
+            thumbnailUrl !== (initialData?.thumbnailUrl || '');
+
+        // Date comparison
+        let initialDate = '';
+        if (initialData?.publishedAt) {
+            const d = new Date(initialData.publishedAt);
+            const offset = d.getTimezoneOffset() * 60000;
+            initialDate = new Date(d.getTime() - offset).toISOString().slice(0, 16);
+        }
+        const dateChanged = publishedAt !== initialDate;
+
+        if (hasChanges || dateChanged) {
+            Swal.fire({
+                title: 'ยืนยันการยกเลิก?',
+                text: 'คุณยังไม่ได้บันทึกการเปลี่ยนแปลง ต้องการยกเลิกใช่หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#3b82f6',
+                confirmButtonText: 'ใช่, ยกเลิกเลย',
+                cancelButtonText: 'กลับไปแก้ไข',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.back();
+                }
+            });
+        } else {
+            router.back();
+        }
+    };
+
     return (
         <form onSubmit={handleSave} className={styles.container}>
             <header className={styles.header}>
@@ -204,7 +243,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                     <button
                         type="button"
                         className={`${styles.btn} ${styles.btnCancel}`}
-                        onClick={() => router.back()}
+                        onClick={handleCancel}
                     >
                         <X size={18} /> ยกเลิก
                     </button>
