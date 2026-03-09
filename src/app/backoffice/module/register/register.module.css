@@ -239,22 +239,277 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.tableHeadRow {
-  /* row styling */
+/* --- Horizontal Table Styles --- */
+.tableCardContainer {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+  margin-top: 1rem;
 }
 
-.tableHeadCell {
-  padding: 0.75rem 1.5rem;
-  text-align: left;
-  font-size: 0.75rem;
+.horizontalTableWrapper {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.horizontalTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  min-width: 1200px;
+  /* Ensure columns have enough space */
+}
+
+.horizontalTable th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  text-align: center;
+  padding: 1rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.horizontalTable td {
+  padding: 1.25rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  color: #1e293b;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.historySection {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.subTitle {
+  font-size: 1.25rem;
   font-weight: 600;
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
 }
 
-.tableBody {
-  /* tbody styling */
+/* Dashboard Layout */
+.dashboardLayout {
+  display: grid;
+  grid-template-columns: 300px 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dashboardBox {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.boxTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 0.5rem;
+}
+
+/* Photo Box */
+.photoBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.photoContainer {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  background-color: #f8fafc;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboardPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dashboardPhotoPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #94a3b8;
+}
+
+/* General & Personal Info */
+.fieldRow {
+  display: flex;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.fieldLabel {
+  font-weight: 600;
+  color: #64748b;
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.fieldValue {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+/* License Info */
+.licenseInfoBoxDashboard {
+  grid-column: span 2;
+}
+
+.licenseBoxHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 0.5rem;
+}
+
+.licenseBoxHeader .boxTitle {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.statusBadgeLarge {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.licenseDatesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.dateItem label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.dateItem p {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* CPE Info */
+.cpeInfoBox {
+  grid-column: 3;
+}
+
+.cpeContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.cpeScoreLarge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.cpeScoreLabel {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.cpeScoreText {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #2563eb;
+  line-height: 1;
+}
+
+.cpeStatusRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #10b981;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  background-color: #ecfdf5;
+  border-radius: 2rem;
+}
+
+.cpeIcon {
+  color: #10b981;
+}
+
+@media (max-width: 1024px) {
+  .dashboardLayout {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .photoBox {
+    grid-column: span 2;
+    aspect-ratio: auto;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .licenseInfoBoxDashboard {
+    grid-column: span 2;
+  }
+
+  .cpeInfoBox {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboardLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .photoBox,
+  .generalInfoBox,
+  .personalInfoBox,
+  .licenseInfoBoxDashboard,
+  .cpeInfoBox {
+    grid-column: span 1;
+  }
+
+  .licenseDatesGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 .tableBodyRow {
@@ -654,4 +909,538 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+/* --- New Details Page Styles --- */
+.detailPageContainer {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.detailHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.backLink:hover {
+  color: var(--color-primary);
+}
+
+.detailPageTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.detailContentGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.profileCard {
+  background: white;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--color-border);
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.largePhotoWrapper {
+  width: 120px;
+  height: 120px;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+.largePhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.largePhotoPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+.profileTitles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.profileFullName {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.licenseBadge {
+  font-family: monospace;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.infoSectionsContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.infoSection {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-primary);
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 1rem;
+}
+
+.sectionHeading h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.infoField label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.infoField p {
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.loadingContainer,
+.errorContainer {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--color-text-muted);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--color-primary);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .profileHeader {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .profileTitles {
+    align-items: center;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .profileFullName {
+    font-size: 1.75rem;
+  }
+}
+
+.viewDetailBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.viewDetailBtn:hover {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+/* --- New Dashboard Premium Styles --- */
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.premiumGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.premiumCard {
+  background: white;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.premiumCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.cardTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0;
+}
+
+.cardValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.cardChange {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.changePos {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.mainDashboardGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.5rem;
+}
+
+.chartCard {
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chartTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.chartContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Status Breakdown Donut Chart (CSS implementation) */
+.donutChart {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  position: relative;
+  transition: transform 0.5s ease-out;
+}
+
+.donutHole {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.donutCenterValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.donutCenterLabel {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Horizontal Bar Chart (CSS implementation) */
+.barList {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.barItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.barLabelWrapper {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.barTrack {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 10px;
+  transition: width 1s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+
+/* Stats Badges */
+.badgeBlue {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.badgeGreen {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.badgeAmber {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.badgeRed {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.recentTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recentTable th {
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  text-transform: uppercase;
+}
+
+.recentTable td {
+  padding: 0.75rem 0.5rem;
+  font-size: 0.875rem;
+  color: #334155;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.compactStatus {
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+@media (max-width: 1280px) {
+  .premiumGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .mainDashboardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .premiumGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Quick Access Card */
+.quickAccessCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+  border: 1px solid #e2e8f0;
+  border-left: 5px solid #2563eb;
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.04);
+}
+
+.quickAccessCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.08);
+  border-color: #bfdbfe;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+}
+
+.quickAccessInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.quickAccessText h3 {
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.quickAccessText p {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0.35rem 0 0 0;
+  line-height: 1.5;
+}
+
+.quickAccessAction {
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  border-radius: 3rem;
+  background: #eff6ff;
+  transition: all 0.2s;
+}
+
+.quickAccessCard:hover .quickAccessAction {
+  background: #2563eb;
+  color: white;
 }
