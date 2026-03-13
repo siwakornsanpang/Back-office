@@ -3,7 +3,7 @@
 
 import {
   Save, Plus, Trash2, FileText, Download, UploadCloud, Edit,
-  Globe, Power, Loader2, Search, GripVertical
+  Globe, Power, Loader2, Search, GripVertical, X
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import styles from "./law.module.css";
@@ -172,6 +172,8 @@ export default function LawPage() {
     status: "online",
   });
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [removePdf, setRemovePdf] = useState(false);
+  const [existingPdfUrl, setExistingPdfUrl] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -325,6 +327,8 @@ export default function LawPage() {
       status: law.status || "online",
     });
     setPdfFile(null);
+    setRemovePdf(false);
+    setExistingPdfUrl(law.pdfUrl || null);
     setIsAdding(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -334,6 +338,8 @@ export default function LawPage() {
     setEditId(null);
     setFormData({ title: "", year: "", announcedAt: "", order: 0, status: "online" });
     setPdfFile(null);
+    setRemovePdf(false);
+    setExistingPdfUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -353,6 +359,7 @@ export default function LawPage() {
       data.append("order", formData.order.toString());
       data.append("status", formData.status);
       if (pdfFile) data.append("pdf", pdfFile);
+      if (removePdf) data.append("removePdf", "true");
 
       const url = editId ? `${API_URL}/laws/${editId}` : `${API_URL}/laws`;
       const res = await authFetch(url, { method: editId ? "PUT" : "POST", body: data });
@@ -509,33 +516,62 @@ export default function LawPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>{editId ? "เปลี่ยนไฟล์ PDF" : "แนบไฟล์ PDF *"}</label>
-                <div className={styles.fileUploadBox} onClick={() => fileInputRef.current?.click()}>
-                  <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => setPdfFile(e.target.files?.[0] || null)} />
-                  {pdfFile ? (
-                    <>
+                <label className={styles.formLabel}>{editId ? "ไฟล์ PDF" : "แนบไฟล์ PDF *"}</label>
+                {/* New file selected */}
+                {pdfFile ? (
+                  <div className={styles.fileUploadBox} onClick={() => fileInputRef.current?.click()}>
+                    <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => { setPdfFile(e.target.files?.[0] || null); setRemovePdf(false); }} />
+                    <FileText size={32} style={{ color: "#ef4444" }} />
+                    <div style={{ textAlign: "center" }}>
+                      <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>{pdfFile.name}</p>
+                      <p style={{ fontSize: "0.75rem", color: "#9ca3af" }}>{(pdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setPdfFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                      style={{ fontSize: "0.75rem", color: "#ef4444", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                    >
+                      ยกเลิกไฟล์นี้
+                    </button>
+                  </div>
+                ) : existingPdfUrl && !removePdf ? (
+                  /* Existing PDF */
+                  <div>
+                    <div className={styles.fileUploadBox} style={{ cursor: "default" }}>
                       <FileText size={32} style={{ color: "#ef4444" }} />
                       <div style={{ textAlign: "center" }}>
-                        <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>{pdfFile.name}</p>
-                        <p style={{ fontSize: "0.75rem", color: "#9ca3af" }}>{(pdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                        <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>ไฟล์ PDF ปัจจุบัน</p>
+                        <a href={existingPdfUrl} target="_blank" rel="noreferrer" style={{ fontSize: "0.75rem", color: "#3b82f6" }} onClick={(e) => e.stopPropagation()}>เปิดดูไฟล์</a>
                       </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem", justifyContent: "center" }}>
                       <button
-                        onClick={(e) => { e.stopPropagation(); setPdfFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-                        style={{ fontSize: "0.75rem", color: "#ef4444", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        style={{ fontSize: "0.8rem", color: "#3b82f6", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem" }}
                       >
-                        ยกเลิกไฟล์นี้
+                        <UploadCloud size={14} /> เปลี่ยนไฟล์
                       </button>
-                    </>
-                  ) : (
-                    <>
-                      <UploadCloud size={32} style={{ color: "#3b82f6" }} />
-                      <div>
-                        <p className={styles.fileUploadText}>คลิกเพื่อ{editId ? "เปลี่ยนไฟล์" : "อัปโหลดไฟล์"}</p>
-                        <p className={styles.fileUploadHint}>รองรับไฟล์ PDF (ไม่เกิน 10MB)</p>
-                      </div>
-                    </>
-                  )}
-                </div>
+                      <button
+                        type="button"
+                        onClick={() => { setRemovePdf(true); setExistingPdfUrl(null); }}
+                        style={{ fontSize: "0.8rem", color: "#ef4444", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem" }}
+                      >
+                        <Trash2 size={14} /> ลบไฟล์ PDF
+                      </button>
+                    </div>
+                    <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => { setPdfFile(e.target.files?.[0] || null); setRemovePdf(false); }} />
+                  </div>
+                ) : (
+                  /* No file */
+                  <div className={styles.fileUploadBox} onClick={() => fileInputRef.current?.click()}>
+                    <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => { setPdfFile(e.target.files?.[0] || null); setRemovePdf(false); }} />
+                    <UploadCloud size={32} style={{ color: "#3b82f6" }} />
+                    <div>
+                      <p className={styles.fileUploadText}>คลิกเพื่ออัปโหลดไฟล์</p>
+                      <p className={styles.fileUploadHint}>รองรับไฟล์ PDF (ไม่เกิน 10MB)</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <div className={styles.formActions}>

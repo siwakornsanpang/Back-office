@@ -234,6 +234,7 @@ export default function AgencyPage() {
       thumbnailPreview: URL.createObjectURL(croppedBlob),
       originalThumbnailPreview: imageToCrop,
     }));
+    setRemovedImages((prev) => ({ ...prev, thumbnail: false }));
     setIsCropping(false);
     setImageToCrop(null);
   };
@@ -249,12 +250,18 @@ export default function AgencyPage() {
   // ===== Simple uploads (Logo, Icon) =====
   const onSelectLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setFormData((prev) => ({ ...prev, logoFile: file, logoPreview: URL.createObjectURL(file) }));
+    if (file) {
+      setFormData((prev) => ({ ...prev, logoFile: file, logoPreview: URL.createObjectURL(file) }));
+      setRemovedImages((prev) => ({ ...prev, logo: false }));
+    }
     e.target.value = "";
   };
   const onSelectIcon = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setFormData((prev) => ({ ...prev, iconFile: file, iconPreview: URL.createObjectURL(file) }));
+    if (file) {
+      setFormData((prev) => ({ ...prev, iconFile: file, iconPreview: URL.createObjectURL(file) }));
+      setRemovedImages((prev) => ({ ...prev, icon: false }));
+    }
     e.target.value = "";
   };
 
