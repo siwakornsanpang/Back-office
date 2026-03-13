@@ -173,15 +173,17 @@
 }
 
 .btnCancel {
-    background-color: #fde7e7;
-    color: #dc2626;
+    background: white;
+    color: #4b5563;
+    border: 1px solid #9ca3af;
 }
 
 .btnCancel:hover {
-    background-color: #fec9c9;
-    color: #da1818;
+    background: #f9fafb;
+    color: #111827;
+    border-color: #6b7280;
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .btnPreview {

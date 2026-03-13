@@ -85,3 +85,171 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ============================================================
+   News Preview — Quill rich text content global overrides
+   ============================================================ */
+
+/* Reset ql-editor เฉพาะใน news preview เพื่อให้ line breaks ทำงาน */
+.news-preview-content .ql-editor {
+  padding: 0 !important;
+  white-space: normal !important;
+  word-break: break-word;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #2c2c2c;
+}
+
+/* ทำให้ <p> ว่าง และ <br> เว้นบรรทัดได้ */
+.news-preview-content .ql-editor p {
+  min-height: 1.5em;
+  margin-bottom: 0.65em;
+}
+
+.news-preview-content .ql-editor p:has(br:only-child),
+.news-preview-content .ql-editor p:empty {
+  min-height: 1.5em;
+}
+
+/* Headings */
+.news-preview-content .ql-editor h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #111;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.news-preview-content .ql-editor h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #111;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.news-preview-content .ql-editor h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #111;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.news-preview-content .ql-editor h4 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #111;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Images */
+.news-preview-content .ql-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem 0;
+  display: block;
+}
+
+.news-preview-content .ql-editor .ql-align-center img {
+  display: inline-block;
+  margin: 1rem auto;
+}
+
+/* Lists */
+.news-preview-content .ql-editor ul,
+.news-preview-content .ql-editor ol {
+  padding-left: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.news-preview-content .ql-editor li {
+  margin-bottom: 0.4rem;
+  line-height: 1.8;
+}
+
+/* Quill renders lists differently — fix bullet display */
+.news-preview-content .ql-editor ul>.ql-ui::before {
+  content: '•';
+}
+
+/* Alignment */
+.news-preview-content .ql-editor .ql-align-center {
+  text-align: center;
+}
+
+.news-preview-content .ql-editor .ql-align-right {
+  text-align: right;
+}
+
+.news-preview-content .ql-editor .ql-align-justify {
+  text-align: justify;
+}
+
+/* Blockquote */
+.news-preview-content .ql-editor blockquote {
+  border-left: 4px solid #d1d5db;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  color: #6b7280;
+  font-style: italic;
+  background: #f9fafb;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Links */
+.news-preview-content .ql-editor a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Code */
+.news-preview-content .ql-editor pre.ql-syntax {
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  white-space: pre-wrap;
+}
+
+/* Indentation */
+.news-preview-content .ql-editor .ql-indent-1 {
+  padding-left: 2em;
+}
+
+.news-preview-content .ql-editor .ql-indent-2 {
+  padding-left: 4em;
+}
+
+.news-preview-content .ql-editor .ql-indent-3 {
+  padding-left: 6em;
+}
+
+.news-preview-content .ql-editor .ql-indent-4 {
+  padding-left: 8em;
+}
+
+.news-preview-content .ql-editor .ql-indent-5 {
+  padding-left: 10em;
+}
+
+/* Video embed */
+.news-preview-content .ql-editor .ql-video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  margin: 1rem 0;
+  display: block;
+}

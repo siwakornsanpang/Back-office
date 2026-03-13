@@ -212,10 +212,9 @@ export default function NewsPreviewPage() {
                             )}
 
                             {/* Render HTML content safely with Quill styles */}
-                            <article className={`${styles.content} ql-snow`}>
+                            <article className={`${styles.content} ql-snow news-preview-content`}>
                                 <div
                                     className="ql-editor"
-                                    style={{ padding: 0 }} // Remove default quill padding to match preview layout
                                     dangerouslySetInnerHTML={{ __html: news.content }}
                                 />
                             </article>
