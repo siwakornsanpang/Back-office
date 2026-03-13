@@ -24,6 +24,7 @@ export interface NewsItem {
     isHighlight: boolean;
     thumbnailUrl?: string;
     publishedAt?: string;
+    excerpt?: string;
 }
 
 interface NewsFormProps {
@@ -53,6 +54,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
     });
     const [isHighlight, setIsHighlight] = useState(initialData?.isHighlight || false);
     const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnailUrl || '');
+    const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
 
     // --- Crop States ---
     const [isCropping, setIsCropping] = useState(false);
@@ -148,7 +150,8 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 status,
                 publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null, // ส่งเป็น ISO String หรือ null
                 isHighlight: isHighlight,
-                thumbnailUrl: thumbnailUrl || null
+                thumbnailUrl: thumbnailUrl || null,
+                excerpt: excerpt || null
             };
 
             let url = API_URL;
@@ -197,7 +200,8 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
             category !== (initialData?.category || 'news') ||
             status !== (initialData?.status || 'draft') ||
             isHighlight !== (initialData?.isHighlight || false) ||
-            thumbnailUrl !== (initialData?.thumbnailUrl || '');
+            thumbnailUrl !== (initialData?.thumbnailUrl || '') ||
+            excerpt !== (initialData?.excerpt || '');
 
         // Date comparison
         let initialDate = '';
@@ -271,6 +275,20 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                                 onChange={e => setTitle(e.target.value)}
                                 required
                                 placeholder="ระบุหัวข้อข่าว..."
+                            />
+                        </div>
+                    </div>
+
+                    {/* Excerpt Card */}
+                    <div className={styles.card}>
+                        <h3 className={styles.cardTitle}>เนื้อหาข่าวโดยย่อ</h3>
+                        <div className={styles.formGroup}>
+                            <textarea
+                                className={styles.textarea}
+                                value={excerpt}
+                                onChange={e => setExcerpt(e.target.value)}
+                                placeholder="ระบุเนื้อหาข่าวโดยย่อ..."
+                                rows={3}
                             />
                         </div>
                     </div>

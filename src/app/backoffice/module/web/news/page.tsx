@@ -22,6 +22,7 @@ interface NewsItem {
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
+  excerpt?: string;
 }
 
 interface SortConfig {
