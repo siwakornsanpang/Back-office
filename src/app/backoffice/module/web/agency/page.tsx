@@ -74,6 +74,11 @@ export default function AgencyPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+  // Track which images to remove
+  const [removedImages, setRemovedImages] = useState<{
+    thumbnail: boolean; logo: boolean; icon: boolean;
+  }>({ thumbnail: false, logo: false, icon: false });
+
   // Form
   const [formData, setFormData] = useState<{
     name: string;
@@ -171,13 +176,14 @@ export default function AgencyPage() {
 
   // ===== Modal =====
   const openModal = (item?: AgencyItem) => {
+    setRemovedImages({ thumbnail: false, logo: false, icon: false });
     if (item) {
       setEditingId(item.id);
       setFormData({
         name: item.name,
         title: item.title || "",
         description: item.description || "",
-        url: item.url,
+        url: item.url || "",
         order: item.order,
         thumbnailFile: null, originalThumbnailFile: null,
         thumbnailPreview: item.thumbnailUrl || null,
@@ -268,11 +274,15 @@ export default function AgencyPage() {
       if (formData.originalThumbnailFile) form.append("originalThumbnail", formData.originalThumbnailFile);
       if (formData.logoFile) form.append("logo", formData.logoFile);
       if (formData.iconFile) form.append("icon", formData.iconFile);
+      // Send remove flags
+      if (removedImages.thumbnail) form.append("removeThumbnail", "true");
+      if (removedImages.logo) form.append("removeLogo", "true");
+      if (removedImages.icon) form.append("removeIcon", "true");
 
-      const url = editingId ? `${API_URL}/agencies/${editingId}` : `${API_URL}/agencies`;
+      const apiUrl = editingId ? `${API_URL}/agencies/${editingId}` : `${API_URL}/agencies`;
       const method = editingId ? "PUT" : "POST";
 
-      const res = await authFetch(url, { method, body: form });
+      const res = await authFetch(apiUrl, { method, body: form });
       if (!res.ok) throw new Error("Save failed");
 
       await MySwal.fire({ icon: "success", title: "สำเร็จ", timer: 1200, showConfirmButton: false });
@@ -417,7 +427,7 @@ export default function AgencyPage() {
                         });
                       }}
                     >
-                      <FileText size={14} /> อ่านประวัติ
+                      <FileText size={14} /> อ่านรายละเอียด
                     </button>
                   ) : (
                     <span className={styles.btnReadDetailDisabled}>
@@ -571,6 +581,17 @@ export default function AgencyPage() {
                         ✂️ ครอปใหม่
                       </button>
                     )}
+                    <button
+                      type="button"
+                      className={styles.changeImageBtn}
+                      style={{ color: '#ef4444' }}
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, thumbnailPreview: null, originalThumbnailPreview: null, thumbnailFile: null, originalThumbnailFile: null }));
+                        setRemovedImages(prev => ({ ...prev, thumbnail: true }));
+                      }}
+                    >
+                      <Trash2 size={14} /> ลบ Thumbnail
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -598,6 +619,17 @@ export default function AgencyPage() {
                       <Upload size={14} /> เปลี่ยน Logo
                       <input type="file" accept="image/*" onChange={onSelectLogo} hidden />
                     </label>
+                    <button
+                      type="button"
+                      className={styles.changeImageBtn}
+                      style={{ color: '#ef4444' }}
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, logoPreview: null, logoFile: null }));
+                        setRemovedImages(prev => ({ ...prev, logo: true }));
+                      }}
+                    >
+                      <Trash2 size={14} /> ลบ Logo
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -625,6 +657,17 @@ export default function AgencyPage() {
                       <Upload size={14} /> เปลี่ยน Icon
                       <input type="file" accept="image/*" onChange={onSelectIcon} hidden />
                     </label>
+                    <button
+                      type="button"
+                      className={styles.changeImageBtn}
+                      style={{ color: '#ef4444' }}
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, iconPreview: null, iconFile: null }));
+                        setRemovedImages(prev => ({ ...prev, icon: true }));
+                      }}
+                    >
+                      <Trash2 size={14} /> ลบ Icon
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -667,11 +710,10 @@ export default function AgencyPage() {
             </div>
             <div className={styles.formRow}>
               <div className={styles.formGroup} style={{ flex: 2 }}>
-                <label className={styles.formLabel}>URL *</label>
+                <label className={styles.formLabel}>URL</label>
                 <input
-                  required
-                  type="url"
-                  placeholder="https://..."
+                  type="text"
+                  placeholder="https://... (ไม่บังคับ)"
                   className={styles.formInput}
                   value={formData.url}
                   onChange={(e) => setFormData({ ...formData, url: e.target.value })}
