@@ -1,4 +1,4 @@
-// src/app/backoffice/module/web/law/page.tsx
+// src/app/backoffice/module/council-web/law/page.tsx
 "use client";
 
 import {

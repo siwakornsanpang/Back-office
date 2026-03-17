@@ -1,4 +1,4 @@
-/* src/app/backoffice/module/web/law/law.module.css */
+/* src/app/backoffice/module/council-web/law/law.module.css */
 
 /* ===== Layout ===== */
 .wrapper {
@@ -377,8 +377,8 @@
 
 .formInput,
 .formSelect {
-  appearance: none;
   -webkit-appearance: none;
+  appearance: none;
   width: 100%;
   height: 42px;
   padding: 0 0.75rem;

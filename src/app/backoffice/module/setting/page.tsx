@@ -211,10 +211,10 @@ export default function UserManagementPage() {
                     <td>
                       {user.createdAt
                         ? new Date(user.createdAt).toLocaleDateString('th-TH', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: '2-digit',
-                          })
+                          day: 'numeric',
+                          month: 'short',
+                          year: '2-digit',
+                        })
                         : '-'}
                     </td>
                     <td style={{ textAlign: 'center' }}>

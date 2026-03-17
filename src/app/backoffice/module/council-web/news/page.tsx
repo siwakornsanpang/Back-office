@@ -245,7 +245,7 @@ export default function NewsPage() {
             <option value="draft">ฉบับร่าง</option>
           </select>
 
-          <Link href="/backoffice/module/web/news/create" className={`${styles.btn} ${styles.btnAdd}`}>
+          <Link href="/backoffice/module/council-web/news/create" className={`${styles.btn} ${styles.btnAdd}`}>
             <Plus size={18} /> เพิ่มข่าว
           </Link>
         </div>
@@ -323,10 +323,10 @@ export default function NewsPage() {
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <div className={styles.actionButtons}>
-                      <Link href={`/backoffice/module/web/news/preview/${item.id}`} className={`${styles.btn} ${styles.btnEdit}`} title="ดูตัวอย่าง">
+                      <Link href={`/backoffice/module/council-web/news/preview/${item.id}`} className={`${styles.btn} ${styles.btnEdit}`} title="ดูตัวอย่าง">
                         <Eye size={16} />
                       </Link>
-                      <Link href={`/backoffice/module/web/news/edit/${item.id}`} className={`${styles.btn} ${styles.btnEdit}`}>
+                      <Link href={`/backoffice/module/council-web/news/edit/${item.id}`} className={`${styles.btn} ${styles.btnEdit}`}>
                         <Edit size={16} />
                       </Link>
                       <button className={`${styles.btn} ${styles.btnDelete}`} onClick={() => deleteNews(item.id)}>

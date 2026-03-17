@@ -1,4 +1,4 @@
-// src/app/backoffice/module/web/about/council/page.tsx
+// src/app/backoffice/module/council-web/about/council/page.tsx
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
