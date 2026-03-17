@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { X } from 'lucide-react';
-import styles from '@/app/backoffice/module/web/about/council/council.module.css';
+import styles from '@/app/backoffice/module/council-web/about/council/council.module.css';
 
 interface ImagePreviewModalProps {
   imageUrl: string | null;

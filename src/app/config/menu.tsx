@@ -76,7 +76,15 @@ export const SIDEBAR_DATA: MenuItem[] = [
     ]
   },
   { id: 'council-web-news', title: 'ข่าวประชาสัมพันธ์', href: '/backoffice/module/council-web/news', icon: <Megaphone size={20} />, permission: 'manage_news' },
-  { id: 'council-web-service', title: 'บริการ', href: '/backoffice/module/council-web/service', icon: <LayoutGrid size={20} />, permission: 'manage_service' },
+  { id: 'council-web-service', title: 'บริการ',
+    icon: <LayoutGrid size={20} />, permission: 'manage_service' ,
+     submenu: [
+      { id: 'council-web-service-medicine', title: 'ความรู้เรื่องยา', href: '/backoffice/module/council-web/service/medicine', },
+      { id: 'council-web-service-people', title: 'โครงการของประชาชน', href: '/backoffice/module/council-web/service/people', },
+      { id: 'council-web-service-e-service', title: 'E-service', href: '/backoffice/module/council-web/service/service-e', },
+      
+    ]
+  },
 
   {
     id: 'council-web-agency', title: 'หน่วยงาน', icon: <Landmark size={20} />,

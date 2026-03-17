@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
 import CrudModal from '@/app/components/ui/CrudModal';
 import styles from './permissions.module.css';
-import councilStyles from '@/app/backoffice/module/web/about/council/council.module.css';
+import councilStyles from '@/app/backoffice/module/council-web/about/council/council.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

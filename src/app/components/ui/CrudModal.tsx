@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import styles from '@/app/backoffice/module/web/about/council/council.module.css';
+import styles from '@/app/backoffice/module/council-web/about/council/council.module.css';
 
 interface CrudModalProps {
   isOpen: boolean;
