@@ -10,6 +10,7 @@ import styles from "./law.module.css";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { authFetch } from "@/app/utils/authFetch";
+import CrudModal from "@/app/components/ui/CrudModal";
 
 import {
   DndContext,
@@ -344,7 +345,8 @@ export default function LawPage() {
   };
 
   // ===== Save =====
-  const handleSave = async () => {
+  const handleSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!formData.title) return MySwal.fire({ icon: "warning", title: "ข้อมูลไม่ครบ", text: "กรุณากรอกชื่อกฎหมาย" });
     if (!editId && !pdfFile) return MySwal.fire({ icon: "warning", title: "ข้อมูลไม่ครบ", text: "กรุณาแนบไฟล์ PDF" });
 
@@ -451,135 +453,128 @@ export default function LawPage() {
         )}
       </div>
 
-      {/* Add/Edit Form */}
+      {/* Add/Edit Form Mode Modal */}
       {isAdding && (
-        <div className={styles.formCard}>
-          <div className={styles.formHeader}>
-            <h3 className={styles.formTitle}>{editId ? "แก้ไขข้อมูล" : "เพิ่มข้อมูลใหม่"}</h3>
+        <CrudModal
+          isOpen={isAdding}
+          onClose={handleCancel}
+          onSubmit={handleSave}
+          title={editId ? "แก้ไขข้อมูล" : "เพิ่มข้อมูลใหม่"}
+        >
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>สถานะการแสดงผล</label>
+            <select
+              className={styles.formSelect}
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+            >
+              <option value="online">🟢 แสดงผล (Online)</option>
+              <option value="offline">⚪️ ซ่อน (Offline)</option>
+            </select>
           </div>
-          <div className={styles.formBody}>
-            <div className={styles.formGrid}>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>ชื่อกฎหมาย <span className={styles.required}>*</span></label>
+            <input
+              required
+              type="text"
+              className={styles.formInput}
+              placeholder="ระบุชื่อกฎหมาย..."
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            />
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup} style={{ flex: 1 }}>
+              <label className={styles.formLabel}>ลำดับ</label>
+              <input
+                type="number"
+                className={styles.formInput}
+                value={formData.order}
+                onChange={(e) => setFormData({ ...formData, order: e.target.value === "" ? "" : parseInt(e.target.value) })}
+              />
+            </div>
+            <div className={styles.formGroup} style={{ flex: 1 }}>
+              <label className={styles.formLabel}>ปี พ.ศ.</label>
+              <input
+                type="number"
+                className={styles.formInput}
+                placeholder="เช่น 2569"
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: e.target.value === "" ? "" : parseInt(e.target.value) })}
+              />
+            </div>
+            <div className={styles.formGroup} style={{ flex: 1 }}>
+              <label className={styles.formLabel}>วันที่ประกาศ</label>
+              <input
+                type="date"
+                className={styles.formInput}
+                value={formData.announcedAt}
+                onChange={(e) => setFormData({ ...formData, announcedAt: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>{editId ? "ไฟล์ PDF" : "แนบไฟล์ PDF *"}</label>
+            {/* New file selected */}
+            {pdfFile ? (
+              <div className={styles.fileUploadBox} onClick={() => fileInputRef.current?.click()}>
+                <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => { setPdfFile(e.target.files?.[0] || null); setRemovePdf(false); }} />
+                <FileText size={32} style={{ color: "#ef4444" }} />
+                <div style={{ textAlign: "center" }}>
+                  <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>{pdfFile.name}</p>
+                  <p style={{ fontSize: "0.75rem", color: "#9ca3af" }}>{(pdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setPdfFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                  style={{ fontSize: "0.75rem", color: "#ef4444", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                >
+                  ยกเลิกไฟล์นี้
+                </button>
+              </div>
+            ) : existingPdfUrl && !removePdf ? (
+              /* Existing PDF */
               <div>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>สถานะการแสดงผล</label>
-                  <select
-                    className={styles.formSelect}
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                <div className={styles.fileUploadBox} style={{ cursor: "default" }}>
+                  <FileText size={32} style={{ color: "#ef4444" }} />
+                  <div style={{ textAlign: "center" }}>
+                    <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>ไฟล์ PDF ปัจจุบัน</p>
+                    <a href={existingPdfUrl} target="_blank" rel="noreferrer" style={{ fontSize: "0.75rem", color: "#3b82f6" }} onClick={(e) => e.stopPropagation()}>เปิดดูไฟล์</a>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem", justifyContent: "center" }}>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{ fontSize: "0.8rem", color: "#3b82f6", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem" }}
                   >
-                    <option value="online">🟢 แสดงผล (Online)</option>
-                    <option value="offline">⚪️ ซ่อน (Offline)</option>
-                  </select>
+                    <UploadCloud size={14} /> เปลี่ยนไฟล์
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setRemovePdf(true); setExistingPdfUrl(null); }}
+                    style={{ fontSize: "0.8rem", color: "#ef4444", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem" }}
+                  >
+                    <Trash2 size={14} /> ลบไฟล์ PDF
+                  </button>
                 </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>ชื่อกฎหมาย <span className={styles.required}>*</span></label>
-                  <input
-                    type="text"
-                    className={styles.formInput}
-                    placeholder="ระบุชื่อกฎหมาย..."
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  />
-                </div>
-
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup} style={{ flex: 1 }}>
-                    <label className={styles.formLabel}>ปี พ.ศ.</label>
-                    <input
-                      type="number"
-                      className={styles.formInput}
-                      placeholder="เช่น 2569"
-                      value={formData.year}
-                      onChange={(e) => setFormData({ ...formData, year: e.target.value === "" ? "" : parseInt(e.target.value) })}
-                    />
-                  </div>
-                  <div className={styles.formGroup} style={{ flex: 1 }}>
-                    <label className={styles.formLabel}>วันที่ประกาศ</label>
-                    <input
-                      type="date"
-                      className={styles.formInput}
-                      value={formData.announcedAt}
-                      onChange={(e) => setFormData({ ...formData, announcedAt: e.target.value })}
-                    />
-                  </div>
-                  <div className={styles.formGroup} style={{ flex: 1 }}>
-                    <label className={styles.formLabel}>ลำดับ</label>
-                    <input
-                      type="number"
-                      className={styles.formInput}
-                      value={formData.order}
-                      onChange={(e) => setFormData({ ...formData, order: e.target.value === "" ? "" : parseInt(e.target.value) })}
-                    />
-                  </div>
+                <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => { setPdfFile(e.target.files?.[0] || null); setRemovePdf(false); }} />
+              </div>
+            ) : (
+              /* No file */
+              <div className={styles.fileUploadBox} onClick={() => fileInputRef.current?.click()}>
+                <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => { setPdfFile(e.target.files?.[0] || null); setRemovePdf(false); }} />
+                <UploadCloud size={32} style={{ color: "#3b82f6" }} />
+                <div>
+                  <p className={styles.fileUploadText}>คลิกเพื่ออัปโหลดไฟล์</p>
+                  <p className={styles.fileUploadHint}>รองรับไฟล์ PDF (ไม่เกิน 10MB)</p>
                 </div>
               </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>{editId ? "ไฟล์ PDF" : "แนบไฟล์ PDF *"}</label>
-                {/* New file selected */}
-                {pdfFile ? (
-                  <div className={styles.fileUploadBox} onClick={() => fileInputRef.current?.click()}>
-                    <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => { setPdfFile(e.target.files?.[0] || null); setRemovePdf(false); }} />
-                    <FileText size={32} style={{ color: "#ef4444" }} />
-                    <div style={{ textAlign: "center" }}>
-                      <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>{pdfFile.name}</p>
-                      <p style={{ fontSize: "0.75rem", color: "#9ca3af" }}>{(pdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                    </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setPdfFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-                      style={{ fontSize: "0.75rem", color: "#ef4444", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
-                    >
-                      ยกเลิกไฟล์นี้
-                    </button>
-                  </div>
-                ) : existingPdfUrl && !removePdf ? (
-                  /* Existing PDF */
-                  <div>
-                    <div className={styles.fileUploadBox} style={{ cursor: "default" }}>
-                      <FileText size={32} style={{ color: "#ef4444" }} />
-                      <div style={{ textAlign: "center" }}>
-                        <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>ไฟล์ PDF ปัจจุบัน</p>
-                        <a href={existingPdfUrl} target="_blank" rel="noreferrer" style={{ fontSize: "0.75rem", color: "#3b82f6" }} onClick={(e) => e.stopPropagation()}>เปิดดูไฟล์</a>
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem", justifyContent: "center" }}>
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        style={{ fontSize: "0.8rem", color: "#3b82f6", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem" }}
-                      >
-                        <UploadCloud size={14} /> เปลี่ยนไฟล์
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { setRemovePdf(true); setExistingPdfUrl(null); }}
-                        style={{ fontSize: "0.8rem", color: "#ef4444", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem" }}
-                      >
-                        <Trash2 size={14} /> ลบไฟล์ PDF
-                      </button>
-                    </div>
-                    <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => { setPdfFile(e.target.files?.[0] || null); setRemovePdf(false); }} />
-                  </div>
-                ) : (
-                  /* No file */
-                  <div className={styles.fileUploadBox} onClick={() => fileInputRef.current?.click()}>
-                    <input type="file" hidden ref={fileInputRef} accept="application/pdf" onChange={(e) => { setPdfFile(e.target.files?.[0] || null); setRemovePdf(false); }} />
-                    <UploadCloud size={32} style={{ color: "#3b82f6" }} />
-                    <div>
-                      <p className={styles.fileUploadText}>คลิกเพื่ออัปโหลดไฟล์</p>
-                      <p className={styles.fileUploadHint}>รองรับไฟล์ PDF (ไม่เกิน 10MB)</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className={styles.formActions}>
-              <button onClick={handleCancel} className={styles.cancelBtn}>ยกเลิก</button>
-              <button onClick={handleSave} className={styles.saveBtn}><Save size={18} /> บันทึกข้อมูล</button>
-            </div>
+            )}
           </div>
-        </div>
+        </CrudModal>
       )}
 
       {/* Table */}
