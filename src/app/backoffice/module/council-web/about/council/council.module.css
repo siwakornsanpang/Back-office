@@ -1,4 +1,4 @@
-/* src/app/backoffice/module/web/about/council/page.module.css */
+/* src/app/backoffice/module/council-web/about/council/council.module.css */
 
 /* --- Layout & Text --- */
 .container {
@@ -243,6 +243,7 @@
   inset: 0;
   z-index: 1050; /* 🔥 เพิ่มค่านี้ให้สูงๆ (สูงกว่า Header หรือ Table) */
   background-color: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -440,6 +441,7 @@
   color: white;
   opacity: 0;
   transition: opacity 0.2s;
+  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
 }
 .imageUploadLabel:hover .uploadOverlay {
@@ -465,6 +467,7 @@
   inset: 0;
   z-index: 9999; /* ให้สูงที่สุด ทับทุกอย่าง (แก้จาก 999 เป็น 9999 เพื่อทับ Header) */
   background-color: rgba(0, 0, 0, 0.85); /* พื้นหลังดำโปร่งแสง */
+  -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px); /* เบลอฉากหลัง */
   display: flex;
   align-items: center;
@@ -550,7 +553,8 @@
     color: white;
     opacity: 0; /* ซ่อนไว้ก่อน */
     transition: opacity 0.2s;
-    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
 }
 
 /* พอเอาเมาส์ชี้ที่รูป -> ให้โชว์แว่นขยาย */
@@ -724,6 +728,7 @@
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 2rem;
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
 

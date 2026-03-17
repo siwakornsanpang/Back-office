@@ -182,7 +182,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
                 timer: 1500
             });
 
-            router.push('/backoffice/module/web/news');
+            router.push('/backoffice/module/council-web/news');
             router.refresh();
 
         } catch (err: any) {

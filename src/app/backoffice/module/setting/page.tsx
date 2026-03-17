@@ -7,7 +7,7 @@ import { authFetch } from '@/app/utils/authFetch';
 import RoleBadge from '@/app/components/ui/RoleBadge';
 import CrudModal from '@/app/components/ui/CrudModal';
 import styles from './users.module.css';
-import councilStyles from '@/app/backoffice/module/web/about/council/council.module.css';
+import councilStyles from '@/app/backoffice/module/council-web/about/council/council.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -211,10 +211,10 @@ export default function UserManagementPage() {
                     <td>
                       {user.createdAt
                         ? new Date(user.createdAt).toLocaleDateString('th-TH', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: '2-digit',
-                          })
+                          day: 'numeric',
+                          month: 'short',
+                          year: '2-digit',
+                        })
                         : '-'}
                     </td>
                     <td style={{ textAlign: 'center' }}>
