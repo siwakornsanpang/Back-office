@@ -322,6 +322,13 @@
     border-color: #fed7aa;
 }
 
+/* Medicine category badge */
+.badge[data-category="medicine"] {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
 /* Sortable Table Columns */
 .thSortable {
     cursor: pointer;
