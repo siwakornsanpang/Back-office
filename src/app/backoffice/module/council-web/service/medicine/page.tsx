@@ -235,7 +235,7 @@ export default function MedicinePage() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th style={{ width: '80px', textAlign: 'center' }}>ภาพปก</th>
+              <th style={{ width: '100px', textAlign: 'center' }}>ภาพปก</th>
               <th className={styles.thSortable} onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
                 <div className="flex items-center gap-1">หัวข้อ {getSortIcon('title')}</div>
               </th>
