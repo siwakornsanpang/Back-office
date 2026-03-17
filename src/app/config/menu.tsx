@@ -57,41 +57,49 @@ export function filterMenuByPermission(items: MenuItem[], userPermissions: strin
 export const SIDEBAR_DATA: MenuItem[] = [
   // --- หน้าเว็บ ---
   {
-    id: 'header-web',
-    title: 'หน้าเว็บ',
+    id: 'header-council-web',
+    title: 'เว็บไซต์สภา',
     isHeader: true,
     permission: 'manage_home',
   },
 
-  { id: 'web-home', title: 'จัดการหน้าแรก', href: '/backoffice/module/web/home', icon: <LayoutDashboard size={20} />, permission: 'manage_home' },
+  { id: 'council-web-home', title: 'จัดการหน้าแรก', href: '/backoffice/module/council-web/home', icon: <LayoutDashboard size={20} />, permission: 'manage_home' },
   {
-    id: 'web-about',
+    id: 'council-web-about',
     title: 'เกี่ยวกับองค์กร',
     icon: <Building2 size={20} />,
     permission: 'manage_about',
     submenu: [
-      { id: 'web-about-history', title: 'ทำเนียบสภา', href: '/backoffice/module/web/about/history',  },
-      { id: 'web-about-board', title: 'กรรมการสภา', href: '/backoffice/module/web/about/council', },
-      { id: 'web-about-honor', title: 'เกียรติประวัติ', href: '/backoffice/module/web/about/honor',  },
+      { id: 'council-web-about-history', title: 'ทำเนียบสภา', href: '/backoffice/module/council-web/about/history', },
+      { id: 'council-web-about-board', title: 'กรรมการสภา', href: '/backoffice/module/council-web/about/council', },
+      { id: 'council-web-about-honor', title: 'เกียรติประวัติ', href: '/backoffice/module/council-web/about/honor', },
     ]
   },
-  { id: 'web-news', title: 'ข่าวประชาสัมพันธ์', href: '/backoffice/module/web/news', icon: <Megaphone size={20} />, permission: 'manage_news' },
-  { id: 'web-service', title: 'บริการ', href: '/backoffice/module/web/service', icon: <LayoutGrid size={20} />, permission: 'manage_service' },
+  { id: 'council-web-news', title: 'ข่าวประชาสัมพันธ์', href: '/backoffice/module/council-web/news', icon: <Megaphone size={20} />, permission: 'manage_news' },
+  { id: 'council-web-service', title: 'บริการ', href: '/backoffice/module/council-web/service', icon: <LayoutGrid size={20} />, permission: 'manage_service' },
 
-  { id: 'web-agency', title: 'หน่วยงาน', icon: <Landmark size={20} />,
+  {
+    id: 'council-web-agency', title: 'หน่วยงาน', icon: <Landmark size={20} />,
     permission: 'manage_agency',
-    href: '/backoffice/module/web/agency',
+    href: '/backoffice/module/council-web/agency',
   },
 
   {
-    id: 'web-law',
+    id: 'council-web-law',
     title: 'กฎหมาย',
     icon: <Scale size={20} />,
     permission: 'manage_law',
-    href: '/backoffice/module/web/law',
+    href: '/backoffice/module/council-web/law',
   },
 
-  { id: 'web-setting', title: 'ตั้งค่าเว็บไซต์', href: '/backoffice/module/web/setting', icon: <Settings size={20} />, permission: 'manage_web_settings' },
+  { id: 'council-web-setting', title: 'ตั้งค่าเว็บไซต์', href: '/backoffice/module/council-web/setting', icon: <Settings size={20} />, permission: 'manage_web_settings' },
+
+  {
+    id: 'header-pharmacist-web',
+    title: 'เว็บไซต์เภสัชกร',
+    isHeader: true,
+    permission: 'manage_home',
+  },
 
   // --- ทะเบียนเภสัช ---
   {

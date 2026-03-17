@@ -26,21 +26,21 @@ const BUILT_IN_ROLES: Record<string, RoleConfig> = {
     labelTh: 'ผู้แก้ไข',
     color: '#f59e0b',
     bg: '#fffbeb',
-    defaultPage: '/backoffice/module/web/home',
+    defaultPage: '/backoffice/module/council-web/home',
   },
   web_editor: {
     label: 'Web Editor',
-    labelTh: 'ผู้จัดการเว็บ',
+    labelTh: 'ผู้จัดการเว็บไซต์สภา',
     color: '#3b82f6',
     bg: '#eff6ff',
-    defaultPage: '/backoffice/module/web/home',
+    defaultPage: '/backoffice/module/council-web/home',
   },
   viewer: {
     label: 'Viewer',
     labelTh: 'ผู้ดู',
     color: '#6b7280',
     bg: '#f9fafb',
-    defaultPage: '/backoffice/module/web/home',
+    defaultPage: '/backoffice/module/council-web/home',
   },
 };
 

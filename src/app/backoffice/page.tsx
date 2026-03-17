@@ -50,7 +50,7 @@ const QUICK_ACTIONS = [
   {
     id: 1,
     label: "เพิ่มข่าวใหม่",
-    href: "/backoffice/module/web/news",
+    href: "/backoffice/module/council-web/news",
     icon: PlusCircle,
     iconClass: "actionIconBlue",
   },
@@ -264,7 +264,7 @@ export default function Dashboard() {
                     ))}
                   </tbody>
                 </table>
-                <Link href="/backoffice/module/web/news" className={styles.viewAllLink}>ดูทั้งหมด →</Link>
+                <Link href="/backoffice/module/council-web/news" className={styles.viewAllLink}>ดูทั้งหมด →</Link>
               </>
             ) : (
               <div style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>ไม่พบข้อมูลข่าว</div>
