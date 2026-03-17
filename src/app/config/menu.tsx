@@ -81,7 +81,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
      submenu: [
       { id: 'council-web-service-medicine', title: 'ความรู้เรื่องยา', href: '/backoffice/module/council-web/service/medicine', },
       { id: 'council-web-service-public-project', title: 'โครงการของประชาชน', href: '/backoffice/module/council-web/service/public-project', },
-      { id: 'council-web-service-Eservice', title: 'E-service', href: '/backoffice/module/council-web/service/service-e', },
+      { id: 'council-web-service-Eservice', title: 'E-service', href: '/backoffice/module/council-web/service/e-service', },
       
     ]
   },
