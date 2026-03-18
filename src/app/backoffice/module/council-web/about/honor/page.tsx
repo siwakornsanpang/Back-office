@@ -6,46 +6,31 @@ import {
   Edit,
   Trash2,
   Plus,
-  User,
-  Upload,
-  UploadCloud,
-  X,
-  ZoomIn,
-  ZoomOut,
   Search,
-  FileText,
-  Crop,
   GripVertical,
-  Video,
-  Play,
+  ChevronRight,
+  Award,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import styles from "./honor.module.css";
 import { authFetch } from "@/app/utils/authFetch";
-import ImagePreviewModal from "@/app/components/ui/ImagePreviewModal";
 import CrudModal from "@/app/components/ui/CrudModal";
-import Cropper from "react-easy-crop";
-import getCroppedImg from "../../../../../components/editor/cropImage";
+import Link from "next/link";
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-interface HonorItem {
+interface HonorAward {
   id: number;
   order: number;
-  prefix?: string | null;
   name: string;
-  awardName: string;
-  workName?: string | null;
-  awardDetail?: string | null;
-  imageUrl: string | null;
-  originalImageUrl?: string | null;
-  videoUrl?: string | null;
+  description: string | null;
+  recipientCount: number;
 }
 
-export default function HonorPage() {
-  const [items, setItems] = useState<HonorItem[]>([]);
+export default function HonorAwardsPage() {
+  const [awards, setAwards] = useState<HonorAward[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -56,117 +41,53 @@ export default function HonorPage() {
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
 
-  // Modals
+  // Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [previewVideo, setPreviewVideo] = useState<string | null>(null);
-  const [viewingDetail, setViewingDetail] = useState<{
-    name: string;
-    text: string;
-  } | null>(null);
+  const [formData, setFormData] = useState({ name: "", description: "" });
 
-  // Form
-  const [formData, setFormData] = useState<{
-    prefix: string;
-    name: string;
-    awardName: string;
-    workName: string;
-    awardDetail: string;
-    order: number | string;
-    file: File | null;
-    originalFile: File | null;
-    preview: string | null;
-    originalPreview: string | null;
-    videoFile: File | null;
-    videoPreview: string | null;
-    existingVideoUrl: string | null;
-    removeVideo: boolean;
-  }>({
-    prefix: "",
-    name: "",
-    awardName: "",
-    workName: "",
-    awardDetail: "",
-    order: 1,
-    file: null,
-    originalFile: null,
-    preview: null,
-    originalPreview: null,
-    videoFile: null,
-    videoPreview: null,
-    existingVideoUrl: null,
-    removeVideo: false,
-  });
-
-  // Crop
-  const [isCropping, setIsCropping] = useState(false);
-  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
-
-  const onCropComplete = (_: any, pixels: any) => setCroppedAreaPixels(pixels);
-
-  const handleConfirmCrop = async () => {
-    if (!imageToCrop || !croppedAreaPixels) return;
+  const fetchAwards = async () => {
     try {
-      const croppedFile = await getCroppedImg(
-        imageToCrop,
-        croppedAreaPixels,
-        `honor-${Date.now()}.jpg`
-      );
-      if (!croppedFile) throw new Error("Crop failed");
-      const croppedUrl = URL.createObjectURL(croppedFile);
-      setFormData((prev) => ({
-        ...prev,
-        preview: croppedUrl,
-        file: croppedFile,
-      }));
-      setIsCropping(false);
-      setImageToCrop(null);
-    } catch (e) {
-      console.error(e);
-      Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถตัดรูปภาพได้", "error");
+      const res = await authFetch(`${API_URL}/honor-awards`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setAwards(data);
+      } else {
+        setAwards([]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const onSelectImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const imageUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({
-        ...prev,
-        originalPreview: imageUrl,
-        originalFile: file,
-      }));
-      setImageToCrop(imageUrl);
-      setIsCropping(true);
-      setCrop({ x: 0, y: 0 });
-      setZoom(1);
-      e.target.value = "";
-    }
-  };
+  useEffect(() => {
+    fetchAwards();
+  }, []);
 
-  const onSelectVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const videoUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({
-        ...prev,
-        videoFile: file,
-        videoPreview: videoUrl,
-        existingVideoUrl: null,
-      }));
-      e.target.value = "";
-    }
-  };
+  const filteredItems = useMemo(() => {
+    return awards
+      .filter((item) => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          item.name.toLowerCase().includes(searchLower) ||
+          (item.description || "").toLowerCase().includes(searchLower)
+        );
+      })
+      .sort((a, b) => {
+        if (sortDirection === "asc") return a.order - b.order;
+        return b.order - a.order;
+      });
+  }, [awards, searchTerm, sortDirection]);
 
-  // Drag and drop handlers
-  const handleDragStart = (
-    e: React.DragEvent<HTMLTableRowElement>,
-    index: number
-  ) => {
+  const handleSort = () => {
+    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+  };
+  const getSortIcon = () => (sortDirection === "asc" ? "↑" : "↓");
+
+  // Drag handlers
+  const handleDragStart = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
     dragItem.current = index;
     e.dataTransfer.effectAllowed = "move";
     setTimeout(() => {
@@ -174,10 +95,7 @@ export default function HonorPage() {
     }, 0);
   };
 
-  const handleDragEnter = (
-    e: React.DragEvent<HTMLTableRowElement>,
-    index: number
-  ) => {
+  const handleDragEnter = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
     e.preventDefault();
     if (sortDirection !== "asc") return;
     dragOverItem.current = index;
@@ -212,13 +130,13 @@ export default function HonorPage() {
       order: index + 1,
     }));
 
-    const newItems = items.map((m) => {
+    const newItems = awards.map((m) => {
       const payloadMatch = payload.find((p) => p.id === m.id);
       if (payloadMatch) return { ...m, order: payloadMatch.order };
       return m;
     });
 
-    setItems(newItems);
+    setAwards(newItems);
     dragItem.current = null;
     dragOverItem.current = null;
 
@@ -228,140 +146,57 @@ export default function HonorPage() {
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
-      const res = await authFetch(`${API_URL}/honor/reorder`, {
+      const res = await authFetch(`${API_URL}/honor-awards/reorder`, {
         method: "PUT",
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
       MySwal.close();
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 1200,
-      });
+      const Toast = Swal.mixin({ toast: true, position: "top-end", showConfirmButton: false, timer: 1200 });
       Toast.fire({ icon: "success", title: "จัดเรียงสำเร็จ" });
     } catch (err) {
       console.error(err);
       MySwal.fire("Error", "เกิดข้อผิดพลาดในการบันทึกลำดับ", "error");
-      fetchItems();
+      fetchAwards();
     }
   };
 
-  const fetchItems = async () => {
-    try {
-      const res = await authFetch(`${API_URL}/honor`);
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setItems(data);
-      } else {
-        setItems([]);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
-  const filteredItems = useMemo(() => {
-    return items
-      .filter((item) => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-          item.name.toLowerCase().includes(searchLower) ||
-          item.awardName.toLowerCase().includes(searchLower) ||
-          (item.workName || "").toLowerCase().includes(searchLower)
-        );
-      })
-      .sort((a, b) => {
-        if (sortDirection === "asc") return a.order - b.order;
-        return b.order - a.order;
-      });
-  }, [items, searchTerm, sortDirection]);
-
-  const handleSort = () => {
-    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-  };
-  const getSortIcon = () => (sortDirection === "asc" ? "↑" : "↓");
-
-  const openModal = (item?: HonorItem) => {
+  const openModal = (item?: HonorAward) => {
     if (item) {
       setEditingId(item.id);
-      setFormData({
-        prefix: item.prefix || "",
-        name: item.name,
-        awardName: item.awardName,
-        workName: item.workName || "",
-        awardDetail: item.awardDetail || "",
-        order: item.order,
-        file: null,
-        originalFile: null,
-        preview: item.imageUrl || null,
-        originalPreview: item.originalImageUrl || item.imageUrl || null,
-        videoFile: null,
-        videoPreview: null,
-        existingVideoUrl: item.videoUrl || null,
-        removeVideo: false,
-      });
+      setFormData({ name: item.name, description: item.description || "" });
     } else {
       setEditingId(null);
-      const maxOrder =
-        items.length > 0 ? Math.max(...items.map((m) => m.order)) : 0;
-      setFormData({
-        prefix: "",
-        name: "",
-        awardName: "",
-        workName: "",
-        awardDetail: "",
-        order: maxOrder + 1,
-        file: null,
-        originalFile: null,
-        preview: null,
-        originalPreview: null,
-        videoFile: null,
-        videoPreview: null,
-        existingVideoUrl: null,
-        removeVideo: false,
-      });
+      setFormData({ name: "", description: "" });
     }
     setIsModalOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    MySwal.fire({
-      title: "กำลังบันทึก...",
-      didOpen: () => Swal.showLoading(),
-    });
-    try {
-      const form = new FormData();
-      form.append("prefix", formData.prefix);
-      form.append("name", formData.name);
-      form.append("awardName", formData.awardName);
-      form.append("workName", formData.workName);
-      form.append("awardDetail", formData.awardDetail);
-      form.append("order", formData.order.toString());
-      if (formData.file) form.append("image", formData.file);
-      if (formData.originalFile)
-        form.append("originalImage", formData.originalFile);
-      if (formData.videoFile) form.append("video", formData.videoFile);
-      if (formData.removeVideo) form.append("removeVideo", "true");
+    if (!formData.name.trim()) {
+      Swal.fire("กรุณากรอกชื่อรางวัล", "", "warning");
+      return;
+    }
 
+    MySwal.fire({ title: "กำลังบันทึก...", didOpen: () => Swal.showLoading() });
+    try {
       const url = editingId
-        ? `${API_URL}/honor/${editingId}`
-        : `${API_URL}/honor`;
+        ? `${API_URL}/honor-awards/${editingId}`
+        : `${API_URL}/honor-awards`;
       const method = editingId ? "PUT" : "POST";
 
-      const res = await authFetch(url, { method, body: form });
+      const res = await authFetch(url, {
+        method,
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description,
+        }),
+      });
       if (res.ok) {
         await MySwal.fire("สำเร็จ", "บันทึกข้อมูลเรียบร้อย", "success");
         setIsModalOpen(false);
-        fetchItems();
+        fetchAwards();
       } else {
         throw new Error();
       }
@@ -372,17 +207,18 @@ export default function HonorPage() {
 
   const handleDelete = async (id: number) => {
     const confirm = await MySwal.fire({
-      title: "ยืนยันการลบ?",
-      text: "ข้อมูลจะถูกลบถาวร",
+      title: "ยืนยันการลบรางวัล?",
+      text: "ข้อมูลรางวัลและผู้ได้รับรางวัลทั้งหมดจะถูกลบถาวร",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#ef4444",
-      confirmButtonText: "ลบข้อมูล",
+      confirmButtonText: "ลบรางวัล",
+      cancelButtonText: "ยกเลิก",
     });
 
     if (confirm.isConfirmed) {
-      await authFetch(`${API_URL}/honor/${id}`, { method: "DELETE" });
-      fetchItems();
+      await authFetch(`${API_URL}/honor-awards/${id}`, { method: "DELETE" });
+      fetchAwards();
       MySwal.fire("ลบสำเร็จ", "", "success");
     }
   };
@@ -391,9 +227,9 @@ export default function HonorPage() {
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>จัดการข้อมูลเกียรติประวัติ</h1>
+          <h1 className={styles.title}>จัดการรางวัลเกียรติประวัติ</h1>
           <p className={styles.subtitle}>
-            รวมรายชื่อเภสัชกรผู้ได้รับรางวัลเกียรติประวัติ
+            เพิ่มรางวัล แล้วกดเข้าไปเพื่อจัดการรายชื่อผู้ได้รับรางวัล
           </p>
         </div>
       </div>
@@ -404,14 +240,14 @@ export default function HonorPage() {
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="ค้นหาชื่อ, รางวัล, ผลงาน..."
+            placeholder="ค้นหารางวัล..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
         <button onClick={() => openModal()} className={styles.btnAdd}>
-          <Plus size={20} /> เพิ่มข้อมูลใหม่
+          <Plus size={20} /> เพิ่มรางวัลใหม่
         </button>
       </div>
 
@@ -429,27 +265,21 @@ export default function HonorPage() {
                     {getSortIcon()}
                   </span>
                 </th>
-                <th className={`${styles.tableTh} text-center w-24`}>
-                  รูปภาพ
-                </th>
-                <th className={`${styles.tableTh} w-24`}>คำนำหน้าชื่อ</th>
-                <th className={styles.tableTh}>ชื่อ-นามสกุล</th>
                 <th className={styles.tableTh}>ชื่อรางวัล</th>
-                <th className={styles.tableTh}>ชื่อผลงาน</th>
-                <th className={`${styles.tableTh} text-center`}>
-                  รายละเอียด
+                <th className={styles.tableTh}>คำอธิบาย</th>
+                <th className={`${styles.tableTh} text-center w-32`}>
+                  จำนวนผู้ได้รับ
                 </th>
-                <th className={`${styles.tableTh} text-center`}>วิดีโอ</th>
                 <th className={`${styles.tableTh} text-center w-32`}>
                   จัดการ
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {items.length === 0 && !isLoading ? (
+              {awards.length === 0 && !isLoading ? (
                 <tr>
-                  <td colSpan={9} className="p-8 text-center text-gray-400">
-                    ยังไม่มีข้อมูล
+                  <td colSpan={5} className="p-8 text-center text-gray-400">
+                    ยังไม่มีรางวัล กดปุ่ม &quot;เพิ่มรางวัลใหม่&quot; เพื่อเริ่มต้น
                   </td>
                 </tr>
               ) : (
@@ -463,7 +293,7 @@ export default function HonorPage() {
                     onDragOver={handleDragOver}
                     onDragEnd={handleDragEnd}
                   >
-                    {/* 1. ลำดับ */}
+                    {/* ลำดับ */}
                     <td className={`${styles.tableTd} text-center`}>
                       <div className="flex items-center justify-center gap-2">
                         {sortDirection === "asc" && (
@@ -476,109 +306,35 @@ export default function HonorPage() {
                       </div>
                     </td>
 
-                    {/* 2. รูปภาพ */}
-                    <td className={styles.tableTd}>
-                      <div className={styles.imageCell}>
-                        <div
-                          className={`${styles.avatarContainer} ${item.imageUrl ? styles.clickableAvatar : ""}`}
-                          onClick={() => {
-                            if (item.imageUrl) setPreviewImage(item.imageUrl);
-                          }}
-                        >
-                          {item.imageUrl ? (
-                            <>
-                              <img
-                                src={item.imageUrl}
-                                alt={item.name}
-                                className={styles.avatarImg}
-                              />
-                              <div className={styles.zoomOverlay}>
-                                <ZoomIn size={16} />
-                              </div>
-                            </>
-                          ) : (
-                            <User
-                              size={20}
-                              className={styles.avatarPlaceholder}
-                            />
-                          )}
-                        </div>
-                        {item.imageUrl && (
-                          <span
-                            className={styles.viewImageLabel}
-                            onClick={() => setPreviewImage(item.imageUrl!)}
-                          >
-                            <ZoomIn size={12} /> ดูภาพเต็ม
-                          </span>
-                        )}
-                      </div>
+                    {/* ชื่อรางวัล (clickable link) */}
+                    <td className={`${styles.tableTd} font-medium`}>
+                      <Link
+                        href={`/backoffice/module/council-web/about/honor/${item.id}`}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <Award size={18} />
+                        {item.name}
+                        <ChevronRight size={16} className="text-gray-400" />
+                      </Link>
                     </td>
 
-                    {/* 3. คำนำหน้าชื่อ */}
+                    {/* คำอธิบาย */}
                     <td className={`${styles.tableTd} text-gray-600`}>
-                      {item.prefix || "-"}
+                      {item.description || "-"}
                     </td>
 
-                    {/* 4. ชื่อ */}
-                    <td
-                      className={`${styles.tableTd} font-medium text-gray-900`}
-                    >
-                      {item.name}
-                    </td>
-
-                    {/* 5. ชื่อรางวัล */}
-                    <td className={`${styles.tableTd} text-gray-600`}>
-                      {item.awardName}
-                    </td>
-
-                    {/* 6. ชื่อผลงาน */}
-                    <td className={`${styles.tableTd} text-gray-600`}>
-                      {item.workName || "-"}
-                    </td>
-
-                    {/* 7. รายละเอียด */}
+                    {/* จำนวนผู้ได้รับ */}
                     <td className={`${styles.tableTd} text-center`}>
-                      {item.awardDetail &&
-                      item.awardDetail.trim() !== "" ? (
-                        <button
-                          type="button"
-                          className={styles.btnReadDetail}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setViewingDetail({
-                              name: item.awardName,
-                              text: item.awardDetail!,
-                            });
-                          }}
-                        >
-                          <FileText size={14} /> อ่านรายละเอียด
-                        </button>
-                      ) : (
-                        <span className={styles.btnReadDetailDisabled}>-</span>
-                      )}
+                      <span
+                        className={styles.orderBadge}
+                        style={{ background: item.recipientCount > 0 ? "#dbeafe" : "#f3f4f6", color: item.recipientCount > 0 ? "#1d4ed8" : "#9ca3af" }}
+                      >
+                        {item.recipientCount} คน
+                      </span>
                     </td>
 
-                    {/* 8. วิดีโอ */}
-                    <td className={`${styles.tableTd} text-center`}>
-                      {item.videoUrl ? (
-                        <button
-                          type="button"
-                          className={styles.videoBadge}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setPreviewVideo(item.videoUrl!);
-                          }}
-                        >
-                          <Play size={14} /> ดูวิดีโอ
-                        </button>
-                      ) : (
-                        <span className={styles.videoBadgeDisabled}>-</span>
-                      )}
-                    </td>
-
-                    {/* 9. จัดการ */}
+                    {/* จัดการ */}
                     <td className={`${styles.tableTd} text-center`}>
                       <div className="flex items-center justify-center gap-2">
                         <button
@@ -603,302 +359,38 @@ export default function HonorPage() {
         </div>
       </div>
 
-      {/* ==================== Image Preview Modal ==================== */}
-      {previewImage && (
-        <ImagePreviewModal
-          imageUrl={previewImage}
-          onClose={() => setPreviewImage(null)}
-        />
-      )}
-
-      {/* ==================== Video Preview Modal ==================== */}
-      {previewVideo && (
-        <div
-          className={styles.videoPreviewOverlay}
-          onClick={() => setPreviewVideo(null)}
-        >
-          <div
-            className={styles.videoPreviewContent}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className={styles.closeVideoBtn}
-              onClick={() => setPreviewVideo(null)}
-            >
-              <X size={24} />
-            </button>
-            <video src={previewVideo} controls autoPlay />
-          </div>
-        </div>
-      )}
-
-      {/* ==================== Award Detail Modal ==================== */}
-      {viewingDetail && (
-        <CrudModal
-          isOpen={true}
-          onClose={() => setViewingDetail(null)}
-          onSubmit={(e) => { e.preventDefault(); setViewingDetail(null); }}
-          title={`📋 รายละเอียดรางวัล: ${viewingDetail.name}`}
-        >
-          <div className={styles.detailContent}>{viewingDetail.text}</div>
-        </CrudModal>
-      )}
-
-      {/* ==================== Crop Modal ==================== */}
-      {isCropping && imageToCrop && (
-        <div className={styles.cropModalOverlay}>
-          <div className={styles.cropModalContent}>
-            <div className={styles.cropperContainer}>
-              <Cropper
-                image={imageToCrop}
-                crop={crop}
-                zoom={zoom}
-                aspect={4 / 3}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
-              />
-            </div>
-            <div className={styles.cropControls}>
-              <div className={styles.zoomSliderContainer}>
-                <ZoomOut size={18} />
-                <input
-                  type="range"
-                  className={styles.zoomSlider}
-                  min={1}
-                  max={3}
-                  step={0.1}
-                  value={zoom}
-                  onChange={(e) => setZoom(Number(e.target.value))}
-                />
-                <ZoomIn size={18} />
-              </div>
-              <div className={styles.cropActions}>
-                <button
-                  className={styles.btnCropCancel}
-                  onClick={() => {
-                    setIsCropping(false);
-                    setImageToCrop(null);
-                  }}
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  className={styles.btnCropConfirm}
-                  onClick={handleConfirmCrop}
-                >
-                  ✂️ ยืนยันการตัดรูป
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ==================== CRUD Modal ==================== */}
       {isModalOpen && (
         <CrudModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
-          title={editingId ? "แก้ไขข้อมูลเกียรติประวัติ" : "เพิ่มข้อมูลเกียรติประวัติ"}
+          title={editingId ? "แก้ไขรางวัล" : "เพิ่มรางวัลใหม่"}
         >
-            {/* รูปเภสัช (4:3 crop) */}
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>รูปภาพเภสัชกร (4:3)</label>
-              {formData.preview ? (
-                <div style={{ textAlign: "center" }}>
-                  <label className={styles.modalUploadArea}>
-                    <img
-                      src={formData.preview}
-                      alt="Preview"
-                      className={styles.modalPreviewImage}
-                    />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={onSelectImage}
-                      hidden
-                    />
-                  </label>
-                  <div className={styles.imageActionRow}>
-                    <label className={styles.changeImageBtn}>
-                      <Upload size={14} /> เปลี่ยนรูป
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={onSelectImage}
-                        hidden
-                      />
-                    </label>
-                    {formData.originalPreview && (
-                      <button
-                        type="button"
-                        className={styles.changeImageBtn}
-                        onClick={() => {
-                          setImageToCrop(formData.originalPreview);
-                          setIsCropping(true);
-                          setCrop({ x: 0, y: 0 });
-                          setZoom(1);
-                        }}
-                      >
-                        <Crop size={14} /> ครอปใหม่
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <label className={styles.modalUploadArea}>
-                  <div className={styles.modalUploadPlaceholder}>
-                    <UploadCloud size={32} />
-                    <span>คลิกเพื่ออัปโหลดรูป</span>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={onSelectImage}
-                    hidden
-                  />
-                </label>
-              )}
-            </div>
-
-            {/* คำนำหน้าชื่อ + ลำดับ */}
-            <div className={styles.gridTwo}>
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>คำนำหน้าชื่อ</label>
-                <input
-                  className={styles.formInput}
-                  placeholder="เช่น ภท., ดร., รศ."
-                  value={formData.prefix}
-                  onChange={(e) =>
-                    setFormData({ ...formData, prefix: e.target.value })
-                  }
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>ลำดับ</label>
-                <input
-                  type="number"
-                  className={styles.formInput}
-                  value={formData.order}
-                  onChange={(e) =>
-                    setFormData({ ...formData, order: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-
-            {/* ชื่อ */}
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>ชื่อ-นามสกุล *</label>
-              <input
-                className={styles.formInput}
-                placeholder="กรอกชื่อ-นามสกุล"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            {/* ชื่อรางวัล */}
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>ชื่อรางวัล *</label>
-              <input
-                className={styles.formInput}
-                placeholder="กรอกชื่อรางวัล"
-                value={formData.awardName}
-                onChange={(e) =>
-                  setFormData({ ...formData, awardName: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            {/* ชื่อผลงาน */}
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>ชื่อผลงาน</label>
-              <input
-                className={styles.formInput}
-                placeholder="กรอกชื่อผลงาน"
-                value={formData.workName}
-                onChange={(e) =>
-                  setFormData({ ...formData, workName: e.target.value })
-                }
-              />
-            </div>
-
-            {/* รายละเอียดรางวัล */}
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>รายละเอียดรางวัล</label>
-              <textarea
-                className={styles.formInput}
-                placeholder="กรอกรายละเอียดรางวัล (สามารถเว้นบรรทัดได้)"
-                rows={4}
-                style={{ resize: "vertical" }}
-                value={formData.awardDetail}
-                onChange={(e) =>
-                  setFormData({ ...formData, awardDetail: e.target.value })
-                }
-              />
-            </div>
-
-            {/* วิดีโอ */}
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>วิดีโอ</label>
-              {formData.videoPreview || formData.existingVideoUrl ? (
-                <div>
-                  <div className={styles.videoPreviewContainer}>
-                    <video
-                      src={formData.videoPreview || formData.existingVideoUrl || ""}
-                      controls
-                    />
-                  </div>
-                  <div className={styles.imageActionRow}>
-                    <label className={styles.changeImageBtn}>
-                      <Upload size={14} /> เปลี่ยนวิดีโอ
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={onSelectVideo}
-                        hidden
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      className={styles.changeImageBtn}
-                      style={{ color: '#ef4444', borderColor: '#fca5a5' }}
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          videoFile: null,
-                          videoPreview: null,
-                          existingVideoUrl: null,
-                          removeVideo: true,
-                        }));
-                      }}
-                    >
-                      <Trash2 size={14} /> ลบวิดีโอ
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <label className={styles.videoUploadArea}>
-                  <div className={styles.modalUploadPlaceholder}>
-                    <Video size={32} />
-                    <span>คลิกเพื่ออัปโหลดวิดีโอ</span>
-                  </div>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={onSelectVideo}
-                    hidden
-                  />
-                </label>
-              )}
-            </div>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>ชื่อรางวัล *</label>
+            <input
+              className={styles.formInput}
+              placeholder="เช่น เภสัชกรยอดเยี่ยม"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              required
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>คำอธิบายรางวัล</label>
+            <textarea
+              className={styles.formTextarea}
+              placeholder="อธิบายรายละเอียดเกี่ยวกับรางวัลนี้ (ไม่บังคับ)"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={3}
+            />
+          </div>
         </CrudModal>
       )}
     </div>

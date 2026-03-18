@@ -435,6 +435,26 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.formTextarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: white;
+  color: #1f2937;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.formTextarea::placeholder { color: var(--color-text-light); }
+.formTextarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 .gridTwo {
   display: grid;
   grid-template-columns: 1fr 1fr;
