@@ -55,10 +55,10 @@ export function filterMenuByPermission(items: MenuItem[], userPermissions: strin
 // Menu Data — แต่ละ item ผูกกับ permission key
 // ============================================
 export const SIDEBAR_DATA: MenuItem[] = [
-  // --- เว็บไซต์สภา ---
+  // --- เว็บสภา ---
   {
     id: 'header-council-web',
-    title: 'เว็บไซต์สภา',
+    title: 'เว็บสภา',
     isHeader: true,
     permission: 'manage_home',
   },
@@ -102,11 +102,11 @@ export const SIDEBAR_DATA: MenuItem[] = [
 
   { id: 'council-web-setting', title: 'ตั้งค่าเว็บไซต์', href: '/backoffice/module/council-web/setting', icon: <Settings size={20} />, permission: 'manage_web_settings' },
 
-  // --- เว็บไซต์เภสัชกร ---
+  // --- เว็บเภสัชกร ---
 
   {
     id: 'header-pharmacist-web',
-    title: 'เว็บไซต์เภสัชกร',
+    title: 'เว็บเภสัชกร',
     isHeader: true,
     permission: 'manage_home',
   },

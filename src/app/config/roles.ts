@@ -30,7 +30,7 @@ const BUILT_IN_ROLES: Record<string, RoleConfig> = {
   },
   web_editor: {
     label: 'Web Editor',
-    labelTh: 'ผู้จัดการเว็บไซต์สภา',
+    labelTh: 'ผู้จัดการเว็บสภา',
     color: '#3b82f6',
     bg: '#eff6ff',
     defaultPage: '/backoffice/module/council-web/home',

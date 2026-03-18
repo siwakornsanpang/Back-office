@@ -70,12 +70,18 @@ export default function SettingPage() {
         setSettings(prev => ({ ...prev, [name]: value }));
     };
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setLogoFile(file);
             setLogoPreview(URL.createObjectURL(file));
         }
+    };
+
+    const handleLogoClick = () => {
+        fileInputRef.current?.click();
     };
 
     const handleCancel = () => {
@@ -221,7 +227,11 @@ export default function SettingPage() {
                         <div className={styles.formGroup}>
                             <label className={styles.label}>ตราสัญลักษณ์หน่วยงาน (Logo)</label>
                             <div className={styles.logoUploadArea}>
-                                <div className={styles.logoPreview}>
+                                <div 
+                                    className={`${styles.logoPreview} ${styles.clickable}`}
+                                    onClick={handleLogoClick}
+                                    title="คลิกเพื่ออัปโหลดโลโก้ใหม่"
+                                >
                                     {logoPreview ? (
                                         <Image
                                             src={logoPreview}
@@ -236,12 +246,14 @@ export default function SettingPage() {
                                 </div>
                                 <div>
                                     <input
+                                        ref={fileInputRef}
                                         type="file"
                                         accept="image/*"
                                         onChange={handleFileChange}
                                         title="เลือกไฟล์โลโก้"
+                                        style={{ display: 'none' }}
                                     />
-                                    <p className={styles.uploadHint}>แนะนำขนาด 512x512px ไฟล์ PNG หรือ JPG (พื้นหลังโปร่งใสจะดีที่สุด)</p>
+                                    <p className={styles.uploadHint}>คลิกที่โลโก้เพื่ออัปโหลดใหม่ • แนะนำขนาด 512x512px ไฟล์ PNG หรือ JPG (พื้นหลังโปร่งใสจะดีที่สุด)</p>
                                 </div>
                             </div>
                         </div>

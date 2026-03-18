@@ -198,7 +198,7 @@ export default function MedicinePage() {
         <div>
           <h1 className={styles.title}>จัดการความรู้เรื่องยา</h1>
           <p className={styles.breadcrumb}>
-            <span className="text-blue-600 font-medium">จัดการเว็บไซต์สภา</span>
+            <span className="text-blue-600 font-medium">จัดการเว็บสภา</span>
           </p>
         </div>
 
