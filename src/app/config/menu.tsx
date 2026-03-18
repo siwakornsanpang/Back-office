@@ -108,7 +108,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
     id: 'header-pharmacist-web',
     title: 'เว็บเภสัชกร',
     isHeader: true,
-    permission: 'manage_home',
+    permission: 'manage_web_pharmacist',
   },
 
   { id: 'pharmacist-web-home', title: 'จัดการหน้าแรก', href: '/backoffice/module/pharmacist-web/home', icon: <LayoutDashboard size={20} />, permission: 'manage_home' },
