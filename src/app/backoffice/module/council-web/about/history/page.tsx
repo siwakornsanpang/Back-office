@@ -134,7 +134,9 @@ export default function HistoryPage() {
   const handleConfirmCrop = async () => {
     if (!imageToCrop || !croppedAreaPixels || !cropType) return;
     try {
-      const croppedFile = await getCroppedImg(imageToCrop, croppedAreaPixels, `history-${cropType}-${Date.now()}.jpg`);
+      const originalFile = cropType === 'president' ? formData.originalPresidentFile : formData.originalSecretaryFile;
+      const ext = originalFile && originalFile.name.includes('.') ? originalFile.name.split('.').pop() : 'jpg';
+      const croppedFile = await getCroppedImg(imageToCrop, croppedAreaPixels, `history-${cropType}-${Date.now()}.${ext}`);
       if (!croppedFile) throw new Error("Crop failed");
       const croppedUrl = URL.createObjectURL(croppedFile);
       

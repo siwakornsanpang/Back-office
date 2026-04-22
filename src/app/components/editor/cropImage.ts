@@ -35,6 +35,11 @@ export default async function getCroppedImg(
     pixelCrop.height
   )
 
+  let mimeType = 'image/jpeg';
+  if (fileName.toLowerCase().endsWith('.png')) mimeType = 'image/png';
+  else if (fileName.toLowerCase().endsWith('.webp')) mimeType = 'image/webp';
+  else if (fileName.toLowerCase().endsWith('.gif')) mimeType = 'image/gif';
+
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
       if (!blob) {
@@ -42,8 +47,8 @@ export default async function getCroppedImg(
         return
       }
       // แปลง Blob กลับเป็น File เพื่อส่งเข้า API ตามระบบเดิม
-      const file = new File([blob], fileName, { type: 'image/jpeg' })
+      const file = new File([blob], fileName, { type: mimeType })
       resolve(file)
-    }, 'image/jpeg', 0.9) // 0.9 คือคุณภาพรูป 90%
+    }, mimeType, 1.0) // 1.0 คือคุณภาพสูงสุด
   })
 }
