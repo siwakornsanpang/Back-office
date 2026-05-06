@@ -133,7 +133,8 @@ export default function CouncilPage() {
   const handleConfirmCrop = async () => {
     if (!imageToCrop || !croppedAreaPixels) return;
     try {
-      const croppedFile = await getCroppedImg(imageToCrop, croppedAreaPixels, `council-${Date.now()}.jpg`);
+      const ext = formData.originalFile && formData.originalFile.name.includes('.') ? formData.originalFile.name.split('.').pop() : 'jpg';
+      const croppedFile = await getCroppedImg(imageToCrop, croppedAreaPixels, `council-${Date.now()}.${ext}`);
       if (!croppedFile) throw new Error("Crop failed");
       const croppedUrl = URL.createObjectURL(croppedFile);
       setFormData(prev => ({ ...prev, preview: croppedUrl, file: croppedFile }));
