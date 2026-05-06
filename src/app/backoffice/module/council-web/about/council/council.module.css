@@ -113,6 +113,26 @@
   background-color: var(--color-primary-hover);
 }
 
+.btnBack {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2563eb; /* blue-600 */
+  font-size: 0.875rem; /* sm */
+  margin-bottom: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.btnBack:hover {
+  color: #1e40af; /* blue-800 */
+  text-decoration: underline;
+}
+
 /* --- Table --- */
 .tableContainer {
   background-color: white;

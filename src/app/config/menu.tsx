@@ -73,6 +73,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
       { id: 'council-web-about-history', title: 'ทำเนียบสภา', href: '/backoffice/module/council-web/about/history', },
       { id: 'council-web-about-board', title: 'กรรมการสภา', href: '/backoffice/module/council-web/about/council', },
       { id: 'council-web-about-honor', title: 'เกียรติประวัติ', href: '/backoffice/module/council-web/about/honor', },
+      { id: 'council-web-about-policy', title: 'นโยบายสภา', href: '/backoffice/module/council-web/about/policy', },
     ]
   },
   { id: 'council-web-news', title: 'ข่าวประชาสัมพันธ์', href: '/backoffice/module/council-web/news', icon: <Megaphone size={20} />, permission: 'manage_news' },
