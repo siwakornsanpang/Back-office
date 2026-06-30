@@ -113,6 +113,7 @@ export const SIDEBAR_DATA: MenuItem[] = [
   },
 
   { id: 'pharmacist-web-home', title: 'จัดการหน้าแรก', href: '/backoffice/module/pharmacist-web/home', icon: <LayoutDashboard size={20} />, permission: 'manage_home' },
+  { id: 'pharmacist-web-product', title: 'สินค้าสภา', href: '/backoffice/module/pharmacist-web/product', icon: <LayoutDashboard size={20} />, permission: 'manage_product' },
 
   // --- ทะเบียนเภสัช ---
   {
