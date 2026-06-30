@@ -395,11 +395,11 @@ export default function WebHomePage() {
               <MonitorPlay size={24} />
             </div>
             <div style={{ flex: 1 }}>
-              <h3 className={styles.cardTitle}>Popup ข่าวสาร</h3>
-              <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>ลากรูปเพื่อเปลี่ยนลำดับ • บันทึกอัตโนมัติ</p>
+              <h3 className={styles.cardTitle}>Splash Screen หน้าแรก</h3>
+              <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>แสดงรูปภาพเต็มหน้าจอเมื่อผู้ใช้เปิดเว็บไซต์ครั้งแรก • ลากเพื่อสลับ • บันทึกอัตโนมัติ</p>
             </div>
-            <button onClick={openPopupAdd} className={styles.addBannerBtn} style={{ background: '#2563eb' }}>
-              <Plus size={18} /> เพิ่ม Popup
+            <button onClick={openPopupAdd} className={styles.addBannerBtn} style={{ background: '#9333ea' }}>
+              <Plus size={18} /> เพิ่ม Splash
             </button>
           </div>
 
@@ -407,7 +407,7 @@ export default function WebHomePage() {
             {popups.length === 0 && (
               <div className={styles.emptyBanner}>
                 <MonitorPlay size={48} style={{ color: '#d1d5db', marginBottom: '0.5rem' }} />
-                <p>ยังไม่มี Popup — กดปุ่ม &quot;เพิ่ม Popup&quot; ด้านบน</p>
+                <p>ยังไม่มี Splash Screen — กดปุ่ม &quot;เพิ่ม Splash&quot; ด้านบน</p>
               </div>
             )}
             {popups.map((popup, index) => (
@@ -504,7 +504,7 @@ export default function WebHomePage() {
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>{popupEditIndex !== null ? 'แก้ไข Popup' : 'เพิ่ม Popup ใหม่'}</h3>
+              <h3 className={styles.modalTitle}>{popupEditIndex !== null ? 'แก้ไข Splash Screen' : 'เพิ่ม Splash Screen ใหม่'}</h3>
               <button onClick={closePopupModal} className={styles.modalCloseBtn}><X size={22} /></button>
             </div>
             <div className={styles.modalBody}>
@@ -513,8 +513,8 @@ export default function WebHomePage() {
                   <img src={popupForm.imageUrl} className={styles.modalPreviewImage} style={{ objectFit: 'contain' }} />
                 ) : (
                   <div className={styles.modalUploadPlaceholder}>
-                    <Upload size={36} /><span>คลิกเพื่อเพิ่มรูป Popup</span>
-                    <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>ตามขนาดดั้งเดิม</span>
+                    <Upload size={36} /><span>คลิกเพื่อเพิ่มรูป Splash Screen</span>
+                    <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>ขนาดแนะนำเต็มหน้าจอ (เช่น 1920x1080)</span>
                   </div>
                 )}
                 <input type="file" hidden accept="image/*" onChange={onSelectPopupImage} />
@@ -527,8 +527,8 @@ export default function WebHomePage() {
                 </div>
               )}
               <div className={styles.modalField}>
-                <label className={styles.modalLabel}>ชื่อ Popup</label>
-                <input type="text" className={styles.modalInput} placeholder="ชื่อ Popup" value={popupForm.title} onChange={e => setPopupForm(prev => ({ ...prev, title: e.target.value }))} />
+                <label className={styles.modalLabel}>ชื่อ/หัวข้อของ Splash Screen</label>
+                <input type="text" className={styles.modalInput} placeholder="ชื่อ Splash Screen" value={popupForm.title} onChange={e => setPopupForm(prev => ({ ...prev, title: e.target.value }))} />
               </div>
               <div className={styles.modalField}>
                 <div className={styles.modalToggleRow}>
