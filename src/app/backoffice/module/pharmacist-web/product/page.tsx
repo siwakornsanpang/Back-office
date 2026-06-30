@@ -1,22 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Link from 'next/link';
 import styles from './product.module.css';
-import { Search, Plus, Edit, Trash2, Image as ImageIcon, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Image as ImageIcon, ArrowUpDown, ArrowUp, ArrowDown, X } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
-import { ProductItem } from './ProductForm';
+import ProductForm, { ProductItem } from './ProductForm';
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/products`;
-
-const CATEGORIES: Record<string, string> = {
-    medicine: 'ยา',
-    supplies: 'เวชภัณฑ์',
-    supplement: 'อาหารเสริม',
-    device: 'อุปกรณ์การแพทย์',
-    other: 'อื่นๆ'
-};
 
 interface SortConfig {
     key: keyof ProductItem;
@@ -26,6 +17,11 @@ interface SortConfig {
 export default function ProductListPage() {
     const [products, setProducts] = useState<ProductItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Modal States
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+    const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
 
     // Filter & Sort States
     const [searchQuery, setSearchQuery] = useState('');
@@ -39,7 +35,6 @@ export default function ProductListPage() {
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
         try {
-            // We can pass filters to API if large dataset, or do it on client-side
             const res = await authFetch(API_URL);
             if (!res.ok) throw new Error('Failed to fetch products');
             const data = await res.json();
@@ -59,6 +54,28 @@ export default function ProductListPage() {
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
+
+    const openCreateModal = () => {
+        setModalMode('create');
+        setSelectedProduct(null);
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (product: ProductItem) => {
+        setModalMode('edit');
+        setSelectedProduct(product);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedProduct(null);
+    };
+
+    const handleSaveSuccess = () => {
+        closeModal();
+        fetchProducts();
+    };
 
     const handleDelete = async (id: number) => {
         const result = await Swal.fire({
@@ -97,6 +114,15 @@ export default function ProductListPage() {
         if (sortConfig.key !== key) return <ArrowUpDown size={14} style={{ opacity: 0.3 }} />;
         return sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />;
     };
+
+    // Extract unique categories dynamically for filtering and autocomplete suggestions
+    const existingCategories = useMemo(() => {
+        const categoriesSet = new Set<string>();
+        products.forEach(p => {
+            if (p.category) categoriesSet.add(p.category);
+        });
+        return Array.from(categoriesSet);
+    }, [products]);
 
     // Filter & Sort Logic
     const processedProducts = useMemo(() => {
@@ -151,10 +177,10 @@ export default function ProductListPage() {
             <div className={styles.header}>
                 <h1 className={styles.title}>จัดการสินค้า</h1>
                 <div className={styles.headerActions}>
-                    <Link href="/backoffice/module/pharmacist-web/product/create" className={`${styles.btn} ${styles.btnPrimary}`}>
+                    <button onClick={openCreateModal} className={`${styles.btn} ${styles.btnPrimary}`}>
                         <Plus size={16} />
                         เพิ่มสินค้า
-                    </Link>
+                    </button>
                 </div>
             </div>
 
@@ -177,8 +203,8 @@ export default function ProductListPage() {
                     onChange={(e) => setSelectedCategory(e.target.value)}
                 >
                     <option value="all">ทุกประเภทสินค้า</option>
-                    {Object.entries(CATEGORIES).map(([key, label]) => (
-                        <option key={key} value={key}>{label}</option>
+                    {existingCategories.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
                     ))}
                 </select>
             </div>
@@ -226,7 +252,7 @@ export default function ProductListPage() {
                                     <td className={styles.td} style={{ fontWeight: 500 }}>{product.name}</td>
                                     <td className={styles.td}>
                                         <span className={styles.categoryTag}>
-                                            {CATEGORIES[product.category] || product.category}
+                                            {product.category}
                                         </span>
                                     </td>
                                     <td className={styles.td} style={{ color: '#64748b', fontSize: '0.85rem' }}>
@@ -245,13 +271,13 @@ export default function ProductListPage() {
                                     </td>
                                     <td className={styles.td} style={{ textAlign: 'center' }}>
                                         <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'center' }}>
-                                            <Link
-                                                href={`/backoffice/module/pharmacist-web/product/edit/${product.id}`}
+                                            <button
+                                                onClick={() => openEditModal(product)}
                                                 className={styles.btnEditIcon}
                                                 title="แก้ไข"
                                             >
                                                 <Edit size={16} />
-                                            </Link>
+                                            </button>
                                             <button
                                                 onClick={() => handleDelete(product.id)}
                                                 className={styles.btnDangerIcon}
@@ -298,6 +324,21 @@ export default function ProductListPage() {
                         >
                             ถัดไป
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Dialog container for Product Form */}
+            {isModalOpen && (
+                <div className={styles.modalOverlay} onClick={closeModal}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <ProductForm
+                            mode={modalMode}
+                            initialData={selectedProduct}
+                            onClose={closeModal}
+                            onSaveSuccess={handleSaveSuccess}
+                            existingCategories={existingCategories}
+                        />
                     </div>
                 </div>
             )}

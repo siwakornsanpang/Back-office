@@ -2,12 +2,10 @@
 
 import React, { useState } from 'react';
 import styles from './product.module.css';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { authFetch } from '@/app/utils/authFetch';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '@/app/components/editor/cropImage';
-import { Image as ImageIcon, Upload, Trash2, Crop, ZoomIn, ZoomOut, Save, X } from 'lucide-react';
+import { Trash2, Upload, Save, X, ZoomIn, ZoomOut } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 export interface ProductItem {
@@ -22,27 +20,21 @@ export interface ProductItem {
 }
 
 interface ProductFormProps {
-    initialData?: ProductItem;
+    initialData?: ProductItem | null;
     mode: 'create' | 'edit';
+    onClose: () => void;
+    onSaveSuccess: () => void;
+    existingCategories: string[];
 }
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/products`;
 
-const CATEGORIES = [
-    { key: 'medicine', label: 'ยา' },
-    { key: 'supplies', label: 'เวชภัณฑ์' },
-    { key: 'supplement', label: 'อาหารเสริม' },
-    { key: 'device', label: 'อุปกรณ์การแพทย์' },
-    { key: 'other', label: 'อื่นๆ' }
-];
-
-export default function ProductForm({ initialData, mode }: ProductFormProps) {
-    const router = useRouter();
+export default function ProductForm({ initialData, mode, onClose, onSaveSuccess, existingCategories }: ProductFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // States for Form Fields
     const [name, setName] = useState(initialData?.name || '');
-    const [category, setCategory] = useState(initialData?.category || 'medicine');
+    const [category, setCategory] = useState(initialData?.category || '');
     const [description, setDescription] = useState(initialData?.description || '');
     const [price, setPrice] = useState(initialData?.price ? parseFloat(initialData.price).toString() : '');
     const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || '');
@@ -123,6 +115,10 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
             Swal.fire('แจ้งเตือน', 'กรุณาระบุชื่อสินค้า', 'warning');
             return;
         }
+        if (!category.trim()) {
+            Swal.fire('แจ้งเตือน', 'กรุณาระบุประเภทสินค้า', 'warning');
+            return;
+        }
         if (!price || parseFloat(price) < 0) {
             Swal.fire('แจ้งเตือน', 'กรุณาระบุราคาสินค้าที่ถูกต้อง', 'warning');
             return;
@@ -133,7 +129,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
         try {
             const payload = {
                 name,
-                category,
+                category: category.trim(),
                 description: description || null,
                 price: parseFloat(price),
                 imageUrl: imageUrl || null
@@ -167,8 +163,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
                 timer: 1500
             });
 
-            router.push('/backoffice/module/pharmacist-web/product');
-            router.refresh();
+            onSaveSuccess();
         } catch (err: any) {
             console.error(err);
             Swal.fire('เกิดข้อผิดพลาด', err.message, 'error');
@@ -178,15 +173,15 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
     };
 
     return (
-        <form onSubmit={handleSave} className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>
+        <form onSubmit={handleSave} style={{ padding: '1.5rem' }}>
+            <div className={styles.header} style={{ marginBottom: '1.5rem' }}>
+                <h1 className={styles.title} style={{ fontSize: '1.5rem' }}>
                     {mode === 'create' ? 'เพิ่มสินค้าใหม่' : 'แก้ไขข้อมูลสินค้า'}
                 </h1>
                 <div className={styles.headerActions}>
-                    <Link href="/backoffice/module/pharmacist-web/product" className={`${styles.btn} ${styles.btnSecondary}`}>
+                    <button type="button" onClick={onClose} className={`${styles.btn} ${styles.btnSecondary}`}>
                         ยกเลิก
-                    </Link>
+                    </button>
                     <button type="submit" disabled={isSubmitting} className={`${styles.btn} ${styles.btnPrimary}`}>
                         <Save size={16} />
                         {isSubmitting ? 'กำลังบันทึก...' : 'บันทึกสินค้า'}
@@ -194,11 +189,11 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
                 </div>
             </div>
 
-            <div className={styles.layoutGrid}>
+            <div className={styles.layoutGrid} style={{ gridTemplateColumns: '1fr 300px' }}>
                 {/* Main Column */}
                 <div className={styles.mainColumn}>
-                    <div className={styles.card}>
-                        <h2 className={styles.cardTitle}>ข้อมูลทั่วไป</h2>
+                    <div className={styles.card} style={{ padding: '1.25rem' }}>
+                        <h2 className={styles.cardTitle} style={{ fontSize: '1rem', marginBottom: '1rem' }}>ข้อมูลทั่วไป</h2>
                         
                         <div className={styles.formGroup}>
                             <label className={styles.label}>
@@ -218,7 +213,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
                             <label className={styles.label}>รายละเอียดสินค้า</label>
                             <textarea
                                 className={styles.textarea}
-                                rows={6}
+                                rows={5}
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 placeholder="ระบุรายละเอียด สรรพคุณ วิธีใช้ หรือข้อควรระวัง..."
@@ -229,22 +224,27 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
 
                 {/* Sidebar Column */}
                 <div className={styles.sidebarColumn}>
-                    <div className={styles.card}>
-                        <h2 className={styles.cardTitle}>ประเภทและราคา</h2>
+                    <div className={styles.card} style={{ padding: '1.25rem' }}>
+                        <h2 className={styles.cardTitle} style={{ fontSize: '1rem', marginBottom: '1rem' }}>ประเภทและราคา</h2>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>ประเภทสินค้า</label>
-                            <select
-                                className={styles.select}
+                            <label className={styles.label}>
+                                ประเภทสินค้า <span className={styles.required}>*</span>
+                            </label>
+                            <input
+                                type="text"
+                                className={styles.input}
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
-                            >
-                                {CATEGORIES.map((cat) => (
-                                    <option key={cat.key} value={cat.key}>
-                                        {cat.label}
-                                    </option>
+                                placeholder="พิมพ์หรือเลือกประเภท..."
+                                list="category-suggestions"
+                                required
+                            />
+                            <datalist id="category-suggestions">
+                                {existingCategories.map((cat) => (
+                                    <option key={cat} value={cat} />
                                 ))}
-                            </select>
+                            </datalist>
                         </div>
 
                         <div className={styles.formGroup}>
@@ -263,8 +263,8 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
                         </div>
                     </div>
 
-                    <div className={styles.card}>
-                        <h2 className={styles.cardTitle}>รูปภาพสินค้า</h2>
+                    <div className={styles.card} style={{ padding: '1.25rem' }}>
+                        <h2 className={styles.cardTitle} style={{ fontSize: '1rem', marginBottom: '1rem' }}>รูปภาพสินค้า</h2>
                         {imageUrl ? (
                             <div className={styles.previewContainer}>
                                 <img src={imageUrl} alt="Product preview" className={styles.previewImage} />
@@ -310,7 +310,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
                                 image={imageToCrop}
                                 crop={crop}
                                 zoom={zoom}
-                                aspect={1} // 1:1 Aspect ratio for products
+                                aspect={1}
                                 onCropChange={setCrop}
                                 onCropComplete={onCropComplete}
                                 onZoomChange={setZoom}
