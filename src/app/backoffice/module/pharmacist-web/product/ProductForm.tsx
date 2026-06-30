@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from './product.module.css';
 import { authFetch } from '@/app/utils/authFetch';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '@/app/components/editor/cropImage';
-import { Trash2, Upload, Save, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { Trash2, Upload, Save, X, ZoomIn, ZoomOut, ChevronDown, Check, Plus } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 export interface ProductItem {
@@ -28,6 +28,104 @@ interface ProductFormProps {
 }
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/products`;
+
+// -------------------------------------------------------------------
+// Custom Category Combobox — allows typing freely + select from list
+// -------------------------------------------------------------------
+interface CategoryComboboxProps {
+    value: string;
+    onChange: (val: string) => void;
+    suggestions: string[];
+    styles: any;
+}
+
+function CategoryCombobox({ value, onChange, suggestions, styles }: CategoryComboboxProps) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [query, setQuery] = useState(value);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Sync external value
+    useEffect(() => { setQuery(value); }, [value]);
+
+    // Close on outside click
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const filtered = suggestions.filter(s => s.toLowerCase().includes(query.toLowerCase()));
+
+    const handleSelect = (cat: string) => {
+        setQuery(cat);
+        onChange(cat);
+        setIsOpen(false);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setQuery(e.target.value);
+        onChange(e.target.value);
+        setIsOpen(true);
+    };
+
+    return (
+        <div ref={containerRef} className={styles.comboboxContainer}>
+            <div className={`${styles.comboboxInput} ${isOpen ? styles.comboboxInputOpen : ''}`}>
+                <input
+                    type="text"
+                    value={query}
+                    onChange={handleInputChange}
+                    onFocus={() => setIsOpen(true)}
+                    placeholder="พิมพ์หรือเลือกประเภท..."
+                    className={styles.comboboxTextField}
+                    required
+                />
+                <button
+                    type="button"
+                    className={styles.comboboxChevron}
+                    onClick={() => setIsOpen(prev => !prev)}
+                    tabIndex={-1}
+                >
+                    <ChevronDown size={16} style={{ transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                </button>
+            </div>
+
+            {isOpen && (
+                <div className={styles.comboboxDropdown}>
+                    {filtered.length === 0 && query.length > 0 ? (
+                        <div className={styles.comboboxNewItem} onMouseDown={() => handleSelect(query)}>
+                            <Plus size={14} />
+                            <span>เพิ่ม &quot;{query}&quot; เป็นประเภทใหม่</span>
+                        </div>
+                    ) : (
+                        <>
+                            {filtered.map(cat => (
+                                <div
+                                    key={cat}
+                                    className={`${styles.comboboxOption} ${cat === value ? styles.comboboxOptionActive : ''}`}
+                                    onMouseDown={() => handleSelect(cat)}
+                                >
+                                    <span>{cat}</span>
+                                    {cat === value && <Check size={14} />}
+                                </div>
+                            ))}
+                            {query.length > 0 && !filtered.some(f => f === query) && (
+                                <div className={styles.comboboxNewItem} onMouseDown={() => handleSelect(query)}>
+                                    <Plus size={14} />
+                                    <span>เพิ่ม &quot;{query}&quot; เป็นประเภทใหม่</span>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function ProductForm({ initialData, mode, onClose, onSaveSuccess, existingCategories }: ProductFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -231,20 +329,12 @@ export default function ProductForm({ initialData, mode, onClose, onSaveSuccess,
                             <label className={styles.label}>
                                 ประเภทสินค้า <span className={styles.required}>*</span>
                             </label>
-                            <input
-                                type="text"
-                                className={styles.input}
+                            <CategoryCombobox
                                 value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                placeholder="พิมพ์หรือเลือกประเภท..."
-                                list="category-suggestions"
-                                required
+                                onChange={setCategory}
+                                suggestions={existingCategories}
+                                styles={styles}
                             />
-                            <datalist id="category-suggestions">
-                                {existingCategories.map((cat) => (
-                                    <option key={cat} value={cat} />
-                                ))}
-                            </datalist>
                         </div>
 
                         <div className={styles.formGroup}>

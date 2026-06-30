@@ -562,3 +562,125 @@
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* -----------------------------------------------
+   Custom Category Combobox
+------------------------------------------------ */
+.comboboxContainer {
+    position: relative;
+    width: 100%;
+}
+
+.comboboxInput {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.2s;
+    overflow: hidden;
+}
+
+.comboboxInput:focus-within,
+.comboboxInputOpen {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.comboboxTextField {
+    flex: 1;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    font-family: 'Sarabun', sans-serif;
+    color: #1e293b;
+    border: none;
+    outline: none;
+    background: transparent;
+    min-width: 0;
+}
+
+.comboboxTextField::placeholder {
+    color: #94a3b8;
+}
+
+.comboboxChevron {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 100%;
+    padding: 0 0.5rem;
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    border-left: 1px solid #f1f5f9;
+    transition: background 0.2s, color 0.2s;
+}
+
+.comboboxChevron:hover {
+    background: #f8fafc;
+    color: #0284c7;
+}
+
+.comboboxDropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(15, 23, 42, 0.06);
+    z-index: 1100;
+    overflow: hidden;
+    animation: dropdownOpen 0.15s ease-out;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+@keyframes dropdownOpen {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.comboboxOption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-family: 'Sarabun', sans-serif;
+    color: #334155;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.comboboxOption:hover {
+    background: #f0f9ff;
+    color: #0284c7;
+}
+
+.comboboxOptionActive {
+    background: #e0f2fe;
+    color: #0284c7;
+    font-weight: 500;
+}
+
+.comboboxNewItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-family: 'Sarabun', sans-serif;
+    color: #7c3aed;
+    cursor: pointer;
+    border-top: 1px dashed #e9d5ff;
+    transition: background 0.12s;
+}
+
+.comboboxNewItem:hover {
+    background: #f5f3ff;
+}
