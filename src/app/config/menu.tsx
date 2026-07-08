@@ -100,8 +100,19 @@ export const SIDEBAR_DATA: MenuItem[] = [
     permission: 'manage_law',
     href: '/backoffice/module/council-web/law',
   },
+  {
+    id: 'council-web-other-service',
+    title: 'บริการอื่นๆ',
+    icon: <Scale size={20} />,
+    permission: 'manage_other_service',
+    href: '/backoffice/module/council-web/other-service',
+  },
 
-  { id: 'council-web-setting', title: 'ตั้งค่าเว็บไซต์', href: '/backoffice/module/council-web/setting', icon: <Settings size={20} />, permission: 'manage_web_settings' },
+  { id: 'council-web-setting', 
+    title: 'ตั้งค่าเว็บไซต์', 
+    href: '/backoffice/module/council-web/setting', 
+    icon: <Settings size={20} />, 
+    permission: 'manage_web_settings' },
 
   // --- เว็บเภสัชกร ---
 
