@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { UserPlus, Trash2, Loader2, Users } from 'lucide-react';
+import { UserPlus, Trash2, Users } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
 import RoleBadge from '@/app/components/ui/RoleBadge';
 import CrudModal from '@/app/components/ui/CrudModal';
+import { SkeletonTable } from '@/app/components/ui/Skeleton';
 import styles from '../users.module.css';
 import councilStyles from '@/app/backoffice/module/council-web/about/council/council.module.css';
 
@@ -174,9 +175,8 @@ export default function UserManagementPage() {
         </h3>
 
         {isLoading ? (
-          <div className={styles.loading}>
-            <Loader2 size={20} className={styles.spinner} />
-            กำลังโหลด...
+          <div className={styles.skeletonArea}>
+            <SkeletonTable rows={6} columns={4} />
           </div>
         ) : users.length === 0 ? (
           <div className={styles.emptyState}>ยังไม่มีผู้ใช้ในระบบ</div>

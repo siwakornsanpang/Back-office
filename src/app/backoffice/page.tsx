@@ -11,12 +11,12 @@ import {
   Search,
   FileCheck,
   TrendingUp,
-  Loader2,
   Building2,
 } from "lucide-react";
 import styles from "./Dashboard.module.css";
 import { authFetch } from "@/app/utils/authFetch";
 import { getDefaultPage } from "@/app/config/roles";
+import { SkeletonBlock, SkeletonTable } from "@/app/components/ui/Skeleton";
 
 // API URL from environment
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -206,7 +206,7 @@ export default function Dashboard() {
               <div className={styles.statContent}>
                 <h3>{stat.title}</h3>
                 <p className={styles.statValue}>
-                  {isLoading ? <Loader2 size={24} className={styles.spinner} /> : stat.value}
+                  {isLoading ? <SkeletonBlock width="72px" height="2rem" /> : stat.value}
                 </p>
                 <span className={`${styles.statChange} ${styles.statChangeUp}`}>
                   <TrendingUp size={12} />
@@ -247,9 +247,8 @@ export default function Dashboard() {
           </div>
           <div className={styles.tableCardBody}>
             {isLoading ? (
-              <div style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>
-                <Loader2 size={24} style={{ animation: "spin 1s linear infinite" }} />
-                <p style={{ marginTop: "0.5rem" }}>กำลังโหลดข้อมูล...</p>
+              <div className={styles.tableSkeleton}>
+                <SkeletonTable rows={5} columns={2} />
               </div>
             ) : latestNews.length > 0 ? (
               <>
@@ -278,9 +277,8 @@ export default function Dashboard() {
           </div>
           <div className={styles.tableCardBody}>
             {isLoading ? (
-              <div style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>
-                <Loader2 size={24} style={{ animation: "spin 1s linear infinite" }} />
-                <p style={{ marginTop: "0.5rem" }}>กำลังโหลดข้อมูล...</p>
+              <div className={styles.tableSkeleton}>
+                <SkeletonTable rows={5} columns={3} />
               </div>
             ) : latestPharmacists.length > 0 ? (
               <>

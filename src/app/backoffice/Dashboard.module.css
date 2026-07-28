@@ -241,6 +241,10 @@
   padding: 0;
 }
 
+.tableSkeleton {
+  padding: 1rem;
+}
+
 .dataTable {
   width: 100%;
   border-collapse: collapse;

@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 import { SIDEBAR_DATA, MenuItem, filterMenuByPermission } from '@/app/config/menu';
 import styles from './Sidebar.module.css';
 import { authFetch } from '@/app/utils/authFetch';
+import { SkeletonMenu } from '@/app/components/ui/Skeleton';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -66,7 +67,7 @@ export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
     >
       <div className={styles.sidebarContent}>
         {!permissionsLoaded ? (
-          <div style={{ padding: '1rem', color: '#999', fontSize: '0.875rem' }}>กำลังโหลดเมนู...</div>
+          <SkeletonMenu rows={7} />
         ) : (
           visibleMenuItems.map((item) => (
             <SidebarItem key={item.id} item={item} level={0} />

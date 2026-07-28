@@ -255,6 +255,10 @@
     gap: 0.5rem;
 }
 
+.skeletonArea {
+    padding: 0.5rem 0;
+}
+
 .spinner {
     animation: spin 1s linear infinite;
 }

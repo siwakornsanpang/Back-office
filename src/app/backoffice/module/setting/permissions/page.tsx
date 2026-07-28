@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, Check, Loader2, ChevronDown, ChevronUp, Plus, X, Trash2 } from 'lucide-react';
+import { Shield, Check, Loader2, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { authFetch } from '@/app/utils/authFetch';
 import CrudModal from '@/app/components/ui/CrudModal';
+import { SkeletonBlock } from '@/app/components/ui/Skeleton';
 import styles from './permissions.module.css';
 import councilStyles from '@/app/backoffice/module/council-web/about/council/council.module.css';
 
@@ -204,28 +205,6 @@ export default function PermissionsPage() {
     } catch { Swal.fire('Error', 'ไม่สามารถลบได้', 'error'); }
   };
 
-  // ลบ Permission
-  const handleDeletePermission = async (key: string) => {
-    const result = await Swal.fire({
-      title: `ลบสิทธิ์ "${key}"?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      confirmButtonText: 'ลบ',
-      cancelButtonText: 'ยกเลิก',
-    });
-    if (!result.isConfirmed) return;
-
-    try {
-      const res = await authFetch(`${API_URL}/permissions/${key}`, { method: 'DELETE' });
-      if (res.ok) {
-        Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1500, showConfirmButton: false });
-        fetchData();
-      } else {
-        Swal.fire('Error', 'ลบไม่สำเร็จ', 'error');
-      }
-    } catch { Swal.fire('Error', 'ไม่สามารถเชื่อมต่อ API', 'error'); }
-  };
 
   // Group permissions
   const groupedPermissions = (permissions || []).reduce((acc, perm) => {
@@ -237,9 +216,19 @@ export default function PermissionsPage() {
 
   if (isLoading) {
     return (
-      <div className={styles.loading}>
-        <Loader2 size={24} className={styles.spinner} />
-        กำลังโหลด...
+      <div className={styles.container}>
+        <div className={styles.permissionSkeleton}>
+          <SkeletonBlock width="42%" height="2rem" />
+          <SkeletonBlock width="64%" height="1rem" />
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className={styles.roleCard}>
+              <div className={styles.roleCardHeader}>
+                <SkeletonBlock width="24%" height="1rem" />
+                <SkeletonBlock width="72px" height="1rem" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -268,7 +257,7 @@ export default function PermissionsPage() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>จัดการสิทธิ์การใช้งาน</h1>
-          <p className={styles.subtitle}>กำหนดสิทธิ์ให้แต่ละ Role — ติ๊กเลือก แล้วกด "บันทึกสิทธิ์"</p>
+          <p className={styles.subtitle}>��˹��Է���������� Role ���͡�Է������ͧ��� ���ǡ��ѹ�֡�Է���</p>
         </div>
         <button onClick={openAddRoleModal} className={styles.btnAdd}>
           <Plus size={18} /> เพิ่ม Role ใหม่

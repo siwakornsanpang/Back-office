@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 
 import Header from "./layout/Header";
 import Sidebar from "./layout/Sidebar";
+import { SkeletonPage } from "@/app/components/ui/Skeleton";
 
 export default function BackOfficeLayout({
   children,
@@ -60,11 +61,7 @@ export default function BackOfficeLayout({
 
   // ระหว่างกำลังเช็ค auth
   if (isAuthorized === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f3f4f6]">
-        <p className="text-gray-500">Loading...</p>
-      </div>
-    );
+    return <SkeletonPage />;
   }
 
   // ไม่ผ่าน auth
