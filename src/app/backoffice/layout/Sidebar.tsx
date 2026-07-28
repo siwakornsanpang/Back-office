@@ -4,11 +4,10 @@
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, LogOut } from 'lucide-react';
+import { ChevronDown, ChevronRight, LogOut, User } from 'lucide-react';
 import Cookies from 'js-cookie';
 import { SIDEBAR_DATA, MenuItem, filterMenuByPermission } from '@/app/config/menu';
 import styles from './Sidebar.module.css';
-import { getRoleLabel } from '@/app/config/roles';
 import { authFetch } from '@/app/utils/authFetch';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -76,7 +75,24 @@ export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
       </div>
 
       {/* Footer — แสดงข้อมูล User + Logout */}
-      
+      <div className={styles.sidebarFooter}>
+        <div className={styles.userProfile}>
+          <div className={styles.avatar}>
+            <User size={22} strokeWidth={2} />
+          </div>
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>
+              {userName && userName !== 'User' && userName !== 'ผู้ดูแลระบบ' ? userName : 'Administrator'}
+            </span>
+            <span className={styles.userRole}>
+              {userRole?.toLowerCase() === 'admin' ? 'ผู้ดูแลระบบ' : userRole?.toLowerCase() === 'editor' ? 'ผู้แก้ไขข้อมูล' : 'ผู้ดูแลระบบ'}
+            </span>
+          </div>
+          <button className={styles.logoutBtn} onClick={handleLogout} title="ออกจากระบบ">
+            <LogOut size={20} />
+          </button>
+        </div>
+      </div>
     </aside>
   );
 }
@@ -85,11 +101,13 @@ export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
 
 // Sub Component SidebarItem
 function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
   if (item.isHeader) {
     return <div className={styles.sectionHeader}>{item.title}</div>;
   }
-  const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
+
   const hasChildren = item.submenu && item.submenu.length > 0;
   const isActive = item.href ? pathname === item.href : false;
   const paddingLeft = '12px';
@@ -100,6 +118,7 @@ function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
       className={`${styles.menuItem} ${isActive ? styles.active : ''}`}
       style={{ paddingLeft }}
       onClick={handleClick}
+      title={item.title}
     >
       <div className={styles.labelContainer}>
         {item.icon && (
@@ -109,11 +128,9 @@ function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
         )}
         <span className={styles.labelText}>{item.title}</span>
       </div>
-      {hasChildren && (
-        <span className={styles.chevron}>
-          {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        </span>
-      )}
+      <span className={styles.chevron}>
+        {hasChildren && isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+      </span>
     </div>
   );
 

@@ -1,17 +1,13 @@
 import {
-  Pill,
-  FileText,
-  Users,
-  Settings,
-  LayoutDashboard,
-  Building2,
-  Megaphone,
-  LayoutGrid,
+  Globe,
+  BookOpen,
   Landmark,
-  Scale,
-  Book,
-  Shield,
+  GraduationCap,
+  Monitor,
+  CreditCard,
+  Settings,
 } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 // ============================================
 // Menu Config — Permission-Based
@@ -22,7 +18,7 @@ import {
 export interface MenuItem {
   id: string;
   title: string;
-  icon?: any;
+  icon?: ReactNode;
   href?: string;
   submenu?: MenuItem[];
   isHeader?: boolean;
@@ -55,156 +51,53 @@ export function filterMenuByPermission(items: MenuItem[], userPermissions: strin
 // Menu Data — แต่ละ item ผูกกับ permission key
 // ============================================
 export const SIDEBAR_DATA: MenuItem[] = [
-  // --- เว็บสภา ---
   {
-    id: 'header-council-web',
-    title: 'เว็บสภา',
-    isHeader: true,
+    id: 'council-web-hub',
+    title: 'เว็บไซต์สภา',
+    href: '/backoffice/module/council-web',
+    icon: <Globe size={20} />,
     permission: 'manage_home',
   },
-
-  { id: 'council-web-home', title: 'จัดการหน้าแรก', href: '/backoffice/module/council-web/home', icon: <LayoutDashboard size={20} />, permission: 'manage_home' },
   {
-    id: 'council-web-about',
-    title: 'เกี่ยวกับองค์กร',
-    icon: <Building2 size={20} />,
-    permission: 'manage_about',
-    submenu: [
-      { id: 'council-web-about-history', title: 'ทำเนียบสภา', href: '/backoffice/module/council-web/about/history', },
-      { id: 'council-web-about-board', title: 'กรรมการสภา', href: '/backoffice/module/council-web/about/council', },
-      { id: 'council-web-about-honor', title: 'เกียรติประวัติ', href: '/backoffice/module/council-web/about/honor', },
-      { id: 'council-web-about-policy', title: 'นโยบายสภา', href: '/backoffice/module/council-web/about/policy', },
-    ]
-  },
-  { id: 'council-web-news', title: 'ข่าวประชาสัมพันธ์', href: '/backoffice/module/council-web/news', icon: <Megaphone size={20} />, permission: 'manage_news' },
-  { id: 'council-web-service', title: 'บริการ',
-    icon: <LayoutGrid size={20} />, permission: 'manage_service' ,
-     submenu: [
-      { id: 'council-web-service-medicine', title: 'ความรู้เรื่องยา', href: '/backoffice/module/council-web/service/medicine', },
-      { id: 'council-web-service-public-project', title: 'โครงการของประชาชน', href: '/backoffice/module/council-web/service/public-project', },
-      { id: 'council-web-service-Eservice', title: 'E-service', href: '/backoffice/module/council-web/service/e-service', },
-      
-    ]
-  },
-
-  {
-    id: 'council-web-agency', title: 'หน่วยงาน', icon: <Landmark size={20} />,
-    permission: 'manage_agency',
-    href: '/backoffice/module/council-web/agency',
-  },
-
-  {
-    id: 'council-web-law',
-    title: 'กฎหมาย',
-    icon: <Scale size={20} />,
-    permission: 'manage_law',
-    href: '/backoffice/module/council-web/law',
-  },
-  {
-    id: 'council-web-other-service',
-    title: 'บริการอื่นๆ',
-    icon: <Scale size={20} />,
-    permission: 'manage_other_service',
-    href: '/backoffice/module/council-web/other-service',
-  },
-
-  { id: 'council-web-setting', 
-    title: 'ตั้งค่าเว็บไซต์', 
-    href: '/backoffice/module/council-web/setting', 
-    icon: <Settings size={20} />, 
-    permission: 'manage_web_settings' },
-
-  // --- เว็บเภสัชกร ---
-
-  {
-    id: 'header-pharmacist-web',
-    title: 'เว็บเภสัชกร',
-    isHeader: true,
+    id: 'pharmacist-web-hub',
+    title: 'เว็บไซต์เภสัชกร',
+    href: '/backoffice/module/pharmacist-web',
+    icon: <BookOpen size={20} />,
     permission: 'manage_web_pharmacist',
   },
-
-  { id: 'pharmacist-web-home', title: 'จัดการหน้าแรก', href: '/backoffice/module/pharmacist-web/home', icon: <LayoutDashboard size={20} />, permission: 'manage_home' },
-  { id: 'pharmacist-web-product', title: 'สินค้าสภา', href: '/backoffice/module/pharmacist-web/product', icon: <LayoutDashboard size={20} />, permission: 'manage_product' },
-
-  // --- ทะเบียนเภสัช ---
   {
-    id: 'header-pharmacy',
+    id: 'register-hub',
     title: 'ทะเบียนเภสัช',
-    isHeader: true,
-    permission: 'manage_register',
-  },
-  {
-    id: 'module-pharmacy',
-    title: 'ทะเบียนเภสัช',
-    icon: <Pill size={20} />,
+    icon: <Landmark size={20} />,
     href: '/backoffice/module/register',
     permission: 'manage_register',
   },
-
-
   {
-    id: 'header-royalcollege',
+    id: 'royalcollege-hub',
     title: 'ราชวิทยาลัย',
-    isHeader: true,
-    permission: 'manage_royalcollege',
-  },
-  {
-    id: 'module-royalcollege',
-    title: 'จัดการราชวิทยาลัย',
-    icon: <Book size={20} />,
+    icon: <GraduationCap size={20} />,
     href: '/backoffice/module/royalcollege',
     permission: 'manage_royalcollege',
   },
-
-  // --- Placeholder modules ---
   {
-    id: 'header-eservice',
+    id: 'eservice-hub',
     title: 'E-Service',
-    isHeader: true,
-    permission: 'manage_eservice',
-  },
-  {
-    id: 'module-eservice',
-    title: 'E-Service',
-    icon: <Users size={20} />,
+    icon: <Monitor size={20} />,
     href: "/backoffice/module/e-service",
     permission: 'manage_eservice',
   },
-
-
   {
-    id: 'header-tran',
-    title: 'การเงิน/ธุรกรรม',
-    isHeader: true,
-    permission: 'manage_tran',
-  },
-  {
-    id: 'module-tran',
-    title: 'การเงิน/ธุรกรรม',
-    icon: <FileText size={20} />,
+    id: 'bill-hub',
+    title: 'การเงิน / ธุรกรรม',
+    icon: <CreditCard size={20} />,
     href: '/backoffice/module/bill',
     permission: 'manage_tran',
   },
-
-  // --- การตั้งค่า (admin only) ---
   {
-    id: 'header-settings',
-    title: 'การตั้งค่า',
-    isHeader: true,
-    permission: 'manage_users',
-  },
-  {
-    id: 'module-settings',
-    title: 'จัดการผู้ใช้',
+    id: 'setting-hub',
+    title: 'ตั้งค่า',
     icon: <Settings size={20} />,
     href: '/backoffice/module/setting',
-    permission: 'manage_users',
-  },
-  {
-    id: 'module-permissions',
-    title: 'จัดการสิทธิ์',
-    icon: <Shield size={20} />,
-    href: '/backoffice/module/setting/permissions',
-    permission: 'manage_roles',
+    permission: 'manage_users', // using existing permission
   },
 ];

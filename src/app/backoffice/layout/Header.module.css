@@ -2,128 +2,219 @@
 
 .header {
   width: 100%;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  color: var(--color-text-secondary);
+  height: 72px;
+  background:
+    linear-gradient(132deg, rgba(255, 255, 255, 0.08) 0 12%, transparent 12% 27%, rgba(7, 9, 0, 0.24) 27% 42%, transparent 42%),
+    radial-gradient(circle at 18% -120%, rgba(255, 255, 255, 0.16), transparent 38%),
+    linear-gradient(135deg, #555900 0%, #404600 50%, #252b00 100%);
+  color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 24px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 0 18px 0 0;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
+  box-shadow: 0 12px 28px rgba(23, 28, 0, 0.26);
+  overflow: visible;
 }
 
 /* --- ฝั่งซ้าย --- */
 .leftSection {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
+  min-width: 240px;
+  padding: 0 18px;
 }
 
 .toggleBtn {
   background: transparent;
-  border: 1px solid var(--color-border);
-  color: var(--color-text-muted);
+  border: none;
+  color: white;
   cursor: pointer;
-  padding: 8px;
+  padding: 7px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .toggleBtn:hover {
-  background-color: var(--color-bg-hover);
-  color: var(--color-text-primary);
+  background-color: rgba(255, 255, 255, 0.16);
 }
 
-.brandName {
-  font-size: 1.125rem;
+.brandContainer {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandTitle {
+  font-size: 0.94rem;
   font-weight: 700;
-  color: var(--color-text-primary);
-  letter-spacing: -0.025em;
+  color: white;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.brandSubtitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  line-height: 1.2;
+}
+
+.logoImage {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.searchBox {
+  width: min(320px, 34vw);
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #737300;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 8px 18px rgba(38, 41, 0, 0.15);
+}
+
+.searchBox input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #303300;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.searchBox input::placeholder {
+  color: rgba(48, 51, 0, 0.5);
 }
 
 /* --- ฝั่งขวา --- */
 .rightSection {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
-/* --- Profile / Logout Button --- */
+/* --- Profile Section --- */
 .userProfile {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 12px 6px 6px; /* ปรับ padding ให้สมดุล */
-  border-radius: 30px;
-  border: 1px solid var(--color-border); /* มีขอบบางๆ ให้ดูเป็นปุ่ม */
+  gap: 8px;
+  padding: 4px 8px 4px 5px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
-  background-color: white;
+  transition: background-color 0.2s;
 }
 
-/* เอฟเฟกต์ตอนเอาเมาส์ชี้ -> เปลี่ยนเป็นสีแดงอ่อนๆ สื่อถึง Logout */
 .userProfile:hover {
-  background-color: #fef2f2; /* สีแดงจางๆ */
-  border-color: #fca5a5;
-}
-
-.userProfile:hover .userName,
-.userProfile:hover .logoutIcon {
-  color: var(--color-danger); /* ตัวหนังสือเปลี่ยนเป็นสีแดง */
+  background-color: rgba(255, 255, 255, 0.14);
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
-  background-color: #dbeafe; /* สีฟ้า */
-  color: var(--color-primary);
+  width: 32px;
+  height: 32px;
+  background-color: #ffffff;
+  color: #4f5500;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .userInfo {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
 }
 
 .userName {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  transition: color 0.2s;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
 }
 
 .userRole {
-    font-size: 0.7rem;
-    color: var(--color-text-light);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.logoutIcon {
-    color: var(--color-text-light);
-    margin-left: 4px;
-    transition: color 0.2s;
+.chevronIcon {
+  color: #ffffff;
+  margin-left: 2px;
 }
 
-/* ซ่อนข้อความบนมือถือ ให้เหลือแต่ Avatar */
+/* Dropdown Menu */
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  min-width: 140px;
+  z-index: 1010;
+}
+
+.dropdownItem {
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: #dc2626;
+  text-align: left;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: #fef2f2;
+}
+
+@media (max-width: 860px) {
+  .searchBox {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
-    .userInfo, .logoutIcon {
-        display: none;
-    }
-    .userProfile {
-        padding: 4px;
-        border: none; /* บนมือถือเอาขอบออก ให้ดูคลีนๆ */
-    }
+  .leftSection {
+    min-width: 0;
+  }
+
+  .brandText,
+  .userInfo,
+  .chevronIcon {
+    display: none;
+  }
 }

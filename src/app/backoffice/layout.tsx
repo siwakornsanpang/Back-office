@@ -29,13 +29,16 @@ export default function BackOfficeLayout({
 
   // เช็คว่า mount แล้ว
   useEffect(() => {
-    setIsMounted(true);
+    queueMicrotask(() => {
+      setIsMounted(true);
+    });
   }, []);
 
   // เช็ค auth + อ่านข้อมูล user หลัง mount
   useEffect(() => {
     if (!isMounted) return;
 
+    queueMicrotask(() => {
     const token = Cookies.get("auth_token");
 
     if (!token) {
@@ -47,6 +50,7 @@ export default function BackOfficeLayout({
       setUserRole(Cookies.get("user_role") || 'viewer');
       setUserName(Cookies.get("user_display_name") || 'User');
     }
+    });
   }, [isMounted, router]);
 
   // ระหว่างยังไม่ mount → render เปล่าไว้ก่อน
@@ -77,7 +81,7 @@ export default function BackOfficeLayout({
         userRole={userRole}
       />
 
-      {/* Sidebar — ส่ง userRole + userName */}
+      {/* Sidebar — ส่ง userRole + userName + onToggle */}
       <Sidebar 
         isOpen={isSidebarOpen} 
         userRole={userRole}
@@ -87,9 +91,9 @@ export default function BackOfficeLayout({
       {/* Main Content */}
       <main
         className={`
-          pt-[60px]
+          pt-[72px]
           transition-all duration-300 ease-in-out
-          ${isSidebarOpen ? "pl-[260px]" : "pl-0"}
+          ${isSidebarOpen ? "pl-[220px]" : "pl-0"}
         `}
       >
         <div className="p-6">{children}</div>

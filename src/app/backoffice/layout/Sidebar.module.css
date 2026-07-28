@@ -1,140 +1,169 @@
-/* Sidebar หลัก */
 .sidebar {
   position: fixed;
-  top: 60px; /* เว้น Header */
+  top: 72px;
   left: 0;
-  width: 260px;
-  height: calc(100vh - 60px);
-  background:  #39444d;
-  border-right: 1px solid #f1f5f9;
-  z-index: 40;
+  width: 220px;
+  height: calc(100vh - 72px);
+  background:
+    linear-gradient(138deg, rgba(255, 255, 255, 0.08) 0 8%, transparent 8% 24%, rgba(6, 8, 0, 0.26) 24% 42%, transparent 42%),
+    linear-gradient(180deg, #4b5100 0%, #353b00 48%, #1e2400 100%);
+  border-right: none;
+  z-index: 900;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .sidebarContent {
-  padding: 16px 12px; /* ลด padding รอบนอกลงนิดหน่อย */
-  overflow-y: auto;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 8px;
 }
 
-/* --- Menu Item (Design แบบ Pill) --- */
+.logoImage {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.toggleBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.brandContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+}
+
+.brandSubtitle {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #e2e8f0;
+  line-height: 1.2;
+}
+
 .menuItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-right: 12px;
-  /* padding-left คำนวณใน inline style */
-  
-  margin-bottom: 4px; /* ระยะห่างระหว่างบรรทัด */
-  border-radius: 8px; /* มุมมนแบบ Pill */
+  padding-top: 14px;
+  padding-right: 10px;
+  padding-bottom: 14px;
+  margin-bottom: 7px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  color: var(--color-bg-card); /* สีเทาเข้ม (Slate-500) */
+  color: white;
   font-size: 14px;
-  font-weight: 500;
-  border: 1px solid transparent; /* กันกระตุกตอน hover */
+  font-weight: 700;
+  border: 1px solid transparent;
 }
 
-/* Hover Effect */
 .menuItem:hover {
-  background-color: #f8fafc; /* สีเทาจางๆ */
-  color: #6f7e0d;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: white;
 }
 
-.menuItem:hover .icon {
-  color: #6f7e0d; /* เปลี่ยนเป็นสีเดียวกับตัวหนังสือ */
-}
-
+.menuItem:hover .icon,
 .menuItem:hover .bulletIcon {
-  color: #6f7e0d;
+  color: white;
   opacity: 1;
 }
 
-/* --- Active State (ไฮไลท์สี) --- */
 .active {
-  background-color: var(--color-primary-light); /* สีฟ้าจางๆ (Blue-50) */
-  color: #6f7e0d; /* สีตัวหนังสือฟ้าเข้ม (Blue-600) */
-  font-weight: 600;
+  background: #fbfaf1;
+  color: #4f5300;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(30, 35, 0, 0.14);
 }
 
-
-
-/* --- Icons & Text --- */
 .labelContainer {
   display: flex;
   align-items: center;
-  gap: 10px; /* ระยะห่าง Icon กับ Text */
-  overflow: hidden; /* สำคัญ: กัน Text ทะลุ */
+  gap: 10px;
+  overflow: hidden;
   flex: 1;
 }
 
 .icon {
-  color: var(--color-bg-card); /* Icon ปกติสีเทาอ่อน */
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px; /* ล็อคความกว้าง Icon ให้เท่ากัน */
+  min-width: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12));
 }
 
-
-
-.active .icon, 
+.active .icon,
 .iconActive {
-  color: #6f7e0d; /* Icon Active สีฟ้า */
+  color: #4f5500;
 }
 
-/* จุด Bullet เล็กๆ สำหรับเมนูย่อย */
 .bulletIcon {
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 20px;
-  color: #cbd5e1; /* สีเทาจาง */
-  opacity: 0.6;
+  color: rgba(255, 255, 255, 0.68);
+  opacity: 0.72;
 }
+
 .active .bulletIcon {
-  color: #6f7e0d;
+  color: #4f5500;
   opacity: 1;
 }
 
-/* จัดการ Text ยาวๆ */
 .labelText {
-  white-space: nowrap;      /* ห้ามขึ้นบรรทัดใหม่ */
-  overflow: hidden;         /* ซ่อนส่วนเกิน */
-  text-overflow: ellipsis;  /* ใส่ ... ต่อท้าย */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   width: 100%;
 }
 
-/* ลูกศรขวาสุด */
 .chevron {
-  color: #94a3b8;
+  color: rgba(255, 255, 255, 0.74);
   display: flex;
   align-items: center;
   min-width: 16px;
 }
 
-/* --- Submenu Animation --- */
+.active .chevron {
+  color: #4f5500;
+}
+
 .submenuContainer {
   display: flex;
   flex-direction: column;
-  
-  /* 1. สร้างเส้นแนวตั้งสีเทาจางๆ ทางซ้าย */
-  border-left: 1px solid #475569; 
-  
-  /* 2. ดันทั้งก้อนให้ขยับเข้าไปทางขวา (Indent) */
-  margin-left: 22px; /* ปรับเลขนี้เพื่อให้เส้นตรงกับ Icon ของแม่ */
-  
-  /* 3. เว้นระยะระหว่างเส้นกับตัวหนังสือลูก */
-  padding-left: 4px; 
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  margin-left: 22px;
+  padding-left: 4px;
 }
 
 .submenuContainer .menuItem {
-  color: #e7e9eb; /* สีเทาอ่อน */
-  font-size: 13px; /* ตัวเล็กลงนิดนึง */
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 13px;
 }
 
 .submenuContainer .menuItem:hover,
@@ -142,71 +171,76 @@
   color: #252323;
 }
 
-/* Scrollbar สวยๆ (Webkit) */
 .sidebarContent::-webkit-scrollbar {
   width: 5px;
 }
+
 .sidebarContent::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .sidebarContent::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: rgba(255, 255, 255, 0.38);
   border-radius: 10px;
 }
 
-
 .sidebarFooter {
-  padding: 8px;
-  border-top: -1px solid #f1f5f9;
-  background-color: var(--color-bg-card);
+  padding: 12px 8px 14px;
+  background-color: transparent;
 }
-
 
 .userProfile {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(14, 18, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: background-color 0.2s;
 }
 
-/* Avatar วงกลม */
+.userProfile:hover {
+  background-color: rgba(0, 0, 0, 0.46);
+}
+
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, var(--color-primary));
-  color: white;
+  background: #f6f4de;
+  color: #4f5500;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 16px;
   flex-shrink: 0;
 }
 
-/* ชื่อและตำแหน่ง */
 .userInfo {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  min-width: 0;
 }
 
 .userName {
-  font-size: 14px;
-  font-weight: 600;
-  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 .userRole {
-  font-size: 12px;
-  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.3;
 }
 
-/* ปุ่ม Logout */
 .logoutBtn {
   display: flex;
   align-items: center;
@@ -216,49 +250,34 @@
   border-radius: 8px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
-/* Hover แล้วเป็นสีแดง (สื่อความหมายว่าออกจากระบบ) */
 .logoutBtn:hover {
-  background-color: #fee2e2; /* red-100 */
-  color: var(--color-danger); /* red-500 */
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
 }
-
 
 .sectionHeader {
-  padding: 24px 12px 8px 12px; /* เว้นระยะห่างด้านบนเยอะหน่อย */
+  padding: 24px 12px 8px;
   font-size: 12px;
   font-weight: 700;
-  color: #dfe2e6; /* สีเทาเข้ม Slate-500 */
-  text-transform: uppercase; /* บังคับตัวพิมพ์ใหญ่ */
-  letter-spacing: 0.05em; /* ระยะห่างตัวอักษร */
-  pointer-events: none; /* ห้ามคลิก */
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
-
-/* src/components/Sidebar.module.css */
-
-/* ... (โค้ดเดิมด้านบน) ... */
-
-
-/* 🔥 เพิ่มคลาสนี้: สำหรับก้อนเมนูที่ "เปิดอยู่" (Expanded) */
 .expandedGroup {
-  background-color: #283038; /* สีเข้มกว่าพื้นหลังหลัก (ดูเป็นหลุมลงไป) */
-  margin-bottom: 4px; /* เว้นระยะห่างจากเมนูก้อนอื่น */
-  padding-bottom: 8px; /* เว้นระยะด้านล่างนิดนึงให้สวย */
+  background-color: rgba(34, 38, 0, 0.28);
+  margin-bottom: 4px;
+  padding-bottom: 8px;
   border-radius: 8px;
 }
 
-/* ลบ margin-bottom ของตัวลูกข้างใน เพื่อให้สีพื้นหลังเชื่อมกันสนิท */
 .expandedGroup .menuItem {
-  margin-bottom: 0; 
-  border-radius: 8; /* ทำให้เป็นสี่เหลี่ยมเต็มๆ (หรือจะคงมนไว้ก็ได้แล้วแต่ชอบ) */
+  margin-bottom: 0;
+  border-radius: 8px;
 }
-
-/* ถ้าอยากให้หัวข้อแม่ (ตัวบนสุดของกลุ่ม) ยังดูมนๆ อยู่ */
-/* .expandedGroup .menuItem:first-child {
- 
-} */
