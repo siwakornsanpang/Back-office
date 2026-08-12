@@ -13,6 +13,16 @@
   --color-primary-light: #eff6ff;
   --color-primary-border: #bfdbfe;
 
+  /* --- Backoffice olive brand --- */
+  --bo-brand: #737300;
+  --bo-brand-dark: #555900;
+  --bo-brand-ink: #3d4200;
+  --bo-brand-soft: #f3f1e2;
+  --bo-brand-wash: #f7f4ea;
+  --bo-brand-muted: #ebe8d4;
+  --bo-brand-line: rgba(115, 115, 0, 0.18);
+  --bo-brand-glow: rgba(115, 115, 0, 0.14);
+
   /* --- Neutral / Gray Scale --- */
   --color-text-primary: #111827;
   --color-text-secondary: #374151;

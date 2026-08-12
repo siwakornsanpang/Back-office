@@ -1,41 +1,64 @@
-// src/components/layout/Sidebar.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ChevronDown, ChevronRight, LogOut, User } from 'lucide-react';
-import Cookies from 'js-cookie';
-import { SIDEBAR_DATA, MenuItem, filterMenuByPermission } from '@/app/config/menu';
-import styles from './Sidebar.module.css';
-import { authFetch } from '@/app/utils/authFetch';
-import { SkeletonMenu } from '@/app/components/ui/Skeleton';
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { ChevronDown, ChevronRight, LogOut, User } from "lucide-react";
+import Cookies from "js-cookie";
+import {
+  MODULE_SUBMENUS,
+  filterMenuByPermission,
+  getActiveBigModule,
+  type MenuItem,
+} from "@/app/config/menu";
+import styles from "./Sidebar.module.css";
+import { authFetch } from "@/app/utils/authFetch";
+import { SkeletonMenu } from "@/app/components/ui/Skeleton";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Props
 interface SidebarProps {
   isOpen: boolean;
   userRole: string;
   userName: string;
 }
 
+function pathMatches(pathname: string, href?: string) {
+  if (!href) return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function itemOrChildActive(pathname: string, item: MenuItem): boolean {
+  if (pathMatches(pathname, item.href)) return true;
+  return Boolean(item.submenu?.some((child) => itemOrChildActive(pathname, child)));
+}
+
 export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
   const [permissionsLoaded, setPermissionsLoaded] = useState(false);
 
-  // ดึง permissions ของ user จาก API
+  const activeModule = getActiveBigModule(pathname);
+  const rawItems: MenuItem[] = activeModule
+    ? MODULE_SUBMENUS[activeModule.id] ?? []
+    : [];
+
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
+        if (userRole === "admin") {
+          setUserPermissions([]);
+          setPermissionsLoaded(true);
+          return;
+        }
         const res = await authFetch(`${API_URL}/permissions/my`);
         if (res.ok) {
           const data = await res.json();
           setUserPermissions(Array.isArray(data) ? data : []);
         }
       } catch (err) {
-        console.error('Failed to fetch permissions:', err);
+        console.error("Failed to fetch permissions:", err);
       } finally {
         setPermissionsLoaded(true);
       }
@@ -44,38 +67,41 @@ export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
     fetchPermissions();
   }, [userRole]);
 
-  // ✅ กรองเมนูตาม permissions จาก DB (ไม่ใช่ hardcode อีกต่อไป)
-  const visibleMenuItems = filterMenuByPermission(SIDEBAR_DATA, userPermissions);
+  const visibleMenuItems =
+    userRole === "admin"
+      ? rawItems
+      : filterMenuByPermission(rawItems, userPermissions);
 
   const handleLogout = () => {
-    Cookies.remove('auth_token', { path: '/' });
-    Cookies.remove('user_role', { path: '/' });
-    Cookies.remove('user_display_name', { path: '/' });
-    Cookies.remove('user_id', { path: '/' });
+    Cookies.remove("auth_token", { path: "/" });
+    Cookies.remove("user_role", { path: "/" });
+    Cookies.remove("user_display_name", { path: "/" });
+    Cookies.remove("user_id", { path: "/" });
     router.refresh();
-    router.replace('/login');
+    router.replace("/login");
   };
 
   return (
     <aside
       className={styles.sidebar}
       style={{
-        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
-        transition: 'transform 0.3s ease-in-out',
-        visibility: isOpen ? 'visible' : 'hidden'
+        transform: isOpen ? "translateX(0)" : "translateX(-100%)",
+        transition: "transform 0.3s ease-in-out",
+        visibility: isOpen ? "visible" : "hidden",
       }}
     >
       <div className={styles.sidebarContent}>
         {!permissionsLoaded ? (
-          <SkeletonMenu rows={7} />
+          <SkeletonMenu rows={6} />
+        ) : visibleMenuItems.length === 0 ? (
+          <div className={styles.emptyHint}>ไม่มีเมนูย่อย</div>
         ) : (
           visibleMenuItems.map((item) => (
-            <SidebarItem key={item.id} item={item} level={0} />
+            <SidebarItem key={item.id} item={item} />
           ))
         )}
       </div>
 
-      {/* Footer — แสดงข้อมูล User + Logout */}
       <div className={styles.sidebarFooter}>
         <div className={styles.userProfile}>
           <div className={styles.avatar}>
@@ -83,13 +109,23 @@ export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
           </div>
           <div className={styles.userInfo}>
             <span className={styles.userName}>
-              {userName && userName !== 'User' && userName !== 'ผู้ดูแลระบบ' ? userName : 'Administrator'}
+              {userName && userName !== "User" && userName !== "ผู้ดูแลระบบ"
+                ? userName
+                : "Administrator"}
             </span>
             <span className={styles.userRole}>
-              {userRole?.toLowerCase() === 'admin' ? 'ผู้ดูแลระบบ' : userRole?.toLowerCase() === 'editor' ? 'ผู้แก้ไขข้อมูล' : 'ผู้ดูแลระบบ'}
+              {userRole?.toLowerCase() === "admin"
+                ? "ผู้ดูแลระบบ"
+                : userRole?.toLowerCase() === "editor"
+                  ? "ผู้แก้ไขข้อมูล"
+                  : "ผู้ดูแลระบบ"}
             </span>
           </div>
-          <button className={styles.logoutBtn} onClick={handleLogout} title="ออกจากระบบ">
+          <button
+            className={styles.logoutBtn}
+            onClick={handleLogout}
+            title="ออกจากระบบ"
+          >
             <LogOut size={20} />
           </button>
         </div>
@@ -98,53 +134,69 @@ export default function Sidebar({ isOpen, userRole, userName }: SidebarProps) {
   );
 }
 
-
-
-// Sub Component SidebarItem
-function SidebarItem({ item, level }: { item: MenuItem; level: number }) {
-  const [isOpen, setIsOpen] = useState(false);
+function SidebarItem({ item, depth = 0 }: { item: MenuItem; depth?: number }) {
   const pathname = usePathname();
+  const hasChildren = Boolean(item.submenu && item.submenu.length > 0);
+  const childActive = itemOrChildActive(pathname, item);
+  const [open, setOpen] = useState(childActive);
 
-  if (item.isHeader) {
-    return <div className={styles.sectionHeader}>{item.title}</div>;
+  useEffect(() => {
+    if (childActive) setOpen(true);
+  }, [childActive]);
+
+  const href = item.href || "#";
+  const isExactActive = pathMatches(pathname, href) && !hasChildren;
+  const isGroupActive = hasChildren && childActive;
+
+  if (hasChildren) {
+    return (
+      <div className={`${styles.itemWrapper} ${open ? styles.expandedGroup : ""}`}>
+        <button
+          type="button"
+          className={`${styles.menuItem} ${isGroupActive ? styles.groupActive : ""}`}
+          style={{ paddingLeft: depth === 0 ? "12px" : "18px" }}
+          title={item.title}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <div className={styles.labelContainer}>
+            {item.icon && <span className={styles.icon}>{item.icon}</span>}
+            <span className={styles.labelText}>{item.title}</span>
+          </div>
+          <span className={styles.chevron}>
+            {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          </span>
+        </button>
+        {open && (
+          <div className={styles.submenuContainer}>
+            {item.submenu!.map((child) => (
+              <SidebarItem key={child.id} item={child} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
   }
 
-  const hasChildren = item.submenu && item.submenu.length > 0;
-  const isActive = item.href ? pathname === item.href : false;
-  const paddingLeft = '12px';
-  const handleClick = () => { if (hasChildren) setIsOpen(!isOpen); };
-
-  const itemContent = (
-    <div
-      className={`${styles.menuItem} ${isActive ? styles.active : ''}`}
-      style={{ paddingLeft }}
-      onClick={handleClick}
-      title={item.title}
-    >
-      <div className={styles.labelContainer}>
-        {item.icon && (
-          <span className={`${styles.icon} ${isActive ? styles.iconActive : ''}`}>
-            {item.icon}
-          </span>
-        )}
-        <span className={styles.labelText}>{item.title}</span>
-      </div>
-      <span className={styles.chevron}>
-        {hasChildren && isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-      </span>
-    </div>
-  );
-
   return (
-    <div className={`${styles.itemWrapper} ${(hasChildren && isOpen) ? styles.expandedGroup : ''}`}>
-      {hasChildren ? itemContent : <Link href={item.href || '#'}>{itemContent}</Link>}
-      {hasChildren && isOpen && (
-        <div className={styles.submenuContainer}>
-          {item.submenu!.map((subItem) => (
-            <SidebarItem key={subItem.id} item={subItem} level={level + 1} />
-          ))}
+    <div className={styles.itemWrapper}>
+      <Link href={href} className={styles.menuLink}>
+        <div
+          className={`${styles.menuItem} ${isExactActive ? styles.active : ""} ${depth > 0 ? styles.subItem : ""}`}
+          style={{ paddingLeft: depth === 0 ? "12px" : "14px" }}
+          title={item.title}
+        >
+          <div className={styles.labelContainer}>
+            {item.icon && (
+              <span
+                className={`${styles.icon} ${isExactActive ? styles.iconActive : ""}`}
+              >
+                {item.icon}
+              </span>
+            )}
+            <span className={styles.labelText}>{item.title}</span>
+          </div>
         </div>
-      )}
+      </Link>
     </div>
   );
 }
