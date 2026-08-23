@@ -602,30 +602,31 @@ export default function ServiceEPage() {
             />
           </div>
 
-          {/* ชื่อย่อ + ลำดับ */}
-          <div className={styles.gridTwo}>
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>ชื่อย่อ</label>
-              <input
-                className={styles.formInput}
-                placeholder="เช่น สภ12"
-                value={formData.shortName}
-                onChange={(e) =>
-                  setFormData({ ...formData, shortName: e.target.value })
-                }
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>ลำดับ</label>
-              <input
-                type="number"
-                className={styles.formInput}
-                value={formData.order}
-                onChange={(e) =>
-                  setFormData({ ...formData, order: e.target.value })
-                }
-              />
-            </div>
+          {/* ชื่อย่อ */}
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>ชื่อย่อ</label>
+            <textarea
+              className={styles.formTextarea}
+              placeholder="เช่น สภ.12 หรือชื่อสั้นของบริการ"
+              rows={2}
+              value={formData.shortName}
+              onChange={(e) =>
+                setFormData({ ...formData, shortName: e.target.value })
+              }
+            />
+          </div>
+
+          {/* ลำดับ */}
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>ลำดับ</label>
+            <input
+              type="number"
+              className={styles.formInput}
+              value={formData.order}
+              onChange={(e) =>
+                setFormData({ ...formData, order: e.target.value })
+              }
+            />
           </div>
 
           {/* รายละเอียด */}
