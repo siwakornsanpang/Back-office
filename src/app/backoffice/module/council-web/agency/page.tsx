@@ -19,6 +19,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const CATEGORIES = [
   { key: "supervised", label: "หน่วยงานในกำกับ", icon: "🏛️" },
   { key: "college", label: "วิทยาลัย", icon: "🎓" },
+  { key: "sample_data", label: "ข้อมูลตัวอย่าง", icon: "📋" },
   { key: "professional_network", label: "เครือข่ายวิชาชีพ", icon: "🤝" },
   { key: "institution", label: "สถาบันการศึกษา", icon: "📚" },
   { key: "other", label: "หน่วยงานอื่น", icon: "📂" },
