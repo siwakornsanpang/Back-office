@@ -149,15 +149,15 @@ export const MODULE_SUBMENUS: Record<BigModuleId, MenuItem[]> = {
       submenu: [
         {
           id: 'cw-about-council',
-          title: 'ทำเนียบสภา',
-          icon: <Armchair size={16} />,
+          title: 'กรรมการสภา',
+          icon: <Users size={16} />,
           href: '/backoffice/module/council-web/about/council',
           permission: 'manage_home',
         },
         {
           id: 'cw-about-history',
-          title: 'กรรมการสภา',
-          icon: <Users size={16} />,
+          title: 'ทำเนียบสภา',
+          icon: <Armchair size={16} />,
           href: '/backoffice/module/council-web/about/history',
           permission: 'manage_home',
         },

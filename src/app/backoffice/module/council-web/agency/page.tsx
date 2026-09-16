@@ -19,7 +19,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const CATEGORIES = [
   { key: "supervised", label: "หน่วยงานในกำกับ", icon: "🏛️" },
   { key: "college", label: "วิทยาลัย", icon: "🎓" },
-  { key: "sample_data", label: "ข้อมูลตัวอย่าง", icon: "📋" },
+  { key: "sample_data", label: "สถาบันเภสัช", icon: "📋" },
   { key: "professional_network", label: "เครือข่ายวิชาชีพ", icon: "🤝" },
   { key: "institution", label: "สถาบันการศึกษา", icon: "📚" },
   { key: "other", label: "หน่วยงานอื่น", icon: "📂" },
@@ -87,7 +87,7 @@ export default function AgencyPage() {
     description: string;
     url: string;
     order: number | string;
-    // Thumbnail (1:1 crop)
+    // Thumbnail (3:2 crop — matches website hero card)
     thumbnailFile: File | null;
     originalThumbnailFile: File | null;
     thumbnailPreview: string | null;
@@ -206,7 +206,7 @@ export default function AgencyPage() {
     setIsModalOpen(true);
   };
 
-  // ===== Image Select & Crop (Thumbnail 1:1) =====
+  // ===== Image Select & Crop (Thumbnail 3:2) =====
   const onSelectThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -531,7 +531,7 @@ export default function AgencyPage() {
                 image={imageToCrop}
                 crop={crop}
                 zoom={zoom}
-                aspect={1}
+                aspect={3 / 2}
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={onCropComplete}
@@ -570,9 +570,9 @@ export default function AgencyPage() {
           onSubmit={handleSubmit}
           title={editingId ? "แก้ไขข้อมูลหน่วยงาน" : "เพิ่มข้อมูลหน่วยงาน"}
         >
-            {/* Thumbnail (1:1 crop) */}
+            {/* Thumbnail (3:2 crop) */}
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Thumbnail (1:1)</label>
+              <label className={styles.formLabel}>Thumbnail (3:2) — สัดส่วนตามการ์ดบนหน้าเว็บ</label>
               {formData.thumbnailPreview ? (
                 <div style={{ textAlign: "center" }}>
                   <label className={styles.modalUploadArea}>
