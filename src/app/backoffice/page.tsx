@@ -76,7 +76,7 @@ export default function ModuleHubPage() {
       <div className={styles.decorBottom} aria-hidden />
       <div className={styles.grid}>
         {loadingPerms
-          ? Array.from({ length: 7 }).map((_, i) => (
+          ? Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className={styles.cardSkeleton}>
                 <SkeletonBlock width="72px" height="72px" radius="999px" />
                 <SkeletonBlock width="70%" height="1rem" />
