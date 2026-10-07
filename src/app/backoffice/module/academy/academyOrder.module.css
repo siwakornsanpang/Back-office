@@ -1,0 +1,6 @@
+.buttons { display:inline-flex; flex-shrink:0; gap:4px; vertical-align:middle; }
+.button { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; padding:0; border:1px solid #e2e8f0; border-radius:6px; color:#555b38; background:#fff; cursor:pointer; }
+.button:hover:not(:disabled) { background:#f0f2e8; border-color:#555b38; }
+.button:disabled { opacity:.4; cursor:not-allowed; }
+.button:focus-visible { outline:3px solid #b3bd89; outline-offset:2px; }
+@media(max-width:800px) { .button { width:44px; height:44px; } }

@@ -1,0 +1,6 @@
+.handle { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; margin-inline: .35rem; padding: .25rem; border: 1px solid #cbd5e1; border-radius: .4rem; color: #475569; background: #fff; cursor: grab; touch-action: none; vertical-align: middle; }
+.handle:hover { background: #f1f5f9; color: #334155; }
+.handle:active { cursor: grabbing; }
+.handle:focus-visible { outline: 3px solid #737300; outline-offset: 2px; }
+.handle:disabled { opacity: .45; cursor: default; }
+.instructions { margin: 1rem 0 .5rem; color: #64748b; font-size: .85rem; }
