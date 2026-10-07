@@ -272,29 +272,6 @@ export const MODULE_SUBMENUS: Record<BigModuleId, MenuItem[]> = {
       href: '/backoffice/module/pharmacist-web/product',
       permission: 'manage_web_pharmacist',
     },
-    {
-      id: 'pw-academy',
-      title: 'Pharmacy Academy',
-      icon: <GraduationCap size={18} />,
-      href: '/backoffice/module/pharmacist-web/academy/courses',
-      permission: 'manage_web_pharmacist',
-      submenu: [
-        {
-          id: 'pw-academy-courses',
-          title: 'จัดการคอร์ส',
-          icon: <BookOpen size={16} />,
-          href: '/backoffice/module/pharmacist-web/academy/courses',
-          permission: 'manage_web_pharmacist',
-        },
-        {
-          id: 'pw-academy-enrollments',
-          title: 'ผู้ลงทะเบียน',
-          icon: <Users size={16} />,
-          href: '/backoffice/module/pharmacist-web/academy/enrollments',
-          permission: 'manage_web_pharmacist',
-        },
-      ],
-    },
   ],
   register: [
     {
