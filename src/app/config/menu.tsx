@@ -13,11 +13,16 @@ import {
   Users,
   Scale,
   Briefcase,
+  School,
   ShoppingBag,
   ShieldCheck,
   Armchair,
   Award,
   FileText,
+  Tags,
+  Star,
+  Receipt,
+  Undo2,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -39,6 +44,7 @@ export type BigModuleId =
   | 'council-web'
   | 'pharmacist-web'
   | 'register'
+  | 'academy'
   | 'royalcollege'
   | 'e-service'
   | 'bill'
@@ -97,6 +103,14 @@ export const BIG_MODULES: BigModule[] = [
     permission: 'manage_register',
   },
   {
+    id: 'academy',
+    title: 'Pharmacy Academy',
+    icon: <School size={36} strokeWidth={1.6} />,
+    href: '/backoffice/module/academy/categories',
+    pathPrefix: '/backoffice/module/academy',
+    permission: 'manage_academy',
+  },
+  {
     id: 'royalcollege',
     title: 'ราชวิทยาลัย',
     icon: <GraduationCap size={36} strokeWidth={1.6} />,
@@ -149,15 +163,15 @@ export const MODULE_SUBMENUS: Record<BigModuleId, MenuItem[]> = {
       submenu: [
         {
           id: 'cw-about-council',
-          title: 'ทำเนียบสภา',
-          icon: <Armchair size={16} />,
+          title: 'กรรมการสภา',
+          icon: <Users size={16} />,
           href: '/backoffice/module/council-web/about/council',
           permission: 'manage_home',
         },
         {
           id: 'cw-about-history',
-          title: 'กรรมการสภา',
-          icon: <Users size={16} />,
+          title: 'ทำเนียบสภา',
+          icon: <Armchair size={16} />,
           href: '/backoffice/module/council-web/about/history',
           permission: 'manage_home',
         },
@@ -289,6 +303,64 @@ export const MODULE_SUBMENUS: Record<BigModuleId, MenuItem[]> = {
       icon: <IdCard size={18} />,
       href: '/backoffice/module/register/list',
       permission: 'manage_register',
+    },
+  ],
+  academy: [
+    {
+      id: 'academy-categories',
+      title: 'หมวดหมู่',
+      icon: <Tags size={18} />,
+      href: '/backoffice/module/academy/categories',
+      permission: 'manage_academy',
+    },
+    {
+      id: 'academy-instructors',
+      title: 'วิทยากร',
+      icon: <Users size={18} />,
+      href: '/backoffice/module/academy/instructors',
+      permission: 'manage_academy',
+    },
+    {
+      id: 'academy-courses',
+      title: 'คอร์สเรียน',
+      icon: <BookOpen size={18} />,
+      href: '/backoffice/module/academy/courses',
+      permission: 'manage_academy',
+    },
+    {
+      id: 'academy-reviews',
+      title: 'รีวิว',
+      icon: <Star size={18} />,
+      href: '/backoffice/module/academy/reviews',
+      permission: 'manage_academy',
+    },
+    {
+      id: 'academy-learners',
+      title: 'ผู้เรียน',
+      icon: <GraduationCap size={18} />,
+      href: '/backoffice/module/academy/learners',
+      permission: 'manage_academy',
+    },
+    {
+      id: 'academy-orders',
+      title: 'การชำระเงิน',
+      icon: <Receipt size={18} />,
+      href: '/backoffice/module/academy/orders',
+      permission: 'manage_academy',
+    },
+    {
+      id: 'academy-refunds',
+      title: 'คำขอคืนเงิน',
+      icon: <Undo2 size={18} />,
+      href: '/backoffice/module/academy/refunds',
+      permission: 'manage_academy',
+    },
+    {
+      id: 'academy-cpe',
+      title: 'รายงาน CPE',
+      icon: <FileText size={18} />,
+      href: '/backoffice/module/academy/cpe',
+      permission: 'manage_academy',
     },
   ],
   royalcollege: [

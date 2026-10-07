@@ -18,7 +18,6 @@ import {
   FileText,
   Crop,
   GripVertical,
-  Video,
   Play,
   ArrowLeft,
 } from "lucide-react";
@@ -30,6 +29,28 @@ import ImagePreviewModal from "@/app/components/ui/ImagePreviewModal";
 import CrudModal from "@/app/components/ui/CrudModal";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "../../../../../../components/editor/cropImage";
+import Editor from "@/app/components/editor/editor";
+
+function getYouTubeId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes("youtube.com")) {
+      if (u.pathname.startsWith("/embed/")) {
+        return u.pathname.split("/")[2]?.split("?")[0] || null;
+      }
+      if (u.pathname.startsWith("/shorts/")) {
+        return u.pathname.split("/")[2]?.split("?")[0] || null;
+      }
+      return u.searchParams.get("v");
+    }
+    if (u.hostname === "youtu.be") {
+      return u.pathname.slice(1).split("?")[0] || null;
+    }
+  } catch {
+    // not a valid URL
+  }
+  return null;
+}
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -43,6 +64,7 @@ interface HonorItem {
   awardName?: string | null;
   workName?: string | null;
   awardDetail?: string | null;
+  fullDetail?: string | null;
   imageUrl: string | null;
   originalImageUrl?: string | null;
   videoUrl?: string | null;
@@ -80,29 +102,25 @@ export default function HonorRecipientsPage() {
     name: string;
     workName: string;
     awardDetail: string;
+    fullDetail: string;
     order: number | string;
     file: File | null;
     originalFile: File | null;
     preview: string | null;
     originalPreview: string | null;
-    videoFile: File | null;
-    videoPreview: string | null;
-    existingVideoUrl: string | null;
-    removeVideo: boolean;
+    videoUrl: string;
   }>({
     prefix: "",
     name: "",
     workName: "",
     awardDetail: "",
+    fullDetail: "",
     order: 1,
     file: null,
     originalFile: null,
     preview: null,
     originalPreview: null,
-    videoFile: null,
-    videoPreview: null,
-    existingVideoUrl: null,
-    removeVideo: false,
+    videoUrl: "",
   });
 
   // Crop
@@ -151,20 +169,6 @@ export default function HonorRecipientsPage() {
       setIsCropping(true);
       setCrop({ x: 0, y: 0 });
       setZoom(1);
-      e.target.value = "";
-    }
-  };
-
-  const onSelectVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const videoUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({
-        ...prev,
-        videoFile: file,
-        videoPreview: videoUrl,
-        existingVideoUrl: null,
-      }));
       e.target.value = "";
     }
   };
@@ -318,15 +322,13 @@ export default function HonorRecipientsPage() {
         name: item.name,
         workName: item.workName || "",
         awardDetail: item.awardDetail || "",
+        fullDetail: item.fullDetail || "",
         order: item.order,
         file: null,
         originalFile: null,
         preview: item.imageUrl || null,
         originalPreview: item.originalImageUrl || item.imageUrl || null,
-        videoFile: null,
-        videoPreview: null,
-        existingVideoUrl: item.videoUrl || null,
-        removeVideo: false,
+        videoUrl: item.videoUrl || "",
       });
     } else {
       setEditingId(null);
@@ -337,15 +339,13 @@ export default function HonorRecipientsPage() {
         name: "",
         workName: "",
         awardDetail: "",
+        fullDetail: "",
         order: maxOrder + 1,
         file: null,
         originalFile: null,
         preview: null,
         originalPreview: null,
-        videoFile: null,
-        videoPreview: null,
-        existingVideoUrl: null,
-        removeVideo: false,
+        videoUrl: "",
       });
     }
     setIsModalOpen(true);
@@ -365,12 +365,12 @@ export default function HonorRecipientsPage() {
       form.append("awardName", awardName); // legacy field
       form.append("workName", formData.workName);
       form.append("awardDetail", formData.awardDetail);
+      form.append("fullDetail", formData.fullDetail);
+      form.append("videoUrl", formData.videoUrl.trim());
       form.append("order", formData.order.toString());
       if (formData.file) form.append("image", formData.file);
       if (formData.originalFile)
         form.append("originalImage", formData.originalFile);
-      if (formData.videoFile) form.append("video", formData.videoFile);
-      if (formData.removeVideo) form.append("removeVideo", "true");
 
       const url = editingId
         ? `${API_URL}/honor/${editingId}`
@@ -642,7 +642,17 @@ export default function HonorRecipientsPage() {
             >
               <X size={24} />
             </button>
-            <video src={previewVideo} controls autoPlay />
+            {getYouTubeId(previewVideo) ? (
+              <iframe
+                src={`https://www.youtube.com/embed/${getYouTubeId(previewVideo)}?autoplay=1`}
+                title="วิดีโอเกียรติประวัติ"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className={styles.youtubePreviewFrame}
+              />
+            ) : (
+              <video src={previewVideo} controls autoPlay />
+            )}
           </div>
         </div>
       )}
@@ -717,6 +727,7 @@ export default function HonorRecipientsPage() {
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
           title={editingId ? "แก้ไขข้อมูลผู้ได้รับรางวัล" : "เพิ่มผู้ได้รับรางวัล"}
+          maxWidth="48rem"
         >
             {/* รูปเภสัช (4:3 crop) */}
             <div className={styles.formGroup}>
@@ -845,57 +856,31 @@ export default function HonorRecipientsPage() {
               />
             </div>
 
-            {/* วิดีโอ */}
+            {/* ข้อมูลผู้ได้รับรางวัลฉบับเต็ม */}
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>ข้อมูลผู้ได้รับรางวัลฉบับเต็ม</label>
+              <Editor
+                value={formData.fullDetail}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, fullDetail: value }))
+                }
+                placeholder="กรอกข้อมูลผู้ได้รับรางวัลฉบับเต็ม..."
+                variant="simple"
+              />
+            </div>
+
+            {/* วิดีโอ YouTube */}
             <div className={styles.formGroup}>
               <label className={styles.formLabel}>วิดีโอ</label>
-              {formData.videoPreview || formData.existingVideoUrl ? (
-                <div className={styles.videoUploadedArea}>
-                  <video
-                    src={formData.videoPreview || formData.existingVideoUrl || ""}
-                    controls
-                    style={{ width: "100%", maxHeight: "200px", borderRadius: "0.5rem", background: "#000" }}
-                  />
-                  <div className={styles.imageActionRow}>
-                    <label className={styles.changeImageBtn}>
-                      <Upload size={14} /> เปลี่ยนวิดีโอ
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={onSelectVideo}
-                        hidden
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      className={`${styles.changeImageBtn} text-red-600`}
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          videoFile: null,
-                          videoPreview: null,
-                          existingVideoUrl: null,
-                          removeVideo: true,
-                        }))
-                      }
-                    >
-                      <Trash2 size={14} /> ลบวิดีโอ
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <label className={styles.modalUploadArea}>
-                  <div className={styles.modalUploadPlaceholder}>
-                    <Video size={32} />
-                    <span>คลิกเพื่ออัปโหลดวิดีโอ (ไม่บังคับ)</span>
-                  </div>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={onSelectVideo}
-                    hidden
-                  />
-                </label>
-              )}
+              <input
+                type="text"
+                className={styles.formInput}
+                placeholder="แปะ Link จาก YouTube"
+                value={formData.videoUrl}
+                onChange={(e) =>
+                  setFormData({ ...formData, videoUrl: e.target.value })
+                }
+              />
             </div>
         </CrudModal>
       )}
